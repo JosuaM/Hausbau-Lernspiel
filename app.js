@@ -29,80 +29,80 @@ const SC = {
     steps: [
       { name: 'Fundament', q: 'Welches Fundament wählst du?', groups: [
         { label: 'Fundament', part: 'found', opts: [
-          o('Stahlbeton-Bodenplatte', 'Durchgehende Platte aus Beton mit Stahlbewehrung', 2, { found: 'slab', foundH: 18 },
+          o('Durchgehende Betonplatte', 'Stahlbeton-Bodenplatte: Eine Platte aus Beton mit Stahl drin, auf der das ganze Haus steht', 2, { found: 'slab', foundH: 18 },
             'Beton nimmt Druckkräfte auf, Stahl die Zugkräfte. Die zusammenhängende Platte verteilt die Gebäudelasten und verbindet die Konstruktion.'),
-          o('Stahlbeton-Streifenfundament', 'Durchlaufende Betonstreifen unter den Wänden', 2, { found: 'strip', foundH: 26 },
+          o('Betonstreifen unter den Wänden', 'Streifenfundament: Beton mit Stahl drin, als Streifen genau unter den tragenden Wänden', 2, { found: 'strip', foundH: 26 },
             'In Japan sehr verbreitet für Holzhäuser: durchlaufende, bewehrte Streifen unter allen tragenden Wänden verbinden das Haus fest mit dem Boden – bei passendem Baugrund ebenso geeignet wie die Platte.'),
-          o('Stahlbetonpfähle', 'Tief im Boden verankerte Betonpfähle', 1, { found: 'piles', foundH: 30 },
+          o('Betonstützen tief im Boden', 'Stahlbetonpfähle: Lange Stützen aus Beton, die tief in die Erde reichen', 1, { found: 'piles', foundH: 30 },
             'Sinnvoll bei schwierigen Bodenverhältnissen, aber nicht automatisch die beste Wahl – das hängt von der Baugrunduntersuchung ab.'),
-          o('Natursteinsockel', 'Lose Steine, auf denen das Holzgerüst aufliegt', 0, { found: 'stone', foundH: 14 },
+          o('Haus liegt auf losen Steinen', 'Natursteinsockel: Das Holzgerüst liegt nur auf Steinen auf, ohne feste Verbindung', 0, { found: 'stone', foundH: 14 },
             'Das Haus ist nicht fest mit dem Boden verbunden und kann bei einem Beben verrutschen oder abheben.'),
         ] },
       ] },
       { name: 'Wand', q: 'Welche Wände wählst du?', groups: [
         { label: 'Außenwände & Tragwerk', part: 'wall', opts: [
-          o('Holzständerbau mit Sperrholzplatten', 'Vollholz, Sperrholz-Beplankung, Stahlverbinder, Zedernfassade', 2, { wall: 'timber' },
+          o('Leichte Holzwände, mit Platten verstärkt', 'Holzständerbau: Holzgerüst mit aufgenagelten Sperrholzplatten, Metallwinkeln und Zedernholz-Fassade', 2, { wall: 'timber' },
             'Holz ist leicht und nimmt Erdbebenkräfte durch kontrollierte Verformung auf. Platten und Stahlverbinder stabilisieren gegen seitliche Bewegungen.'),
-          o('Stahlprofile mit Diagonalverbänden', 'Stahlrahmen mit schrägen Aussteifungen', 1, { wall: 'steel' },
+          o('Stahlgerüst mit Schrägstreben', 'Stahlprofile mit Diagonalverbänden: Stahlrahmen, der durch schräge Streben nicht wackelt', 1, { wall: 'steel' },
             'Funktioniert, braucht aber eine fachgerechte Erdbebenbemessung und ist aufwendiger.'),
-          o('Bewehrter Stahlbeton', 'Massive Wände aus Beton mit Stahleinlagen', 1, { wall: 'concrete' },
+          o('Massive Betonwände', 'Bewehrter Stahlbeton: Dicke Wände aus Beton mit Stahl drin', 1, { wall: 'concrete' },
             'Tragfähig, aber schwer: Je mehr Masse, desto größer die Erdbebenkräfte. Ebenfalls nur mit fachgerechter Bemessung.'),
-          o('Ziegelmauerwerk ohne Bewehrung', 'Gemauerte Wände aus Ziegeln', 0, { wall: 'brick' },
+          o('Gemauerte Ziegelwände', 'Ziegelmauerwerk ohne Bewehrung: Gemauerte Wände aus Ziegeln, ohne Stahl darin', 0, { wall: 'brick' },
             'Unbewehrtes Mauerwerk reißt bei seitlichen Kräften und kann einstürzen.'),
         ] },
         { label: 'Innenwände', part: 'win', opts: [
-          o('Gipskarton auf Holzständern', 'Leichte Wand mit Mineralwolle und flexiblen Anschlüssen', 2, { inner: 'gyp' },
+          o('Leichte Trennwand mit Holzgerüst', 'Gipskarton auf Holzständern: Dünne Platten auf einem Holzgerüst, innen mit Dämmwolle gefüllt', 2, { inner: 'gyp' },
             'Leichte, nichttragende Wände entlasten das Tragwerk. Bewegungsverträgliche Anschlüsse verringern Risse.'),
-          o('Gipsfaser auf dünnen Stahlprofilen', 'Leichte Trockenbauwand mit Stahlständern', 2, { inner: 'gypsteel' },
-            'Ebenfalls leicht und nichttragend – bei richtigen Anschlüssen genauso gut geeignet.'),
-          o('Leichte Holzwerkstoffplatten', 'Platten aus Holzwerkstoff', 1, { inner: 'wood' },
+          o('Leichte Trennwand mit Metallgerüst', 'Gipsfaser auf Stahlprofilen: Dünne Platten auf einem schmalen Metallgerüst', 1, { inner: 'gypsteel' },
+            'Ebenfalls leicht und nichttragend – aber Holzständer mit flexiblen Anschlüssen sind hier die erste Wahl.'),
+          o('Dünne Holzplatten', 'Holzwerkstoffplatten: Platten aus gepressten Holzspänen', 1, { inner: 'wood' },
             'Leicht und möglich, brauchen aber ebenfalls passende Anschlüsse.'),
-          o('Massive Mauerwerkswände', 'Schwere gemauerte Trennwände', 0, { inner: 'brick' },
+          o('Schwere gemauerte Wände', 'Massives Mauerwerk: Dicke Wände aus Stein', 0, { inner: 'brick' },
             'Schwer, müssen aufwendig gegen Umkippen und Risse gesichert werden und belasten das Tragwerk.'),
         ] },
       ] },
       { name: 'Dach', q: 'Welches Dach wählst du?', groups: [
         { label: 'Dachmaterial', part: 'roof', opts: [
-          o('Beschichtetes Stahlblech', 'Metalldeckung, mechanisch befestigt', 2, { roofMat: 'steel' },
+          o('Leichtes Metalldach aus Stahl', 'Beschichtetes Stahlblech: Dünne Stahlplatten mit Schutzschicht, fest verschraubt', 2, { roofMat: 'steel' },
             'Das geringe Gewicht reduziert die Trägheitskräfte im Erdbeben. Sichere Befestigungen verhindern Verrutschen oder Abheben.'),
-          o('Aluminiumblech', 'Leichte Metalldeckung', 2, { roofMat: 'alu' },
-            'Sehr leicht – ebenso gut geeignet wie Stahlblech, wenn es sicher befestigt ist.'),
-          o('Faserzement-Platten', 'Leichte Platten aus Faserzement', 1, { roofMat: 'fiber' },
+          o('Leichtes Metalldach aus Aluminium', 'Aluminiumblech: Dünne Aluminiumplatten, noch leichter als Stahl', 1, { roofMat: 'alu' },
+            'Sehr leicht und gut möglich – Stahlblech ist hier aber die bessere Wahl, weil es robuster ist.'),
+          o('Leichte Platten aus Zement und Fasern', 'Faserzement-Platten: Dünne Dachplatten aus Zement und Fasern', 1, { roofMat: 'fiber' },
             'Leicht genug, wenn sie für die örtlichen Anforderungen zugelassen und sicher befestigt sind, aber schwerer als Metall.'),
-          o('Tonziegel', 'Klassische, schwere Dachziegel', 0, { roofMat: 'clay' },
+          o('Schwere Dachziegel aus Ton', 'Tonziegel: Klassische, schwere Dachziegel', 0, { roofMat: 'clay' },
             'Schwere Dachdeckungen erzeugen große Kräfte im oberen Geschoss und können herabrutschen.'),
         ] },
         { label: 'Dachform', part: 'roof', opts: [
-          o('Leichtes Satteldach', 'Zwei Dachflächen, symmetrisch', 2, { shape: 'gable', rh: 62, ro: 14 },
+          o('Klassisches Dach mit zwei Seiten', 'Satteldach: Zwei schräge Dachflächen, symmetrisch – wie ein typisches Hausdach', 2, { shape: 'gable', rh: 62, ro: 14 },
             'Leichte, symmetrische Form; aussteifende Wände lassen sich gleichmäßig in beide Richtungen verteilen.'),
-          o('Walmdach', 'Dach mit vier geneigten Flächen', 2, { shape: 'hip', rh: 60, ro: 14 },
-            'Ebenfalls symmetrisch und stabil – gut für gleichmäßige Aussteifung.'),
-          o('Pultdach', 'Eine einzige geneigte Dachfläche', 1, { shape: 'shed', rh: 60, ro: 12 },
+          o('Dach mit vier schrägen Seiten', 'Walmdach: Alle vier Seiten sind geneigt', 1, { shape: 'hip', rh: 60, ro: 14 },
+            'Ebenfalls symmetrisch und stabil, aber komplizierter zu bauen – das einfache Satteldach ist hier die beste Wahl.'),
+          o('Dach mit nur einer schrägen Seite', 'Pultdach: Eine einzige geneigte Dachfläche', 1, { shape: 'shed', rh: 60, ro: 12 },
             'Möglich, aber die unsymmetrische Form macht gleichmäßige Aussteifung schwieriger.'),
-          o('Flachdach mit Kiesschicht', 'Fast waagerechtes Dach, mit Kies beschwert', 0, { shape: 'flat', rh: 10, ro: 8, heavy: true },
+          o('Flaches Dach mit schwerer Kiesschicht', 'Flachdach mit Kies: Fast waagerecht, mit Kies beschwert', 0, { shape: 'flat', rh: 10, ro: 8, heavy: true },
             'Die Kiesschicht macht das Dach schwer – das ergibt hohe Erdbebenkräfte ganz oben im Haus.'),
         ] },
       ] },
       { name: 'Besonderheit', q: 'Welche Besonderheiten bekommt dein Haus?', groups: [
         { label: 'Fenster & Außentüren', part: 'win', opts: [
-          o('Aluminiumrahmen mit Sicherheitsglas', 'Fachgerecht befestigt, mit flexiblen Anschlüssen', 2, { win: 'alu' },
+          o('Alu-Fenster mit bruchsicherem Glas', 'Sicherheitsglas zerfällt nicht in scharfe Scherben; flexibel eingebaut, damit nichts klemmt', 2, { win: 'alu' },
             'Bewegungsverträgliche Anschlüsse verhindern Schäden und verklemmte Türen, Sicherheitsglas verringert die Verletzungsgefahr.'),
-          o('Holzrahmen mit Sicherheitsglas', 'Geeignete Holzrahmen, flexibel angeschlossen', 2, { win: 'wood' },
-            'Ebenfalls geeignet, solange Anschlüsse und Glas passen.'),
-          o('Kunststoffrahmen mit Normalglas', 'Übliche Fenster ohne besondere Sicherung', 1, { win: 'pvc' },
+          o('Holzfenster mit bruchsicherem Glas', 'Holzrahmen, flexibel eingebaut, mit Sicherheitsglas', 1, { win: 'wood' },
+            'Ebenfalls möglich, aber Alu-Rahmen bleiben bei Verformung formstabiler.'),
+          o('Kunststoff-Fenster mit normalem Glas', 'Übliche Fenster ohne besondere Sicherung', 1, { win: 'pvc' },
             'Der Rahmen ist in Ordnung, aber Normalglas splittert und erhöht die Verletzungsgefahr.'),
-          o('Große Glasfront, fest eingemauert', 'Breite Fensterfläche, starr im Mauerwerk', 0, { win: 'pano' },
+          o('Große Glasfront, fest eingemauert', 'Breite Fensterfläche, die starr in der Wand sitzt', 0, { win: 'pano' },
             'Starre Einbindung verträgt keine Gebäudeverformung – das Glas bricht, Türen klemmen.'),
         ] },
         { label: 'Zusatzmaßnahme', part: 'extra', opts: [
-          o('Stahlverbinder & Zuganker', 'Fundament, Wände und Dach fest verbinden', 2, { extra: 'ties' },
+          o('Metallwinkel & Zugstangen', 'Stahlverbinder und Zuganker: Metallteile, die Fundament, Wände und Dach fest zusammenhalten', 2, { extra: 'ties' },
             'Zugfeste Verbindungen verhindern, dass sich Dach, Wände und Fundament bei seitlichen Kräften voneinander lösen.'),
-          o('Aussteifende Wände gleichmäßig verteilen', 'Tragende Wände in beiden Richtungen verteilt', 2, { extra: 'shear' },
-            'Gleichmäßig verteilte Aussteifung verhindert, dass sich das Haus verdreht oder ein Geschoss einknickt.'),
-          o('Schwere Möbel und Geräte sichern', 'Schränke, Regale, Warmwasserbereiter befestigen', 1, { extra: 'furn' },
+          o('Stabile Wände gleichmäßig verteilen', 'Aussteifende Wände: Feste Wände, die das Haus stabil halten – in beide Richtungen verteilt', 1, { extra: 'shear' },
+            'Wichtig und sinnvoll, aber ohne feste Verbindungen zwischen Fundament, Wänden und Dach hilft das allein nicht – die Metallverbinder sind wichtiger.'),
+          o('Schwere Möbel und Geräte sichern', 'Schränke, Regale, Warmwasserbereiter an der Wand befestigen', 1, { extra: 'furn' },
             'Wichtig für die Sicherheit der Bewohner, schützt aber das Tragwerk selbst nicht.'),
           o('Offenes Erdgeschoss (Garage)', 'Große Öffnung ohne Wände im Erdgeschoss', 0, { extra: 'open' },
-            'Fehlen im Erdgeschoss aussteifende Wände, kann dieses Geschoss einknicken (Weiches Geschoss).'),
+            'Fehlen im Erdgeschoss stabile Wände, kann dieses Geschoss einknicken (ein sogenanntes „weiches Geschoss“).'),
         ] },
       ] },
     ],
@@ -128,79 +128,79 @@ const SC = {
     steps: [
       { name: 'Fundament', q: 'Welches Fundament wählst du?', groups: [
         { label: 'Fundament', part: 'found', opts: [
-          o('Stahlbetonpfähle, aufgeständert', 'Das Haus steht auf hohen Betonstützen', 2, { found: 'piles', foundH: 70 },
+          o('Hohe Betonstützen – Haus schwebt über dem Boden', 'Stahlbetonpfähle: Stützen aus Beton mit Stahl drin; das Haus steht erhöht darauf', 2, { found: 'piles', foundH: 70 },
             'Stahlbeton ist feuchtebeständig und für Termiten uninteressant. Die erhöhte Lage schützt vor Spritzwasser und kleineren Überflutungen.'),
-          o('Erhöhte Stahlbeton-Bodenplatte', 'Platte mit Feuchtigkeitssperre und Entwässerung', 2, { found: 'slab', foundH: 44 },
-            'Tragfähig und feuchtebeständig; die Erhöhung hält Wasser fern, die Entwässerung leitet es ab.'),
-          o('Bodenplatte auf Geländehöhe', 'Betonplatte direkt am Boden', 1, { found: 'slab', foundH: 12 },
+          o('Betonplatte, höher gelegt', 'Stahlbeton-Bodenplatte: Beton mit Stahl drin, mit Sperre gegen Feuchte von unten und Abfluss für Wasser', 1, { found: 'slab', foundH: 44 },
+            'Tragfähig und feuchtebeständig, aber die Platte liegt fester am Boden: Wasser und Termiten kommen leichter heran als bei Stützen, die das Haus frei anheben.'),
+          o('Betonplatte direkt am Boden', 'Betonplatte ohne Erhöhung', 1, { found: 'slab', foundH: 12 },
             'Robust, aber bei Starkregen und Hochwasser steht das Wasser direkt am Haus.'),
-          o('Holzpfosten im Erdreich', 'Behandelte Holzstützen, im Boden eingegraben', 0, { found: 'wpost', foundH: 44 },
+          o('Holzpfosten in der Erde', 'Behandelte Holzstützen, die eingegraben sind', 0, { found: 'wpost', foundH: 44 },
             'Holz im feuchten Boden fault und ist ein Einfallstor für Termiten.'),
         ] },
       ] },
       { name: 'Wand', q: 'Welche Wände wählst du?', groups: [
         { label: 'Außenwände & Tragwerk', part: 'wall', opts: [
-          o('Stahlbeton / bewehrte Betonsteine', 'Außen Faserzement oder mineralischer Putz', 2, { wall: 'concrete' },
-            'Beton und Faserzement sind robust gegen Feuchtigkeit und Termiten. Eine entwässerte Fassade leitet Schlagregen wieder nach außen.'),
-          o('Stahltragwerk mit Faserzement', 'Korrosionsgeschützte Stahlkonstruktion', 2, { wall: 'fiber' },
+          o('Betonwände', 'Stahlbeton bzw. bewehrte Betonsteine: Beton mit Stahl drin; außen Zementplatten oder Putz', 1, { wall: 'concrete' },
+            'Robust gegen Feuchtigkeit und Termiten, aber sehr schwer und aufwendig zu bauen. Ein leichtes Stahlgerüst ist praktischer.'),
+          o('Stahlgerüst mit Zementplatten', 'Rostgeschützter Stahlrahmen, außen mit Platten aus Zement und Fasern', 2, { wall: 'fiber' },
             'Leicht, termitensicher und typisch für moderne Tropenhäuser – vorausgesetzt, der Korrosionsschutz hält dauerhaft.'),
-          o('Behandeltes Holz', 'Mit Termiten- und Feuchteschutz', 2, { wall: 'wtreat' },
-            'Klassisch für Queenslander-Häuser: leicht und gut geeignet, solange Termiten- und Feuchteschutz vollständig sind und gepflegt werden.'),
-          o('Unbehandeltes Holz', 'Offene Holzwände ohne Schutzbehandlung', 0, { wall: 'wraw' },
+          o('Holz mit Schutzbehandlung', 'Gegen Termiten und Feuchte imprägniertes Holz', 1, { wall: 'wtreat' },
+            'Klassisch für Queenslander-Häuser und leicht, aber der Schutz muss ständig gepflegt werden. Stahl und Zement brauchen weniger Pflege.'),
+          o('Holz ohne Schutz', 'Offene Holzwände ohne Schutzbehandlung', 0, { wall: 'wraw' },
             'Quillt, schimmelt und wird von Termiten gefressen – im Dauerregen ungeeignet.'),
         ] },
         { label: 'Innenwände', part: 'win', opts: [
-          o('Zementgebundene Platten', 'Faserzement- und zementgebundene Bauplatten', 2, { inner: 'cement' },
+          o('Platten aus Zement', 'Zementgebundene Platten: Bauplatten aus Zement und Fasern, vertragen Nässe', 2, { inner: 'cement' },
             'Mineralisch und zementgebunden: widerstandsfähig gegen Feuchtigkeit, Schimmel und Termiten.'),
-          o('Verputzte Betonsteinwände', 'Gemauert und verputzt', 2, { inner: 'plaster' },
-            'Ebenso feuchte- und termitenbeständig.'),
-          o('Feuchtraum-Gipsplatten', 'Imprägnierte Gipsplatten', 1, { inner: 'gypw' },
+          o('Gemauerte, verputzte Wände', 'Verputzte Betonsteinwände: Gemauert und mit Putz überzogen', 1, { inner: 'plaster' },
+            'Feuchte- und termitenbeständig, aber schwerer und aufwendiger als Zementplatten.'),
+          o('Gipsplatten mit Nässeschutz', 'Feuchtraum-Gipsplatten: Gipsplatten, die gegen Nässe behandelt sind (wie im Bad)', 1, { inner: 'gypw' },
             'Nur in trockeneren Innenbereichen und bei guter Lüftung sinnvoll.'),
-          o('Normale Gipskarton- und Spanplatten', 'Übliche Trockenbau-Materialien', 0, { inner: 'chip' },
+          o('Normale Trockenbauplatten', 'Gipskarton und Spanplatten: Die üblichen günstigen Innenplatten', 0, { inner: 'chip' },
             'Spanplatten quellen bei hoher Luftfeuchte, Gipsplatten schimmeln, Termiten lieben beides.'),
         ] },
       ] },
       { name: 'Dach', q: 'Welches Dach wählst du?', groups: [
         { label: 'Dachmaterial', part: 'roof', opts: [
-          o('Helles Stahlblech', 'Beschichtet, helle Oberfläche', 2, { roofMat: 'steelL' },
+          o('Helles Metalldach', 'Beschichtetes Stahlblech: Dünne Stahlplatten mit Schutzschicht, helle Farbe', 2, { roofMat: 'steelL' },
             'Leitet Starkregen schnell ab, ist leicht und termitensicher. Helle Flächen heizen sich weniger auf.'),
-          o('Faserzement-Platten', 'Wellplatten aus Faserzement', 1, { roofMat: 'fiber' },
+          o('Wellplatten aus Zement und Fasern', 'Faserzement-Platten: Dachplatten aus Zement und Fasern', 1, { roofMat: 'fiber' },
             'Feuchtebeständig, aber schwerer und weniger flexibel; gute Befestigung nötig.'),
           o('Dachziegel', 'Sicher befestigte Ziegel', 1, { roofMat: 'clay' },
             'Möglich bei ausreichend tragfähiger Konstruktion, bei Zyklonen aber ein Risiko, wenn Ziegel sich lösen.'),
-          o('Dunkle Holzschindeln', 'Schindeln aus Holz', 0, { roofMat: 'shingle' },
+          o('Dunkle Holzschindeln', 'Schindeln: Kleine, dünne Holzplättchen als Dachdeckung', 0, { roofMat: 'shingle' },
             'Faulen bei Dauerregen, sind für Termiten attraktiv und heizen sich dunkel stark auf.'),
         ] },
         { label: 'Dachform', part: 'roof', opts: [
-          o('Steiles Satteldach, große Überstände', 'Steil geneigt, weit überstehend', 2, { shape: 'gable', rh: 95, ro: 42 },
+          o('Steiles Dach mit zwei Seiten, weit überstehend', 'Satteldach: Zwei steile Dachflächen. Überstand heißt: Das Dach ragt weit über die Wand hinaus', 2, { shape: 'gable', rh: 95, ro: 42 },
             'Steile Dächer leiten Wasser rasch ab, große Überstände schützen die Wände vor Regen und Sonne.'),
-          o('Walmdach mit Überständen', 'Vier geneigte Flächen, weit überstehend', 2, { shape: 'hip', rh: 80, ro: 40 },
+          o('Dach mit vier schrägen Seiten, weit überstehend', 'Walmdach: Alle vier Seiten sind geneigt; das Dach ragt weit über die Wand hinaus', 2, { shape: 'hip', rh: 80, ro: 40 },
             'Ebenfalls gut: schnelle Ableitung, geschützte Wände und bei Zyklonen windgünstiger.'),
-          o('Mittelsteiles Dach ohne Überstand', 'Normal geneigt, bündig mit der Wand', 1, { shape: 'gable', rh: 55, ro: 0 },
+          o('Normal geneigtes Dach ohne Überstand', 'Dach schließt direkt mit der Wand ab', 1, { shape: 'gable', rh: 55, ro: 0 },
             'Wasser wird abgeleitet, aber ohne Überstände läuft Regen an der Fassade herab.'),
-          o('Flachdach', 'Fast waagerecht', 0, { shape: 'flat', rh: 10, ro: 6 },
+          o('Flachdach', 'Fast waagerechtes Dach', 0, { shape: 'flat', rh: 10, ro: 6 },
             'Starkregen sammelt sich und kann eindringen – ein hohes Risiko bei Dauerregen.'),
         ] },
       ] },
       { name: 'Besonderheit', q: 'Welche Besonderheiten bekommt dein Haus?', groups: [
         { label: 'Fenster & Außentüren', part: 'win', opts: [
-          o('Pulverbeschichtetes Aluminium', 'Schlagregendicht, mit Insektenschutz und Verschattung', 2, { win: 'alu' },
+          o('Alu-Fenster mit eingebranntem Lack', 'Pulverbeschichtet: Der Lack ist eingebrannt und hält Nässe und Sonne aus. Dicht gegen Regen, mit Insektengitter und Verschattung', 2, { win: 'alu' },
             'Korrosions- und termitenbeständig. Gute Anschlüsse verhindern Wassereintritt bei Starkregen.'),
-          o('Kunststoffrahmen mit Dichtungen', 'Mit Insektenschutz', 1, { win: 'pvc' },
+          o('Kunststoff-Fenster mit Dichtungen', 'Mit Insektengitter', 1, { win: 'pvc' },
             'Geeignet und termitenbeständig, aber weniger belastbar bei Zyklonen und starker UV-Strahlung.'),
-          o('Behandeltes Hartholz', 'Hochwertiger Holzrahmen', 1, { win: 'wood' },
+          o('Holzfenster aus hartem, geschütztem Holz', 'Hochwertiger Holzrahmen', 1, { win: 'wood' },
             'Möglich, verlangt aber mehr Wartung und Termitenschutz.'),
-          o('Unbehandeltes Weichholz', 'Einfache Holzfenster ohne Schutz', 0, { win: 'softwood' },
+          o('Einfache Holzfenster ohne Schutz', 'Weiches Holz ohne Behandlung', 0, { win: 'softwood' },
             'Quillt, verzieht sich und wird von Termiten befallen.'),
         ] },
         { label: 'Schutz vor Feuchtigkeit & Termiten', part: 'extra', opts: [
-          o('Drainage, Rinnen & Termitensperre', 'Wasser ableiten, physische Sperre, Sockel sichtbar', 2, { extra: 'full' },
+          o('Wasser ableiten und Termiten aussperren', 'Drainage = Abfluss für Wasser. Termitensperre = Sperre aus Metall, die Termiten nicht überwinden. Der Sockel bleibt sichtbar', 2, { extra: 'full' },
             'Wasser sammelt sich weder am Haus noch unter dem Fundament. Termiten sind früh erkennbar und finden keine verdeckten Zugänge.'),
           o('Nur Regenrinnen und Fallrohre', 'Dachwasser ableiten, sonst nichts', 1, { extra: 'gutter' },
             'Hilft gegen Wasser, lässt aber das Termitenrisiko offen.'),
-          o('Einmalige chemische Bodenbehandlung', 'Schutzmittel rund ums Haus', 1, { extra: 'chem' },
+          o('Einmal Termitengift in den Boden', 'Chemische Bodenbehandlung: Schutzmittel rund ums Haus, nur einmal aufgetragen', 1, { extra: 'chem' },
             'Chemie allein lässt nach und ersetzt weder Entwässerung noch Kontrolle.'),
-          o('Dichte Beete und Mulch am Sockel', 'Bewuchs direkt am Haus für kühlere Luft', 0, { extra: 'mulch' },
+          o('Beete und Rindenmulch direkt am Haus', 'Mulch = Abdeckung aus Rinde oder Pflanzenresten; Bewuchs direkt an der Wand', 0, { extra: 'mulch' },
             'Feuchte Beete direkt am Haus verstecken Termiten und halten den Sockel dauernd nass.'),
         ] },
       ] },
@@ -484,6 +484,7 @@ function quake() {
   const btn = document.getElementById('quake');
   if (btn) btn.disabled = true;
   document.querySelectorAll('svg.scene').forEach(s => s.classList.add('quake'));
+  Meister.onQuake();
   setTimeout(() => {
     document.querySelectorAll('svg.scene').forEach(s => s.classList.remove('quake'));
     const b = document.getElementById('quake');
@@ -491,7 +492,7 @@ function quake() {
   }, 4000);
 }
 
-const go = p => { S.page = p; render(); window.scrollTo(0, 0); };
+const go = p => { S.page = p; render(); window.scrollTo(0, 0); Meister.onPage(p, S.sc, S.pct); };
 
 function render() {
   const p = S.page;
@@ -537,6 +538,7 @@ function pick(gi, oi) {
   document.getElementById('house').innerHTML = houseInner(stateNow(), S.sc);
   const part = document.querySelector(`#house [data-p="${g.part}"]`);
   if (part) part.classList.add('pop');
+  Meister.onPick(g.opts[oi]);
   updateNext();
 }
 
@@ -556,7 +558,7 @@ function renderOverview() {
     callouts += `<div class="callout r${op.r}" data-a="${a.join(',')}"><div class="rowtop"><span class="rowstep">${step.name} · ${g.label}</span><span class="chip c${op.r}">${CHIP[op.r]}</span></div>
       <b>${op.label}</b><ul class="alts">${alts}</ul></div>`;
   }));
-  const pct = score / max;
+  const pct = S.pct = score / max;
   const verdict = pct >= .9 ? 'Meisterbauer!' : pct >= .65 ? 'Solide Planung' : pct >= .4 ? 'Noch Luft nach oben' : 'Das Haus hätte es schwer';
   const firstRight = c.steps.reduce((n, step, i) => n + step.groups.filter((g, gi) => g.opts[S.first[`${i}-${gi}`]].r === 2).length, 0);
   const total = c.steps.reduce((n, s) => n + s.groups.length, 0);
