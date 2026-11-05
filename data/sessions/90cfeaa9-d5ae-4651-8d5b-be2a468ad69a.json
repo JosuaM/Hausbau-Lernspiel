@@ -1,0 +1,15 @@
+{
+  "id": "90cfeaa9-d5ae-4651-8d5b-be2a468ad69a",
+  "startedAt": "2026-11-05T13:53:43.043Z",
+  "name": "dsa",
+  "scenario": "flood",
+  "page": 0,
+  "choices": {},
+  "ratings": {
+    "availability": 0,
+    "stability": 0,
+    "flood": 0
+  },
+  "finished": false,
+  "updatedAt": "2026-11-05T13:53:44.653Z"
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testdaten</title>
+<style>
+  body { font: 15px/1.45 system-ui, sans-serif; margin: 24px; color: #1d2433; background: #f6f7fa; }
+  h1 { margin: 0 0 4px; }
+  .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0 16px; flex-wrap: wrap; }
+  a.btn, button { padding: 8px 14px; border-radius: 8px; border: 1px solid #c5cad6; background: #fff; color: inherit; text-decoration: none; font: inherit; cursor: pointer; }
+  table { border-collapse: collapse; width: 100%; background: #fff; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid #e3e6ee; text-align: left; vertical-align: top; }
+  th { background: #eef0f6; position: sticky; top: 0; }
+  .ok { color: #1a7f45; font-weight: 600; }
+  .wip { color: #b26b00; }
+  .id { font: 12px ui-monospace, monospace; color: #6b7387; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>Testdaten</h1>
+<div class="bar">
+  <span id="count">Lade …</span>
+  <a class="btn" href="/results.csv">Als CSV (Excel)</a>
+  <button id="reload" type="button">Neu laden</button>
+  <a class="btn" href="/">Zurück zum Spiel</a>
+</div>
+<div class="scroll"><table><thead id="head"></thead><tbody id="body"></tbody></table></div>
+<script>
+const fmt = iso => iso ? new Date(iso).toLocaleString('de-DE') : '';
+function cell(tr, text, cls) {
+  const td = document.createElement('td');
+  td.textContent = text == null ? '' : text;
+  if (cls) td.className = cls;
+  tr.append(td);
+}
+async function load() {
+  const count = document.getElementById('count');
+  let data;
+  try { data = await (await fetch('/api/results')).json(); } catch { count.textContent = 'Keine Verbindung zum Server.'; return; }
+  const steps = [...new Set(data.flatMap(r => Object.keys(r.choices || {})))];
+  const head = document.getElementById('head'), body = document.getElementById('body');
+  head.replaceChildren(); body.replaceChildren();
+  const hr = document.createElement('tr');
+  ['Name', 'Szenario', 'Gestartet', 'Status', ...steps, 'ID'].forEach(t => { const th = document.createElement('th'); th.textContent = t; hr.append(th); });
+  head.append(hr);
+  data.slice().reverse().forEach(r => {
+    const tr = document.createElement('tr');
+    cell(tr, r.name); cell(tr, r.scenario); cell(tr, fmt(r.startedAt));
+    cell(tr, r.finished ? 'fertig' : 'abgebrochen/offen', r.finished ? 'ok' : 'wip');
+    steps.forEach(s => cell(tr, r.choices && r.choices[s] ? r.choices[s].text : '–'));
+    cell(tr, r.id, 'id');
+    body.append(tr);
+  });
+  count.textContent = `${data.length} Durchläufe, ${data.filter(r => r.finished).length} fertig`;
+}
+document.getElementById('reload').onclick = load;
+load();
+</script>
+</body>
+</html>

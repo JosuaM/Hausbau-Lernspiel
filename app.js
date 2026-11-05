@@ -772,6 +772,12 @@ const FD_DEFS = `
         <use href="#fd-leaf" transform="rotate(155) scale(.85)"/>
       </g>
     </g>
+    <mask id="fd-wall-mask" maskUnits="userSpaceOnUse" x="140" y="360" width="280" height="130">
+      <rect x="140" y="360" width="280" height="130" fill="#fff"/>
+      <path d="M256 480V416H304V480Z"/>
+      <rect x="176" y="394" width="44" height="36"/>
+      <rect x="340" y="394" width="44" height="36"/>
+    </mask>
     <path id="fd-tuft" fill="none" stroke="#5a8a45" stroke-width="2.4" stroke-linecap="round" d="M0 0Q-6-7-9-13M0 0V-16M0 0Q6-7 9-13"/>`;
 
 const FD_BUILD = `
@@ -783,6 +789,23 @@ const FD_BUILD = `
     <use href="#fd-tuft" x="80" y="404"/><use href="#fd-tuft" x="486" y="432"/><use href="#fd-tuft" x="56" y="452"/>
   </g>
   <circle class="pt-extra" cx="490" cy="470" r="1" fill="none" stroke="none"/>
+
+  <!-- Erhöhter Brunnen mit Handpumpe und Latrine auf Betonplattform -->
+  <g class="fd-extra fd-well">
+    <rect x="456" y="462" width="118" height="18" rx="2" fill="#a9afb3"/>
+    <rect x="456" y="462" width="118" height="5" rx="2" fill="#c9ced1"/>
+    <rect x="482" y="424" width="9" height="38" fill="#3b6a8f"/>
+    <rect x="476" y="416" width="26" height="11" rx="3" fill="#2f5877"/>
+    <path fill="#2f5877" d="M500 420H520V426H500Z"/>
+    <g class="fd-pump-handle"><path stroke="#24384a" stroke-width="4" stroke-linecap="round" d="M479 419L462 402"/></g>
+    <circle class="fd-drip" cx="518" cy="430" r="3" fill="#6fc7ee"/>
+    <circle class="fd-drip fd-drip-b" cx="518" cy="430" r="3" fill="#6fc7ee"/>
+    <ellipse class="fd-puddle" cx="518" cy="465" rx="9" ry="2.500" fill="#6fc7ee"/>
+    <rect x="534" y="424" width="32" height="38" fill="#b08a5a"/>
+    <path stroke="#8a6542" stroke-width="2" d="M542 424V462M550 424V462M558 424V462"/>
+    <path fill="#7f8e9b" d="M530 426L550 408L570 426Z"/>
+    <rect x="543" y="436" width="14" height="26" fill="#6d3a2a"/>
+  </g>
   <g class="fd-raise">
     <circle class="pt-base" cx="146" cy="476" r="1" fill="none" stroke="none"/>
   <!-- Noch keine Wahl -->
@@ -836,13 +859,59 @@ const FD_BUILD = `
   <!-- Haus als Umriss -->
   <g class="fd-house" fill="none" stroke="#24384a" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="11 8">
     <rect class="fd-walls" x="150" y="368" width="260" height="112" fill="#fff" fill-opacity=".2" stroke="none"/>
-    <path d="M150 480V368H410V480"/>
+    <g class="fd-wallset" stroke="none" stroke-dasharray="none" mask="url(#fd-wall-mask)">
+      <g class="fd-wall fd-wall-mud">
+        <rect x="150" y="368" width="260" height="112" fill="#a8794c"/>
+        <path stroke="#8a6038" stroke-width="3" stroke-dasharray="14 18" d="M150 386H410M150 414H410M150 442H410M150 468H410"/>
+        <path stroke="#d2a874" stroke-width="2" stroke-dasharray="6 26" d="M160 400H410M170 428H410M160 456H410"/>
+      </g>
+      <g class="fd-wall fd-wall-tin">
+        <rect x="150" y="368" width="260" height="112" fill="#aeb9c2"/>
+        <path stroke="#dfe6eb" stroke-width="4" d="M158 368V480M174 368V480M190 368V480M206 368V480M222 368V480M238 368V480M254 368V480M270 368V480M286 368V480M302 368V480M318 368V480M334 368V480M350 368V480M366 368V480M382 368V480M398 368V480"/>
+        <path stroke="#7f8b95" stroke-width="3" d="M166 368V480M182 368V480M198 368V480M214 368V480M230 368V480M246 368V480M262 368V480M278 368V480M294 368V480M310 368V480M326 368V480M342 368V480M358 368V480M374 368V480M390 368V480M406 368V480"/>
+        <path stroke="#b5654a" stroke-width="2" d="M150 470L410 470" opacity=".5"/>
+      </g>
+      <g class="fd-wall fd-wall-brick">
+        <rect x="150" y="368" width="260" height="112" fill="url(#fd-bricks)"/>
+        <rect x="150" y="368" width="260" height="76" fill="#efe3d0" opacity=".88"/>
+        <path stroke="#d8c8ae" stroke-width="2" d="M150 392H410M150 416H410"/>
+      </g>
+      <g class="fd-wall fd-wall-ferro">
+        <rect x="150" y="368" width="260" height="112" fill="#c3c9cc"/>
+        <path stroke="#8e979c" stroke-width="1.8" d="M150 384H410M150 400H410M150 416H410M150 432H410M150 448H410M150 464H410M166 368V480M182 368V480M198 368V480M214 368V480M230 368V480M246 368V480M262 368V480M278 368V480M294 368V480M310 368V480M326 368V480M342 368V480M358 368V480M374 368V480M390 368V480"/>
+        <rect x="150" y="368" width="260" height="112" fill="#fff" opacity=".18"/>
+      </g>
+    </g>
+    <path class="fd-outline" d="M150 480V368H410V480"/>
     <path class="fd-roof" fill="#fff" fill-opacity=".3" d="M126 368L184 296H376L434 368Z"/>
     <path class="fd-door" d="M256 480V416H304V480"/>
     <rect class="fd-window" x="176" y="394" width="44" height="36" rx="1"/>
     <rect class="fd-window" x="340" y="394" width="44" height="36" rx="1"/>
     <circle class="pt-roof" cx="300" cy="334" r="1" fill="none" stroke="none"/>
     <circle class="pt-wall" cx="160" cy="400" r="1" fill="none" stroke="none"/>
+
+    <!-- Machan: Bambusboden mit Leiter, darauf winkt jemand -->
+    <g class="fd-extra fd-machan" stroke="none" stroke-dasharray="none">
+      <rect x="140" y="384" width="316" height="8" rx="2" fill="#bda95f"/>
+      <path stroke="#8e7c3e" stroke-width="2" d="M160 384V392M190 384V392M220 384V392M250 384V392M280 384V392M310 384V392M340 384V392M370 384V392M400 384V392M430 384V392"/>
+      <rect x="440" y="384" width="5" height="96" fill="#8a6542"/><rect x="452" y="384" width="5" height="96" fill="#8a6542"/>
+      <path stroke="#8a6542" stroke-width="3" d="M440 404H457M440 424H457M440 444H457M440 464H457"/>
+      <g class="fd-person">
+        <circle cx="414" cy="352" r="8" fill="#f2c9a0"/>
+        <rect x="406" y="360" width="16" height="24" rx="5" fill="#f05a3c"/>
+        <path class="fd-wave" stroke="#f2c9a0" stroke-width="4" stroke-linecap="round" d="M421 364L432 350"/>
+      </g>
+    </g>
+
+    <!-- Verstärktes Tragwerk: Kreuzstreben, Pfosten mit Betonfuß und schwarzem Schutzanstrich -->
+    <g class="fd-extra fd-frame" stroke="none" stroke-dasharray="none">
+      <rect x="144" y="366" width="272" height="9" rx="2" fill="#8a6542"/>
+      <rect x="146" y="366" width="10" height="114" fill="#8a6542"/><rect x="404" y="366" width="10" height="114" fill="#8a6542"/>
+      <rect x="146" y="448" width="10" height="22" fill="#2b2b2e"/><rect x="404" y="448" width="10" height="22" fill="#2b2b2e"/>
+      <rect x="141" y="470" width="20" height="12" rx="2" fill="#a9afb3"/><rect x="399" y="470" width="20" height="12" rx="2" fill="#a9afb3"/>
+      <path class="fd-brace" fill="none" stroke="#8a6542" stroke-width="7" stroke-linecap="round" d="M156 408L192 372M404 408L368 372M156 440L196 400M404 440L364 400"/>
+      <path class="fd-gleam" stroke="#fff" stroke-width="3" stroke-linecap="round" d="M151 372V470M409 372V470"/>
+    </g>
   </g>
   </g>
 `;
@@ -857,7 +926,7 @@ const FD_CLOUDS = `
 `;
 
 const FOUNDATION_ART = `
-<svg class="art fd" data-foundation="" data-extra="" viewBox="-60 20 680 530" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+<svg class="art fd" data-foundation="" data-extra="" data-wall="" viewBox="-60 20 680 530" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <defs>
     <clipPath id="fd-above-ground"><rect x="-1000" width="2600" height="480"/></clipPath>
     <linearGradient id="fd-sky" x1="0" y1="0" x2="0" y2="1">
@@ -910,7 +979,7 @@ function farSilhouettes(y, scale, fill, shift) {
 
 // Das fertige Haus bei Regen. Boden bei y = 810; Lage und Größe des Hauses steuert das CSS.
 const SITE_ART = `
-<svg class="site-art fd final" data-foundation="" data-extra="" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+<svg class="site-art fd final" data-foundation="" data-extra="" data-wall="" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
   <defs>
     ${FD_DEFS}
     <pattern id="st-drops" width="160" height="160" patternUnits="userSpaceOnUse">
@@ -967,9 +1036,6 @@ const MASCOT_ART = `
 
 const LOREM = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.';
 const LOREM_SHORT = 'Lorem ipsum dolor sit amet, consetetur sadipscing.';
-const HINT_START = 'Klick eine Option an, dann verrate ich dir etwas dazu!';
-const HINT_LATER = 'Dazu weiß ich noch nichts. Das kommt später!';
-const TEST_MESSAGE = 'Hey, bist du auch so gespannt, ob dein Haus der Flut standhält? Finden wir es heraus!';
 
 const SCALES = [
   ['availability', 'Materialverfügbarkeit', 'Wie leicht bekommst du die Materialien im jeweiligen Land? Müssen sie importiert werden, oder sind sie lokal verfügbar?'],
@@ -1082,6 +1148,7 @@ const SCENARIOS = [
       context: 'Du lebst im Distrikt Sirajganj am Ufer des Jamuna, einem der größten Flüsse Bangladeschs. Jedes Jahr in der Regenzeit steigt der Fluss an, und schwere Überschwemmungen sind keine Seltenheit.',
       task: 'Baue ein Haus für deine Familie, das der nächsten Flut standhält, mit den Materialien, die dir in Bangladesch zur Verfügung stehen.',
     },
+    region: 'Sirajganj',
     facts: [
       { label: 'Ort', value: 'Sirajganj', detail: 'Festland am Jamuna-Ufer' },
       { label: 'Hausgröße', value: '25 m²', detail: 'eingeschossig, für 4–5 Personen' },
@@ -1098,49 +1165,101 @@ const SCENARIOS = [
             id: 'earth', text: 'Gestampfter Erdsockel', lift: 34,
             info: 'Erde oder sandiger Lehm, schichtweise festgestampft, etwa 45 bis 75 cm hoch.',
             ratings: { availability: 5, stability: 1, flood: 3 },
-            hint: 'Ah ja, sandiger Lehm! Den gibt es in Bangladesch fast umsonst, weil die Flüsse ihn über Jahrtausende angeschwemmt haben.',
+            hint: 'Sandiger Lehm wurde über Jahrtausende angeschwemmt. Er ist fast gratis.',
             good: 'Überall vor Ort zu haben und fast kostenlos.',
             bad: 'Weicht im Wasser auf und kann weggespült werden. Bei 1 m Flut stehen 25 bis 55 cm Wasser im Haus.',
-            tip: 'Ey, schon gewusst? Nach der Flut 2024 wurden Erdsäulen einfach weggespült, und viele Häuser stürzten ein. Erde allein hält einer starken Flut kaum stand.',
+            tip: 'Bei der Flut 2024 wurden Erdsäulen einfach weggespült.',
           },
           {
             id: 'concrete', text: 'Ebenerdige Betonplatte', lift: 8,
             info: 'Beton mit Ziegelsplitt, 10 bis 15 cm dick, direkt auf Bodenhöhe.',
             ratings: { availability: 4, stability: 4, flood: 1 },
-            hint: 'Zement bekommst du überall beim Händler. Aber rund 90 % des Klinkers werden importiert, darum schwankt der Preis mit dem Weltmarkt.',
+            hint: 'Zement gibt es beim Händler, aber der Klinker wird zu 90 % importiert.',
             good: 'Weicht nicht auf und übersteht die Flut meist ohne größere Schäden.',
             bad: 'Liegt auf Bodenhöhe: Bei 1 m Flut steht das Haus fast einen Meter im Wasser.',
-            tip: 'Ey, Beton allein hält das Wasser nicht aus dem Haus. Trocken bleibt nur, wer höher baut als der Wasserstand.',
+            tip: 'Beton allein hält kein Wasser draußen. Dafür musst du höher bauen.',
           },
           {
             id: 'brick', text: 'Ziegelsockel mit Betonpfeilern', lift: 50,
             info: 'Etwa 90 cm hoher Sockel aus Ziegelwänden, innen mit Erde gefüllt und mit tief verankerten Betonpfeilern.',
             ratings: { availability: 4, stability: 4, flood: 4 },
-            hint: 'Die Ziegel kommen aus heimischen Ziegeleien. Aber Vorsicht: Viele haben mindere Qualität und sind kleiner als der Standard.',
+            hint: 'Die Ziegel sind heimisch, aber oft kleiner und schlechter als der Standard.',
             good: 'Hebt das Haus 90 cm an, die Ziegelwände schützen die Erdfüllung vor dem Ausspülen.',
             bad: 'Bei 1 m Flut stehen noch rund 10 cm Wasser im Haus, und es ist das teuerste Fundament.',
-            tip: 'Ey, das war knapp! Ein Hilfsprogramm in Nordbangladesch baut seine Sockel deshalb rund 60 cm über den höchsten bekannten Flutstand.',
+            tip: 'Hilfsprogramme bauen 60 cm über den höchsten bekannten Flutstand.',
           },
           {
             id: 'stilts', text: 'Pfahlbau auf Stelzen', lift: 34,
             info: 'Behandelte Bambusstelzen auf Betonfüßen, etwa 60 cm hoch, darauf eine Plattform aus Koroi-Holz.',
             ratings: { availability: 4, stability: 3, flood: 3 },
-            hint: 'Mit Borsalz behandelter Bambus hält mehr als doppelt so lange. Das Salz wird allerdings nach Bangladesch importiert.',
+            hint: 'Mit Borsalz hält Bambus doppelt so lang. Das Salz wird importiert.',
             good: 'Das Wasser fließt unter dem Haus durch, und Bambus gibt es vor Ort.',
             bad: 'Bei 1 m Flut stehen rund 40 cm Wasser im Haus, und das Holz der Plattform ist meist unbehandelt.',
-            tip: 'Ey, Stelzen lassen das Wasser zwar durch, aber 60 cm reichen bei 1 m Flut nicht. Erst mit mehr Höhe bliebe der Boden trocken.',
+            tip: 'Stelzen lassen Wasser durch, aber 60 cm reichen bei 1 m Flut nicht.',
           },
         ],
       },
-      ...['Wand', 'Dach'].map((name, k) => {
-        const i = k + 1;
-        return {
-          name,
-          question: `Beispielfrage ${i + 1}`,
-          art: FOUNDATION_ART,
-          options: [0, 1, 2, 3].map(j => ({ text: `Antwort ${j + 1}`, info: LOREM, good: LOREM_SHORT, bad: LOREM_SHORT })),
-        };
-      }),
+      {
+        name: 'Wand',
+        kind: 'wall',
+        question: 'Wähle deine Wand',
+        art: FOUNDATION_ART,
+        options: [
+          {
+            id: 'mud', text: 'Lehmwand',
+            info: 'Erde und Lehm werden schichtweise aufgetragen und verdichtet, teils mit Stroh vermischt. Günstig und überall vor Ort, braucht aber regelmäßige Instandhaltung.',
+            ratings: { availability: 2, stability: 1, flood: 1 },
+            usage: { real: { value: 3.76, kind: 'measured', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). 31.519 Haushalte haben Lehmwände.' } },
+            hint: 'Lehm ist billig und traditionell, aber er mag kein Wasser.',
+            good: 'Traditionell und sehr günstig, der Lehm liegt direkt vor Ort.',
+            bad: 'Saugt sich mit Wasser voll und weicht auf. Wird der Wandfuß beschädigt, kann die ganze Wand einstürzen.',
+            tip: 'Ist der Fuß einer Erdwand beschädigt, stürzt sie schnell ein.',
+          },
+          {
+            id: 'tin', text: 'Wellblech-Wand',
+            info: 'Verzinkte Stahlbleche auf einem Rahmen aus Holz oder Bambus. Sehr leicht, günstig und schnell aufgebaut, heizt sich aber stark auf.',
+            ratings: { availability: 5, stability: 2, flood: 3 },
+            usage: { real: { value: 76.94, kind: 'measured', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). 644.211 Haushalte haben Wellblechwände.' } },
+            hint: 'Wellblech ist überall zu sehen und hält Wasser ab. Nur an Fugen dringt es ein.',
+            good: 'Wasserdicht, günstig und leicht. Lässt sich bei Erosion abbauen und woanders wieder aufstellen.',
+            bad: 'Rostet bei Dauerfeuchte, ist wenig stabil gegen Stöße und Wind und heizt sich in der Sonne stark auf.',
+            tip: 'Ein Blechhaus lässt sich abbauen und versetzen. Am Flussufer ein Vorteil.',
+          },
+          {
+            id: 'brickwall', text: 'Verputzte Ziegelwand',
+            info: 'Gebrannte Ziegel mit Zementmörtel und Zementputz. Robust und langlebig, deutlich widerstandsfähiger als Lehm.',
+            ratings: { availability: 4, stability: 4, flood: 3 },
+            usage: {
+              real: { value: 10, kind: 'estimate', info: 'Schätzwert, nicht gemessen. Zement, Beton, Ziegel und Terrakotta werden im Zensus nur zusammen gezählt (157.380 Haushalte). Der Zensus trennt das nicht auf. Etwa 10 % davon sind verputzte Ziegel (Spanne 7 bis 13 %). Ob verputzt wird, fragt der Zensus nicht.' },
+              material: { value: 18.8, kind: 'measured', line: 'Zement/Beton/Ziegel zusammen', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). Zement, Beton, Ziegel und Terrakotta werden im Zensus nur zusammen gezählt (157.380 Haushalte). Der Zensus trennt das nicht auf.' },
+            },
+            hint: 'Gebrannte Ziegel behalten im Wasser ihre Form, wasserdicht sind sie aber nicht.',
+            good: 'Hohe Druckfestigkeit und deutlich robuster als eine Lehmwand.',
+            bad: 'Bei langer Flut werden die unteren Mörtelfugen schwächer, und der Putz kann abblättern.',
+            tip: 'Ziegelwände mit Zementputz sind in Sirajganj bei ansässigen Familien üblich.',
+          },
+          {
+            id: 'ferro', text: 'Ferrocement-Wand',
+            info: 'Dünne Wand aus engmaschigem Metallgitter, vollständig in mehrere Schichten Zement-Sand-Mörtel eingebettet.',
+            ratings: { availability: 1, stability: 4, flood: 5 },
+            usage: {
+              real: { value: 0.02, label: 'unter 1 %', kind: 'estimate', info: 'Grobe Schätzung, nicht gemessen. Ferrozement hat im Zensus keine eigene Zeile. Es sind wohl nur einige Hundert Häuser (0,01 bis 0,1 %).' },
+              material: { value: 18.8, kind: 'measured', line: 'Zement/Beton/Ziegel zusammen', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). Zement, Beton, Ziegel und Terrakotta werden im Zensus nur zusammen gezählt (157.380 Haushalte). Der Zensus trennt das nicht auf.' },
+            },
+            hint: 'Das Gitter im Mörtel macht die Wand rissfest und fast wasserdicht.',
+            good: 'Sehr wasserbeständig, rissfest, leicht zu reparieren und nicht übermäßig teuer.',
+            bad: 'Braucht sorgfältige Verarbeitung und Aushärtung. Nicht jeder Maurer auf dem Land beherrscht sie.',
+            tip: 'Auf dem Land fehlen oft geschulte Handwerker für Ferrozement.',
+          },
+        ],
+      },
+      {
+        name: 'Dach',
+        kind: 'roof',
+        question: 'Beispielfrage 3',
+        art: FOUNDATION_ART,
+        options: [0, 1, 2, 3].map(j => ({ text: `Antwort ${j + 1}`, info: LOREM, good: LOREM_SHORT, bad: LOREM_SHORT })),
+      },
       {
         name: 'Besonderheit',
         kind: 'extra',
@@ -1151,12 +1270,40 @@ const SCENARIOS = [
             id: 'platform', text: 'Erdplattform', raise: 112,
             info: 'Die ganze Hausstelle wird mit Erde aufgeschüttet, etwa 1,8 bis 2,1 m hoch, und oben mit Lehm abgedeckt.',
             floors: { flood: 5 },
-            hint: 'Erde und Lehm kosten hier nichts. Teuer ist nur die Arbeit, denn rund 160 m³ Erde wollen bewegt werden.',
+            hint: 'Erde und Lehm sind gratis. Teuer ist die Arbeit für rund 160 m³ Erde.',
             good: 'Das Haus bleibt bei 1 m Flut komplett trocken, Erde und Lehm kosten nichts.',
             bad: 'Erde bleibt anfällig für Erosion, vor allem an den Rändern, und das Aufschütten macht viel Arbeit.',
-            tip: 'Ey, mit Pflanzen rund um die Erdplattform würde sie noch viel besser halten. Ihre Wurzeln schützen die Ränder vor Erosion.',
+            tip: 'Pflanzen am Rand schützen die Erdplattform vor Erosion.',
+            usage: { real: { value: 78.1, kind: 'measured', info: 'Gemessen: Haushaltsumfrage, 78,1 % der Haushalte wohnen auf einer erhöhten Hausplattform.' } },
           },
-          ...[2, 3, 4].map(j => ({ text: `Antwort ${j}`, info: LOREM, good: LOREM_SHORT, bad: LOREM_SHORT })),
+          {
+            id: 'well', text: 'Erhöhter Brunnen und Latrine',
+            info: 'Handpumpe und Latrine stehen auf einer Betonplattform, die höher liegt als der Flutstand.',
+            hint: 'Jedes Jahr steht das Land unter Wasser. Viele Familien bauen deshalb auch Brunnen und Latrine höher.',
+            good: 'Das Trinkwasser bleibt in der Flut sauber, das schützt vor Krankheiten wie Durchfall.',
+            bad: 'Wand und Fundament schützt das nicht. Der Brunnen hält kein Wasser vom Haus fern.',
+            tip: 'Manche Maßnahmen schützen die Menschen, andere das Haus. Schau genau hin, was wofür gedacht ist.',
+            usage: { real: { value: 40, kind: 'estimate', info: 'Grobe Zahl aus einer älteren Studie mit 207 Brunnen in drei Flutgebieten, darunter Sirajganj. Etwa 40 % haben eine Plattform. In einer Umfrage nennen 45,8 % die Maßnahme, sie ist aber nicht überall gebaut.' } },
+          },
+          {
+            id: 'machan', text: 'Machan (Rettungsboden)',
+            info: 'Ein hoch gelegener Zwischenboden aus Bambus und Holz, den man über eine Leiter erreicht.',
+            hint: 'Ein Bambusboden weit über dem Boden, in einigen Flutgebieten üblich.',
+            good: 'Die Familie hat einen trockenen Platz, wenn das Wasser im Haus steht.',
+            bad: 'Das Haus selbst wird dadurch nicht stabiler und nicht trockener.',
+            tip: 'Frag dich bei jeder Besonderheit: Hilft sie dem Haus, oder hilft sie den Menschen darin?',
+            usage: { real: { value: 20, kind: 'estimate', info: 'Schätzwert, nicht belegt. Es wurde keine Zahl gefunden. Das Handbuch nennt den Machan nur „in einigen Flutgebieten“. Geschätzt sind etwa 10 bis 30 %.' } },
+          },
+          {
+            id: 'frame', text: 'Verstärktes Tragwerk',
+            info: 'Kreuzverstrebungen halten das Gerüst steif. Die Pfosten bekommen einen Betonfuß und einen Bitumenanstrich gegen Fäulnis.',
+            boost: { stability: 1 },
+            hint: 'Ein Betonfuß lässt den Pfosten mehr als doppelt so lang halten.',
+            good: 'Das Tragwerk wird steifer, und der Pfosten hält mit Betonfuß statt etwa 2 mindestens 5 Jahre.',
+            bad: 'Gegen das Wasser an der Wand hilft das nicht. Es braucht zusätzliches Material und Wissen.',
+            tip: 'Der Bitumenanstrich ist laut Handbuch nicht weit verbreitet.',
+            usage: { real: { value: 12, kind: 'estimate', info: 'Schätzwert, nicht belegt. Es wurde keine Zahl gefunden. Das Handbuch nennt den Bitumenanstrich „nicht weit verbreitet“. Geschätzt sind etwa 5 bis 20 %.' } },
+          },
         ],
       },
     ],
@@ -1165,6 +1312,27 @@ const SCENARIOS = [
     id: 'wildfire', title: 'Waldbrand', subtitle: 'Australien', art: WILDFIRE_ART, locked: true,
   },
 ];
+
+// User-Testing: Name und Auswahl werden im Hintergrund an den Server geschickt (siehe server.js).
+// Ohne Server (z. B. per Datei geöffnet) bleibt das Spiel trotzdem benutzbar.
+const session = { id: '', name: '' };
+
+function saveSession(finished = false) {
+  if (!session.id) return;
+  const choices = {};
+  if (scenario) {
+    scenario.steps.forEach((step, i) => {
+      const o = chosenOption(i);
+      if (o) choices[step.name] = { id: o.id || null, text: o.text };
+    });
+  }
+  const body = JSON.stringify({
+    id: session.id, name: session.name, scenario: scenario ? scenario.id : null,
+    choices, ratings: scenario ? houseRatings() : null, page, finished,
+  });
+  fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true })
+    .catch(() => {});
+}
 
 const stage = document.getElementById('stage');
 const progress = document.getElementById('progress');
@@ -1177,6 +1345,9 @@ let page = -1, scenario = null, answers = [], cancelTransition = null;
 // Aussehen: Beim Öffnen immer Kurzgesagt, per Kreis oben rechts wechselbar.
 const LOOKS = [['original', 'Original'], ['kurzgesagt', 'Kurzgesagt']];
 let look = 'kurzgesagt';
+
+// Darstellung, per Taste E umschaltbar (siehe buildSettingsMenu).
+const settings = { usage: 'real', info: 'inline' };
 
 function themed(art) {
   return look === 'kurzgesagt' ? KG_ARTS.get(art) || art : art;
@@ -1315,7 +1486,8 @@ function optionOfKind(kind) {
   return index < 0 ? null : chosenOption(index);
 }
 
-// Mittelwert aller bewerteten Antworten; Besonderheiten können einzelne Werte anheben.
+// Mittelwert aller bewerteten Antworten; Besonderheiten können einzelne Werte anheben
+// (floors: Mindestwert, boost: Aufschlag). Brunnen und Machan haben bewusst keinen Wert.
 function houseRatings() {
   const chosen = scenario.steps.map((_, i) => chosenOption(i)).filter(Boolean);
   const rated = chosen.map(o => o.ratings).filter(Boolean);
@@ -1326,6 +1498,7 @@ function houseRatings() {
     if (!rated.length) return;
     chosen.forEach(o => {
       if (o.floors && o.floors[key]) result[key] = Math.max(result[key], o.floors[key]);
+      if (o.boost && o.boost[key]) result[key] = Math.min(5, result[key] + o.boost[key]);
     });
   });
   return result;
@@ -1335,8 +1508,10 @@ function houseRatings() {
 function updateHouse(svg) {
   const foundation = optionOfKind('foundation');
   const extra = optionOfKind('extra');
+  const wall = optionOfKind('wall');
+  svg.dataset.wall = wall ? wall.id : '';
   svg.dataset.foundation = foundation ? foundation.id : '';
-  svg.dataset.extra = extra && extra.raise ? extra.id : '';
+  svg.dataset.extra = extra && extra.id ? extra.id : '';
   svg.style.setProperty('--lift', `${foundation ? foundation.lift : 0}px`);
   svg.style.setProperty('--raise', `${extra && extra.raise ? extra.raise : 0}px`);
   return { foundation, extra };
@@ -1404,10 +1579,10 @@ function scaleRow(label, value, info) {
 // Bauteil im Bild und Kasten heben sich beim Überfahren gegenseitig hervor.
 // Reihenfolge wichtig: Das Dach liegt innerhalb von .fd-house.
 const PART_ZONES = [
+  { name: 'Besonderheit', hit: '.fd-extra, .fd-platform', glow: '.fd-extra, .fd-platform' },
   { name: 'Dach', hit: '.fd-roof', glow: '.fd-roof' },
   { name: 'Wand', hit: '.fd-house', glow: '.fd-walls, .fd-door, .fd-window' },
   { name: 'Fundament', hit: '.fd-part', glow: '.fd-part' },
-  { name: 'Besonderheit', hit: '.fd-platform', glow: '.fd-platform' },
 ];
 
 function linkPartsToCards(svg, cards) {
@@ -1446,7 +1621,7 @@ function renderHouse(wrap, backdrop) {
   const { svg } = siteScene(backdrop, 'site-right');
   linkPartsToCards(svg, cards);
   const mascot = el('div', 'mascot house-mascot');
-  mascot.append(el('p', 'bubble', TEST_MESSAGE), mascotFigure());
+  mascot.append(mascotFigure());
   const forward = el('button', 'btn house-go', 'Zur Simulation →');
   forward.onclick = () => go(SIMULATION);
   backdrop.push(mascot, forward);
@@ -1479,6 +1654,7 @@ function pointerLines(svg, targets) {
 // Ergebnis: Haus in der Mitte, links die Bauteile mit Zeigern, rechts die Wertung.
 function renderOutcome(wrap, backdrop) {
   wrap.classList.add('outcome');
+  saveSession(true);
   const { svg, foundation, extra } = siteScene(backdrop, 'site-first');
 
   const place = {
@@ -1528,6 +1704,7 @@ function renderOutcome(wrap, backdrop) {
 }
 
 function render() {
+  guideStop();
   renderProgress();
   const wrap = el('div', 'page');
   const backdrop = [];
@@ -1537,8 +1714,31 @@ function render() {
     const title = el('h1');
     title.append('Kannst du das perfekte', el('br'), 'Haus bauen?');
     const begin = el('button', 'btn btn-big', 'Los geht’s');
-    begin.onclick = () => softGo(0);
-    main.append(title, begin);
+    const nameField = el('input', 'name-input');
+    nameField.type = 'text';
+    nameField.placeholder = 'Dein Name';
+    nameField.maxLength = 60;
+    nameField.autocomplete = 'off';
+    nameField.setAttribute('aria-label', 'Dein Name');
+    nameField.value = session.name;
+    begin.disabled = !nameField.value.trim();
+    const start = () => {
+      const name = nameField.value.trim();
+      if (!name) return;
+      // Jeder Start ist ein neuer Durchlauf mit eigener ID, damit gleiche Namen sich nie überschreiben.
+      session.name = name;
+      session.id = (crypto.randomUUID && crypto.randomUUID()) || `s${Date.now()}${Math.random().toString(16).slice(2)}`;
+      answers = [];
+      scenario = null;
+      saveSession();
+      softGo(0);
+    };
+    nameField.oninput = () => { begin.disabled = !nameField.value.trim(); };
+    nameField.onkeydown = e => { if (e.key === 'Enter') start(); };
+    begin.onclick = start;
+    const entry = el('div', 'start-entry');
+    entry.append(nameField, begin);
+    main.append(title, entry);
     const art = el('div', 'start-art');
     art.innerHTML = themed(BUILD_ART);
     backdrop.push(art);
@@ -1559,6 +1759,7 @@ function render() {
         card.onclick = () => {
           if (scenario !== s) answers = [];
           scenario = s;
+          saveSession();
           softGo(1);
         };
       }
@@ -1596,16 +1797,15 @@ function render() {
     const main = el('div', 'split-main');
     main.append(el('p', 'eyebrow', `Schritt ${i + 1} von ${scenario.steps.length}`),
       el('h1', null, step.question), list);
-    const hint = el('div', 'hint');
-    const hintText = el('p', 'bubble bubble-side',
-      chosenOption(i) ? chosenOption(i).hint || HINT_LATER : HINT_START);
-    hintText.setAttribute('aria-live', 'polite');
-    hint.append(mascotFigure(), hintText);
-    main.append(hint);
+    const gauge = usageGauge();
+    gauge.show(chosenOption(i), scenario.region);
+    main.append(gauge.box);
     const art = el('div', 'split-art');
     art.innerHTML = themed(step.art);
     const preview = art.firstElementChild;
     updateHouse(preview);
+    const guide = artMascot(art);
+    backdrop.push(guide.box);
     wrap.append(main, art);
     step.options.forEach((o, j) => {
       const b = el('button', 'option' + (answers[i] === j ? ' selected' : ''));
@@ -1615,7 +1815,14 @@ function render() {
       const clip = el('span', 'option-clip');
       clip.append(el('span', 'option-info', o.info));
       detail.append(clip);
-      b.append(el('span', 'option-title', o.text), detail);
+      const icon = el('span', 'info-btn option-i', 'i');
+      icon.setAttribute('role', 'button');
+      icon.tabIndex = 0;
+      icon.setAttribute('aria-label', `Mehr zu ${o.text}`);
+      const toggleInfo = e => { e.preventDefault(); e.stopPropagation(); b.classList.toggle('info-open'); };
+      icon.onclick = toggleInfo;
+      icon.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') toggleInfo(e); };
+      b.append(el('span', 'option-title', o.text), icon, detail);
       b.onclick = () => {
         answers[i] = j;
         list.querySelectorAll('.option').forEach((x, k) => {
@@ -1624,7 +1831,9 @@ function render() {
         });
         next.lastChild.disabled = false;
         updateHouse(preview);
-        hintText.textContent = o.hint || HINT_LATER;
+        gauge.show(o, scenario.region);
+        guide.react(o, b);
+        saveSession();
       };
       list.append(b);
     });
@@ -1643,40 +1852,216 @@ function render() {
   window.scrollTo(0, 0);
 }
 
-// Der Hammer macht ab und zu von selbst einen Salto und sagt manchmal etwas Passendes.
-const MASCOT_QUIPS = {
-  foundation: [
-    'Ein Haus ist nur so stark wie sein Fundament. Hab ich mir nicht ausgedacht, ehrlich!',
-    'Ey, ich bin aus Stahl, und selbst ich hab Respekt vor einem Meter Wasser.',
-  ],
-  extra: [
-    'Ein bisschen höher bauen schadet nie. Frag mal meinen Salto!',
-    'Eine Besonderheit noch, und dein Haus wird richtig fancy.',
-  ],
-  choose: [
-    'Erst nachdenken, dann draufhauen. So mach ich das immer!',
-    'Nimm dir Zeit. Die Flut wartet schon noch auf dich.',
-    'Sah der Salto gut aus? Beim Bauen bleib ich aber bodenständig!',
-  ],
-  house: [
-    'Ich bin nervöser als du. Und ich bin aus Stahl!',
-    'Noch ein Salto fürs Glück, dann geht’s los!',
-    'Daumen drücken! Also, wenn ich Daumen hätte.',
-  ],
-  outcome: [
-    'Das war echt Hammerarbeit. Sorry, den musste ich bringen!',
-    'Egal wie viele Punkte: Das nächste Haus wird noch besser.',
-    'Neues Szenario? Ich wär dabei, ich hab ja sonst nichts vor.',
-  ],
-};
-const QUIP_CHANCE = 0.6, QUIP_MS = 5000, TRICK_MIN_MS = 9000, TRICK_EXTRA_MS = 9000;
+// Ring mit dem Anteil der Haushalte vor Ort, die genau diese Option nutzen.
+// Daten: usage: { real: Eintrag, material?: Eintrag } an der Option. Ein Eintrag hat
+// value (Prozent), kind ('measured' | 'estimate'), info (Hinweis hinter dem i), optional label und line.
+// Fehlt usage, gibt es noch keine Daten. Ohne material zeigt auch die Materialansicht den realen Wert.
+const RING_R = 44, RING_LEN = 2 * Math.PI * RING_R;
 
-function currentQuips() {
-  if (page === HOUSE) return MASCOT_QUIPS.house;
-  if (page === RESULT) return MASCOT_QUIPS.outcome;
-  const step = scenario && scenario.steps[page - 2];
-  return (step && MASCOT_QUIPS[step.kind]) || MASCOT_QUIPS.choose;
+function usageGauge() {
+  const box = el('div', 'usage');
+  const ring = el('div', 'usage-ringbox');
+  ring.innerHTML = `<svg class="usage-ring" viewBox="0 0 110 110" aria-hidden="true">
+    <circle class="usage-track" cx="55" cy="55" r="${RING_R}"/>
+    <circle class="usage-arc" cx="55" cy="55" r="${RING_R}" stroke-dasharray="${RING_LEN}" stroke-dashoffset="${RING_LEN}" transform="rotate(-90 55 55)"/>
+  </svg>`;
+  const number = el('span', 'usage-number');
+  ring.append(number);
+  const text = el('p', 'usage-text');
+  text.setAttribute('aria-live', 'polite');
+  const help = el('button', 'info-btn usage-i', 'i');
+  help.type = 'button';
+  help.hidden = true;
+  const pop = el('span', 'usage-pop');
+  pop.setAttribute('role', 'tooltip');
+  help.onclick = () => box.classList.toggle('is-pop');
+  const side = el('div', 'usage-side');
+  side.append(text, help, pop);
+  box.append(ring, side);
+  const arc = ring.querySelector('.usage-arc');
+  return {
+    box,
+    show(option, region) {
+      const u = option && option.usage;
+      const entry = u && ((settings.usage === 'material' && u.material) || u.real);
+      const value = entry ? entry.value : 0;
+      box.classList.remove('is-pop');
+      number.replaceChildren();
+      if (entry && entry.kind === 'estimate' && !entry.label) number.append(el('small', null, 'ca.'));
+      number.append(el('span', null, !entry ? '–'
+        : entry.label || `${value.toLocaleString('de-DE', { maximumFractionDigits: 2 })} %`));
+      arc.style.strokeDashoffset = RING_LEN * (1 - value / 100);
+      const main = !option ? 'Wähle eine Option.'
+        : !entry ? 'Keine Daten'
+        : entry.line || `der Haushalte in ${region} bauen so`;
+      text.replaceChildren(el('strong', 'usage-main', main));
+      if (entry && entry.line) text.append(el('span', 'usage-sub', `der Wände in ${region} bestehen aus diesem Material`));
+      text.title = text.textContent;
+      pop.textContent = (entry && entry.info) || '';
+      help.hidden = !(entry && entry.info);
+      help.setAttribute('aria-label', `Woher kommt die Zahl? ${pop.textContent}`);
+    },
+  };
 }
+document.addEventListener('click', e => {
+  document.querySelectorAll('.usage.is-pop').forEach(box => { if (!box.contains(e.target)) box.classList.remove('is-pop'); });
+});
+
+// Menü mit Taste E: Darstellung der Prozentanzeige und der Infos unter den Optionen.
+// Reihenfolge wie auf der Seite: erst der Text unter den Auswahlmöglichkeiten, dann der Prozentring darunter.
+const SETTING_ROWS = [
+  ['info', 'Text unter den Auswahlmöglichkeiten', [
+    ['inline', 'Immer aufgeklappt', 'Der Text steht direkt unter der gewählten Option, zum Beispiel unter „Lehmwand“.'],
+    ['icon', 'Hinter dem i-Symbol', 'Der Text öffnet sich erst, wenn du rechts im Kasten auf das i klickst.'],
+  ]],
+  ['usage', 'Prozentring unten: Welche Zahl wird gezeigt?', [
+    ['real', 'Genau diese Wand (teils geschätzt)', 'Anteil dieser Wandart. Bei verputzter Ziegelwand und Ferrozement ist die Zahl geschätzt.'],
+    ['material', 'Hauptmaterial (gemessen)', 'Zement, Beton, Ziegel und Terrakotta zusammen, so wie der Zensus sie zählt. Wellblech und Lehm bleiben gleich.'],
+  ]],
+];
+
+function buildSettingsMenu() {
+  const menu = el('div', 'settings');
+  menu.hidden = true;
+  const panel = el('div', 'settings-panel');
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-label', 'Ansicht der Auswahlseiten');
+  panel.append(el('h2', null, 'Ansicht der Auswahlseiten'));
+  const buttons = [];
+  SETTING_ROWS.forEach(([key, label, choices]) => {
+    const group = el('div', 'settings-row');
+    const row = el('div', 'settings-choices');
+    choices.forEach(([value, name, description]) => {
+      const b = el('button', 'settings-choice');
+      b.type = 'button';
+      b.append(el('span', 'settings-choice-name', name), el('span', 'settings-choice-note', description));
+      b.onclick = () => {
+        settings[key] = value;
+        sync();
+        if (page >= 2 && page <= 5) go(page);
+      };
+      buttons.push([key, value, b]);
+      row.append(b);
+    });
+    group.append(el('h3', 'settings-label', label), row);
+    panel.append(group);
+  });
+  const data = el('a', 'settings-choice settings-link', 'Testdaten ansehen (wer hat was gewählt)');
+  data.href = '/results';
+  data.target = '_blank';
+  data.rel = 'noopener';
+  panel.append(data);
+  panel.append(el('p', 'settings-close', 'E oder Esc schließt das Menü'));
+  menu.append(panel);
+  document.body.append(menu);
+
+  function sync() {
+    buttons.forEach(([key, value, b]) => b.setAttribute('aria-pressed', String(settings[key] === value)));
+    document.documentElement.dataset.info = settings.info;
+  }
+  let opener = null;
+  const toggle = open => {
+    menu.hidden = !open;
+    if (open) { opener = document.activeElement; buttons[0][2].focus(); } else if (opener) opener.focus();
+  };
+  menu.addEventListener('click', e => { if (e.target === menu) toggle(false); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !menu.hidden) { toggle(false); return; }
+    if (e.key.toLowerCase() !== 'e' || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;
+    toggle(menu.hidden);
+  });
+  sync();
+}
+
+// Der Hammer sitzt oben rechts im Bild. Bei einem Klick geht er zum angeklickten Kasten links, sagt etwas dazu und
+// kehrt nach einer Weile zurück. Nach längerer Ruhe gibt er einmal den Tipp zur Auswahl.
+const GUIDE_FIG = 84, GUIDE_BUBBLE_W = 230, GUIDE_SETTLE_MS = 950, GUIDE_BACK_MS = 2500, GUIDE_IDLE_MS = 25000;
+// Lesezeit: Der kurze Text bleibt lange genug stehen, um ihn in Ruhe zu lesen.
+const readTime = text => 8000 + (text || '').length * 60;
+let guideTimers = [], guideRefresh = () => {};
+window.addEventListener('resize', () => guideRefresh());
+
+function guideStop() {
+  guideTimers.forEach(clearTimeout);
+  guideTimers = [];
+  guideRefresh = () => {};
+}
+
+function artMascot(art) {
+  const box = el('div', 'art-mascot');
+  const bubble = el('p', 'bubble art-bubble');
+  bubble.hidden = true;
+  const figure = mascotFigure();
+  box.append(bubble, figure);
+  const told = new Set();
+  let spot = null, current = null;
+
+  const later = (fn, ms) => guideTimers.push(setTimeout(fn, ms));
+  const place = (pos, animate) => {
+    spot = pos;
+    box.style.transition = animate && !reducedMotion() ? '' : 'none';
+    box.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+  };
+  // Koordinaten gelten relativ zur Bühne (#stage), damit der Hammer auch über den Auswahlkästen links stehen kann.
+  const home = () => {
+    const a = art.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    return { x: a.right - s.left - GUIDE_FIG - 14, y: a.top - s.top + 14 };
+  };
+  // Direkt rechts neben den angeklickten Kasten
+  const beside = card => {
+    if (!card || !card.isConnected) return null;
+    const r = card.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    const figH = figure.offsetHeight || GUIDE_FIG * 1.3;
+    return {
+      x: Math.max(4, Math.min(s.width - GUIDE_FIG - 4, r.right - s.left + 6)),
+      y: Math.max(4, Math.min(s.height - figH - 4, r.top - s.top + r.height / 2 - figH / 2)),
+    };
+  };
+  const hide = () => { bubble.hidden = true; };
+  const say = text => {
+    if (!text) { hide(); return; }
+    const room = stage.clientWidth - (spot.x + GUIDE_FIG + 12);
+    bubble.textContent = text;
+    bubble.className = `bubble art-bubble ${room >= GUIDE_BUBBLE_W ? 'is-right' : 'is-left'}`;
+    bubble.hidden = false;
+  };
+  const goHome = () => { hide(); current = null; place(home(), true); };
+  const visit = (option, card, text, hold) => {
+    guideStop();
+    guideRefresh = refresh;
+    hide();
+    current = card;
+    place(beside(card) || home(), true);
+    // Der aufgeklappte Text schiebt den Kasten noch etwas, darum erst danach genau daneben stellen.
+    later(() => {
+      const target = beside(card);
+      if (target) place(target, true);
+      say(text);
+      mascotSalto(figure);
+    }, GUIDE_SETTLE_MS);
+    later(hide, GUIDE_SETTLE_MS + hold);
+    later(goHome, GUIDE_SETTLE_MS + hold + GUIDE_BACK_MS);
+    later(() => idle(option, card), GUIDE_SETTLE_MS + hold + GUIDE_BACK_MS + GUIDE_IDLE_MS);
+  };
+  const idle = (option, card) => {
+    if (!option.tip || told.has(option)) return;
+    told.add(option);
+    visit(option, card, option.tip, readTime(option.tip));
+  };
+  function refresh() { place(beside(current) || home(), false); }
+
+  guideRefresh = refresh;
+  requestAnimationFrame(() => { refresh(); box.classList.add('is-ready'); });
+  return {
+    box,
+    react(option, card) { visit(option, card, option.hint, readTime(option.hint)); },
+  };
+}
+
+// Der Hammer macht ab und zu von selbst einen Salto, redet dabei aber nicht.
+const TRICK_MIN_MS = 9000, TRICK_EXTRA_MS = 9000;
 
 function mascotSalto(figure) {
   if (reducedMotion()) return;
@@ -1691,31 +2076,14 @@ function mascotSalto(figure) {
   ], { duration: 1100, easing: 'ease-in-out' });
 }
 
-function mascotQuip(figure) {
-  const bubble = figure.parentElement.querySelector('.bubble');
-  if (!bubble || bubble.dataset.quip) return;
-  const normal = bubble.textContent;
-  const options = currentQuips();
-  const quip = options[Math.floor(Math.random() * options.length)];
-  bubble.textContent = quip;
-  bubble.dataset.quip = 'true';
-  setTimeout(() => {
-    delete bubble.dataset.quip;
-    // Hat jemand inzwischen eine Option gewählt, bleibt deren Text stehen.
-    if (bubble.textContent === quip) bubble.textContent = normal;
-  }, QUIP_MS);
-}
-
 function mascotTrick() {
   const figure = stage.querySelector('.mascot-figure');
-  if (figure) {
-    mascotSalto(figure);
-    if (Math.random() < QUIP_CHANCE) mascotQuip(figure);
-  }
+  if (figure) mascotSalto(figure);
   setTimeout(mascotTrick, TRICK_MIN_MS + Math.random() * TRICK_EXTRA_MS);
 }
 
 buildProgress();
 buildLookSwitch();
+buildSettingsMenu();
 render();
 setTimeout(mascotTrick, TRICK_MIN_MS);
