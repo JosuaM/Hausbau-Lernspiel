@@ -218,6 +218,20 @@ p.text { color: var(--muted); font-size: 1.1rem; line-height: 1.6; margin: 0 0 3
 .fd[data-wall="tin"] .fd-wall-tin,
 .fd[data-wall="brickwall"] .fd-wall-brick,
 .fd[data-wall="ferro"] .fd-wall-ferro { opacity: 1; transform: none; }
+/* Dach: Die Auswahl steht in data-roof am SVG, das Platzhalter-Dach verschwindet dann. */
+.fd-roof { transition: opacity .3s ease; }
+.fd:not([data-roof=""]) .fd-roof { opacity: 0; }
+.fd-roofpart {
+  opacity: 0; transform: scaleY(0); transform-box: fill-box; transform-origin: 50% 100%;
+  transition: opacity .3s ease, transform .6s cubic-bezier(.3, 1.2, .5, 1);
+}
+.fd[data-roof="tinhip"] .fd-roof-tinhip,
+.fd[data-roof="concreteflat"] .fd-roof-concreteflat,
+.fd[data-roof="tilegable"] .fd-roof-tilegable,
+.fd[data-roof="thatch"] .fd-roof-thatch { opacity: 1; transform: none; }
+.fd-roofs { pointer-events: none; }
+.fd[data-roof="tinhip"] .fd-roof-tinhip, .fd[data-roof="concreteflat"] .fd-roof-concreteflat,
+.fd[data-roof="tilegable"] .fd-roof-tilegable, .fd[data-roof="thatch"] .fd-roof-thatch { pointer-events: auto; }
 /* Mit Wand: Umriss, Tür und Fenster werden durchgezogen und gefüllt statt gestrichelt. */
 .fd-door, .fd-window { transition: fill .35s ease; }
 .fd:not([data-wall=""]) .fd-outline, .fd:not([data-wall=""]) .fd-door, .fd:not([data-wall=""]) .fd-window { stroke-dasharray: none; }
@@ -237,7 +251,7 @@ p.text { color: var(--muted); font-size: 1.1rem; line-height: 1.6; margin: 0 0 3
   .st-swing, .st-hammer, .st-place, .st-wave, .st-bird, .st-glow { animation: none; }
   .btn.btn-big, .btn.btn-big:hover { transition: none; transform: none; }
   .mascot-figure, .mascot-eyes, .option-detail { animation: none; transition: none; }
-  .fd-house, .fd-part, .fd-empty, .fd-raise, .fd-platform, .fd-wall, .fd-extra, .fd-brace { transition: none; }
+  .fd-house, .fd-part, .fd-empty, .fd-raise, .fd-platform, .fd-wall, .fd-roofpart, .fd-extra, .fd-brace { transition: none; }
   .scenario, .scenario .art { transition: none; }
   .scenario:hover, .scenario:hover .art { transform: none; }
 }
@@ -570,17 +584,17 @@ main { position: relative; }
 :root[data-look="kurzgesagt"] .mascot-figure { animation: kg-hop 1.1s cubic-bezier(.3, 0, .5, 1) infinite alternate; }
 @keyframes kg-hop { from { transform: translateY(0) scale(1.04, .96); } to { transform: translateY(-14px) rotate(4deg) scale(.98, 1.03); } }
 :root[data-look="kurzgesagt"] .fd-part { transition: opacity .2s ease, transform .75s cubic-bezier(.2, 1.9, .4, 1); }
-:root[data-look="kurzgesagt"] .fd-wall { transition: opacity .2s ease, transform .75s cubic-bezier(.2, 1.5, .4, 1); }
+:root[data-look="kurzgesagt"] .fd-wall, :root[data-look="kurzgesagt"] .fd-roofpart { transition: opacity .2s ease, transform .75s cubic-bezier(.2, 1.5, .4, 1); }
 :root[data-look="kurzgesagt"] .fd-extra { transition: opacity .2s ease, transform .75s cubic-bezier(.2, 1.9, .4, 1); }
 :root[data-look="kurzgesagt"] .fd-house { transition: transform .8s cubic-bezier(.2, 1.9, .4, 1); }
 :root[data-look="kurzgesagt"] .fd-raise { transition: transform .9s cubic-bezier(.2, 1.7, .4, 1); }
-:root[data-look="kurzgesagt"] .final .fd-wall, :root[data-look="kurzgesagt"] .final .fd-part, :root[data-look="kurzgesagt"] .final .fd-house, :root[data-look="kurzgesagt"] .final .fd-raise { transition: none; }
+:root[data-look="kurzgesagt"] .final .fd-wall, :root[data-look="kurzgesagt"] .final .fd-roofpart, :root[data-look="kurzgesagt"] .final .fd-part, :root[data-look="kurzgesagt"] .final .fd-house, :root[data-look="kurzgesagt"] .final .fd-raise { transition: none; }
 
 .final .fd-house { stroke-dasharray: none; stroke: none; transition: none; }
 .final .fd-walls { fill: #f2d6a4; fill-opacity: 1; }
 .final .fd-roof { fill: #f05a3c; fill-opacity: 1; }
 .final .fd-door, .final .fd-window { fill: #6d3a2a; }
-.final .fd-raise, .final .fd-wall { transition: none; }
+.final .fd-raise, .final .fd-wall, .final .fd-roofpart { transition: none; }
 .final .fd-roof, .final .fd-walls, .final .fd-door, .final .fd-window, .final .fd-part, .final .fd-platform { transition: filter .2s ease; }
 
 @media (max-width: 1100px) {

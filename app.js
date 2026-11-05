@@ -884,6 +884,47 @@ const FD_BUILD = `
     </g>
     <path class="fd-outline" d="M150 480V368H410V480"/>
     <path class="fd-roof" fill="#fff" fill-opacity=".3" d="M126 368L184 296H376L434 368Z"/>
+    <!-- Dächer: Walmdach von vorn als Trapez, Satteldach mit Giebel, Flachdach als Platte -->
+    <g class="fd-roofs" stroke="none" stroke-dasharray="none">
+      <g class="fd-roofpart fd-roof-tinhip">
+        <clipPath id="fd-clip-hip"><path d="M126 368L184 296H376L434 368Z"/></clipPath>
+        <path fill="#aeb9c2" d="M126 368L184 296H376L434 368Z"/>
+        <g clip-path="url(#fd-clip-hip)">
+          <path stroke="#dfe6eb" stroke-width="4" d="M132 290V370M146 290V370M160 290V370M174 290V370M188 290V370M202 290V370M216 290V370M230 290V370M244 290V370M258 290V370M272 290V370M286 290V370M300 290V370M314 290V370M328 290V370M342 290V370M356 290V370M370 290V370M384 290V370M398 290V370M412 290V370M426 290V370"/>
+          <path stroke="#7f8b95" stroke-width="3" transform="translate(7 0)" d="M132 290V370M146 290V370M160 290V370M174 290V370M188 290V370M202 290V370M216 290V370M230 290V370M244 290V370M258 290V370M272 290V370M286 290V370M300 290V370M314 290V370M328 290V370M342 290V370M356 290V370M370 290V370M384 290V370M398 290V370M412 290V370M426 290V370"/>
+          <path fill="#7f8b95" opacity=".45" d="M126 368L184 296L204 368ZM434 368L376 296L356 368Z"/>
+        </g>
+        <path stroke="#6b7680" stroke-width="6" stroke-linecap="round" d="M184 296H376"/>
+        <path stroke="#6b7680" stroke-width="4" d="M124 368H436"/>
+      </g>
+      <g class="fd-roofpart fd-roof-concreteflat">
+        <rect x="134" y="342" width="292" height="26" rx="1" fill="#a9afb3"/>
+        <rect x="130" y="338" width="300" height="7" rx="2" fill="#c3c9cc"/>
+        <path stroke="#8b9296" stroke-width="2" stroke-dasharray="3 11" d="M138 356H422"/>
+        <path stroke="#6b5a4e" stroke-width="3" stroke-linecap="round" d="M150 338V322M162 338V326M398 338V322M410 338V326"/>
+      </g>
+      <g class="fd-roofpart fd-roof-tilegable">
+        <clipPath id="fd-clip-gable"><path d="M118 372L280 270L442 372Z"/></clipPath>
+        <path fill="#c4673f" d="M118 372L280 270L442 372Z"/>
+        <g clip-path="url(#fd-clip-gable)" fill="none">
+          <path stroke="#a24f2e" stroke-width="3" d="M100 300H460M100 322H460M100 344H460M100 366H460"/>
+          <path stroke="#a24f2e" stroke-width="2.5" stroke-dasharray="2 16" d="M100 311H460M100 355H460"/>
+          <path stroke="#a24f2e" stroke-width="2.5" stroke-dasharray="2 16" stroke-dashoffset="9" d="M100 289H460M100 333H460"/>
+          <path stroke="#e08a5e" stroke-width="2" d="M100 298H460M100 320H460M100 342H460M100 364H460" opacity=".6"/>
+        </g>
+        <path stroke="#8e3f24" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" fill="none" d="M118 372L280 270L442 372"/>
+      </g>
+      <g class="fd-roofpart fd-roof-thatch">
+        <clipPath id="fd-clip-thatch"><path d="M112 378L280 262L448 378Z"/></clipPath>
+        <path fill="#d9b25f" d="M112 378L280 262L448 378Z"/>
+        <g clip-path="url(#fd-clip-thatch)" fill="none">
+          <path stroke="#b8913f" stroke-width="2.5" stroke-dasharray="10 7" d="M90 292H470M90 310H470M90 328H470M90 346H470M90 364H470"/>
+          <path stroke="#ecd08a" stroke-width="2" stroke-dasharray="6 12" stroke-dashoffset="5" d="M90 301H470M90 319H470M90 337H470M90 355H470"/>
+        </g>
+        <path fill="#b8913f" d="M112 378L120 386L128 378L136 387L144 378L152 386L160 378L168 387L176 378L184 386L192 378L200 387L208 378L216 386L224 378L232 387L240 378L248 386L256 378L264 387L272 378L280 386L288 378L296 387L304 378L312 386L320 378L328 387L336 378L344 386L352 378L360 387L368 378L376 386L384 378L392 387L400 378L408 386L416 378L424 387L432 378L440 386L448 378Z"/>
+        <path fill="#a8823a" d="M262 274L280 258L298 274Z"/>
+      </g>
+    </g>
     <path class="fd-door" d="M256 480V416H304V480"/>
     <rect class="fd-window" x="176" y="394" width="44" height="36" rx="1"/>
     <rect class="fd-window" x="340" y="394" width="44" height="36" rx="1"/>
@@ -926,7 +967,7 @@ const FD_CLOUDS = `
 `;
 
 const FOUNDATION_ART = `
-<svg class="art fd" data-foundation="" data-extra="" data-wall="" viewBox="-60 20 680 530" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+<svg class="art fd" data-foundation="" data-extra="" data-wall="" data-roof="" viewBox="-60 20 680 530" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <defs>
     <clipPath id="fd-above-ground"><rect x="-1000" width="2600" height="480"/></clipPath>
     <linearGradient id="fd-sky" x1="0" y1="0" x2="0" y2="1">
@@ -979,7 +1020,7 @@ function farSilhouettes(y, scale, fill, shift) {
 
 // Das fertige Haus bei Regen. Boden bei y = 810; Lage und Größe des Hauses steuert das CSS.
 const SITE_ART = `
-<svg class="site-art fd final" data-foundation="" data-extra="" data-wall="" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+<svg class="site-art fd final" data-foundation="" data-extra="" data-wall="" data-roof="" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
   <defs>
     ${FD_DEFS}
     <pattern id="st-drops" width="160" height="160" patternUnits="userSpaceOnUse">
@@ -1256,9 +1297,46 @@ const SCENARIOS = [
       {
         name: 'Dach',
         kind: 'roof',
-        question: 'Beispielfrage 3',
+        question: 'Wähle dein Dach',
         art: FOUNDATION_ART,
-        options: [0, 1, 2, 3].map(j => ({ text: `Antwort ${j + 1}`, info: LOREM, good: LOREM_SHORT, bad: LOREM_SHORT })),
+        options: [
+          {
+            id: 'tinhip', text: 'Wellblech-Walmdach',
+            info: 'Verzinkte Wellbleche auf einem Holz- oder Bambusgerüst, nach allen vier Seiten geneigt.',
+            ratings: { availability: 4, stability: 4, flood: 4 },
+            hint: 'Wellblech gibt es bei jedem Händler. Die vier Dachseiten bieten dem Wind wenig Angriffsfläche.',
+            good: 'Leicht, wasserdicht und windfest. Das Dach bleibt stehen und lässt sich bei Hochwasser abbauen und bergen.',
+            bad: 'Heizt sich in der Sonne stark auf, ist bei Regen laut und rostet ohne Pflege an den Nägeln.',
+            tip: 'Ein Walmdach aus Wellblech ist die beste realistische Wahl. Die Bleche kann man nach der Flut wiederverwenden.',
+          },
+          {
+            id: 'concreteflat', text: 'Beton-Flachdach',
+            info: 'Gegossene Stahlbetondecke, flach und etwa 10 bis 12 cm dick.',
+            ratings: { availability: 2, stability: 5, flood: 5 },
+            hint: 'Beton ist sehr stark, aber auch sehr schwer. Nicht jede Wand kann ihn tragen.',
+            good: 'Maximaler Schutz: Das Dach hält Sturm stand, und die Familie kann sich bei Hochwasser darauf retten.',
+            bad: 'Teuer, braucht Stahl und Zement, und es hält nur auf Mauerwerk. Auf Lehm oder Blech wäre es viel zu schwer.',
+            tip: 'Ein Betondach passt nur auf ein Haus mit Ziegel- oder Ferrozementwänden.',
+          },
+          {
+            id: 'tilegable', text: 'Tonziegel-Satteldach',
+            info: 'Gebrannte Tonziegel auf einem Holzgerüst, nach zwei Seiten geneigt.',
+            ratings: { availability: 2, stability: 2, flood: 2 },
+            hint: 'Tonziegel halten lange, aber jeder einzelne ist schwer.',
+            good: 'Haltbar, kühl im Sommer und leise bei Regen.',
+            bad: 'Das Gewicht drückt auf die Wände. Sind sie vom Wasser aufgeweicht, kann das Dach einstürzen. Bei Sturm fliegen einzelne Ziegel weg.',
+            tip: 'Schwere Dächer brauchen starke Wände. Bei einer Flut ist das ein Risiko.',
+          },
+          {
+            id: 'thatch', text: 'Gras-Satteldach',
+            info: 'Gebündeltes Stroh oder Gras auf einem Bambusgerüst, nach zwei Seiten geneigt.',
+            ratings: { availability: 4, stability: 2, flood: 1 },
+            hint: 'Gras und Stroh wachsen direkt vor Ort und kosten fast nichts.',
+            good: 'Sehr günstig, leicht und hält das Haus angenehm kühl.',
+            bad: 'Verrottet bei Wasserkontakt, muss oft erneuert werden und fängt leicht Feuer.',
+            tip: 'Ein Grasdach ist billig, aber nach jeder Flut musst du es neu decken.',
+          },
+        ],
       },
       {
         name: 'Besonderheit',
@@ -1510,6 +1588,8 @@ function updateHouse(svg) {
   const extra = optionOfKind('extra');
   const wall = optionOfKind('wall');
   svg.dataset.wall = wall ? wall.id : '';
+  const roof = optionOfKind('roof');
+  svg.dataset.roof = roof && roof.id ? roof.id : '';
   svg.dataset.foundation = foundation ? foundation.id : '';
   svg.dataset.extra = extra && extra.id ? extra.id : '';
   svg.style.setProperty('--lift', `${foundation ? foundation.lift : 0}px`);
@@ -1580,7 +1660,7 @@ function scaleRow(label, value, info) {
 // Reihenfolge wichtig: Das Dach liegt innerhalb von .fd-house.
 const PART_ZONES = [
   { name: 'Besonderheit', hit: '.fd-extra, .fd-platform', glow: '.fd-extra, .fd-platform' },
-  { name: 'Dach', hit: '.fd-roof', glow: '.fd-roof' },
+  { name: 'Dach', hit: '.fd-roof, .fd-roofs', glow: '.fd-roof, .fd-roofpart' },
   { name: 'Wand', hit: '.fd-house', glow: '.fd-walls, .fd-door, .fd-window' },
   { name: 'Fundament', hit: '.fd-part', glow: '.fd-part' },
 ];
