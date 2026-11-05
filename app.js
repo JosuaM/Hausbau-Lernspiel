@@ -790,6 +790,14 @@ const FD_BUILD = `
   </g>
   <circle class="pt-extra" cx="490" cy="470" r="1" fill="none" stroke="none"/>
 
+  <!-- Vetiver-Hecke links und rechts vom Haus, die Wurzeln reichen tief in den Boden -->
+  <g class="fd-extra fd-vetiver">
+    ${[58, 80, 102, 124, 436, 458, 480, 502].map(x => `<g transform="translate(${x} 482)">
+      <path fill="none" stroke="#c9a36a" stroke-width="2" stroke-linecap="round" d="M-5 0Q-11 22-6 56M0 0Q5 26 0 62M5 0Q11 20 8 50"/>
+      <path class="rv-sway" fill="#3f7a46" d="M-14 0Q-20-34-28-56Q-8-34-4 0ZM-5 0Q-6-44 0-70Q6-44 5 0ZM4 0Q8-34 28-56Q20-34 14 0Z"/>
+    </g>`).join('')}
+  </g>
+
   <!-- Erhöhter Brunnen mit Handpumpe und Latrine auf Betonplattform -->
   <g class="fd-extra fd-well">
     <rect x="456" y="462" width="118" height="18" rx="2" fill="#a9afb3"/>
@@ -930,19 +938,6 @@ const FD_BUILD = `
     <rect class="fd-window" x="340" y="394" width="44" height="36" rx="1"/>
     <circle class="pt-roof" cx="300" cy="334" r="1" fill="none" stroke="none"/>
     <circle class="pt-wall" cx="160" cy="400" r="1" fill="none" stroke="none"/>
-
-    <!-- Machan: Bambusboden mit Leiter, darauf winkt jemand -->
-    <g class="fd-extra fd-machan" stroke="none" stroke-dasharray="none">
-      <rect x="140" y="384" width="316" height="8" rx="2" fill="#bda95f"/>
-      <path stroke="#8e7c3e" stroke-width="2" d="M160 384V392M190 384V392M220 384V392M250 384V392M280 384V392M310 384V392M340 384V392M370 384V392M400 384V392M430 384V392"/>
-      <rect x="440" y="384" width="5" height="96" fill="#8a6542"/><rect x="452" y="384" width="5" height="96" fill="#8a6542"/>
-      <path stroke="#8a6542" stroke-width="3" d="M440 404H457M440 424H457M440 444H457M440 464H457"/>
-      <g class="fd-person">
-        <circle cx="414" cy="352" r="8" fill="#f2c9a0"/>
-        <rect x="406" y="360" width="16" height="24" rx="5" fill="#f05a3c"/>
-        <path class="fd-wave" stroke="#f2c9a0" stroke-width="4" stroke-linecap="round" d="M421 364L432 350"/>
-      </g>
-    </g>
 
     <!-- Verstärktes Tragwerk: Kreuzstreben, Pfosten mit Betonfuß und schwarzem Schutzanstrich -->
     <g class="fd-extra fd-frame" stroke="none" stroke-dasharray="none">
@@ -1206,6 +1201,7 @@ const SCENARIOS = [
             id: 'earth', text: 'Gestampfter Erdsockel', lift: 34,
             info: 'Erde oder sandiger Lehm, schichtweise festgestampft, etwa 45 bis 75 cm hoch.',
             ratings: { availability: 5, stability: 1, flood: 3 },
+            usage: { real: { value: 13, label: '≈ 75 €', kind: 'fact', note: 'kostet der Erdsockel grob, fast nur für die Arbeit (50 bis 100 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
             hint: 'Sandiger Lehm wurde über Jahrtausende angeschwemmt. Er ist fast gratis.',
             good: 'Überall vor Ort zu haben und fast kostenlos.',
             bad: 'Weicht im Wasser auf und kann weggespült werden. Bei 1 m Flut stehen 25 bis 55 cm Wasser im Haus.',
@@ -1215,7 +1211,8 @@ const SCENARIOS = [
             id: 'concrete', text: 'Ebenerdige Betonplatte', lift: 8,
             info: 'Beton mit Ziegelsplitt, 10 bis 15 cm dick, direkt auf Bodenhöhe.',
             ratings: { availability: 4, stability: 4, flood: 1 },
-            hint: 'Zement gibt es beim Händler, aber der Klinker wird zu 90 % importiert.',
+            usage: { real: { value: 44, label: '≈ 250 €', kind: 'fact', note: 'kostet die Betonplatte grob, vor allem für Zement und Ziegel (240 bis 260 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
+            hint: 'Zement gibt es überall beim Händler. Sein Hauptrohstoff Klinker wird aber zu rund 90 % importiert.',
             good: 'Weicht nicht auf und übersteht die Flut meist ohne größere Schäden.',
             bad: 'Liegt auf Bodenhöhe: Bei 1 m Flut steht das Haus fast einen Meter im Wasser.',
             tip: 'Beton allein hält kein Wasser draußen. Dafür musst du höher bauen.',
@@ -1224,16 +1221,18 @@ const SCENARIOS = [
             id: 'brick', text: 'Ziegelsockel mit Betonpfeilern', lift: 50,
             info: 'Etwa 90 cm hoher Sockel aus Ziegelwänden, innen mit Erde gefüllt und mit tief verankerten Betonpfeilern.',
             ratings: { availability: 4, stability: 4, flood: 4 },
-            hint: 'Die Ziegel sind heimisch, aber oft kleiner und schlechter als der Standard.',
+            usage: { real: { value: 93, label: '≈ 530 €', kind: 'fact', note: 'kostet der Ziegelsockel grob, das teuerste Fundament (490 bis 570 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
+            hint: 'Die Ziegel kommen aus heimischen Ziegeleien, und die Füllung im Sockel ist einfach Erde von vor Ort.',
             good: 'Hebt das Haus 90 cm an, die Ziegelwände schützen die Erdfüllung vor dem Ausspülen.',
             bad: 'Bei 1 m Flut stehen noch rund 10 cm Wasser im Haus, und es ist das teuerste Fundament.',
             tip: 'Hilfsprogramme bauen 60 cm über den höchsten bekannten Flutstand.',
           },
           {
-            id: 'stilts', text: 'Pfahlbau auf Stelzen', lift: 34,
+            id: 'stilts', text: 'Pfahlbau', lift: 34,
             info: 'Behandelte Bambusstelzen auf Betonfüßen, etwa 60 cm hoch, darauf eine Plattform aus Koroi-Holz.',
             ratings: { availability: 4, stability: 3, flood: 3 },
-            hint: 'Mit Borsalz hält Bambus doppelt so lang. Das Salz wird importiert.',
+            usage: { real: { value: 46, label: '≈ 260 €', kind: 'fact', note: 'kostet der Pfahlbau grob, vor allem für das Holz der Plattform (240 bis 280 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
+            hint: 'Mit Borsalz hält Bambus doppelt so lang.',
             good: 'Das Wasser fließt unter dem Haus durch, und Bambus gibt es vor Ort.',
             bad: 'Bei 1 m Flut stehen rund 40 cm Wasser im Haus, und das Holz der Plattform ist meist unbehandelt.',
             tip: 'Stelzen lassen Wasser durch, aber 60 cm reichen bei 1 m Flut nicht.',
@@ -1304,6 +1303,7 @@ const SCENARIOS = [
             id: 'tinhip', text: 'Wellblech-Walmdach',
             info: 'Verzinkte Wellbleche auf einem Holz- oder Bambusgerüst, nach allen vier Seiten geneigt.',
             ratings: { availability: 4, stability: 4, flood: 4 },
+            usage: { real: { value: 75, kind: 'estimate', note: 'der Haushalte in Bangladesch haben ein Dach aus Wellblech' } },
             hint: 'Wellblech gibt es bei jedem Händler. Die vier Dachseiten bieten dem Wind wenig Angriffsfläche.',
             good: 'Leicht, wasserdicht und windfest. Das Dach bleibt stehen und lässt sich bei Hochwasser abbauen und bergen.',
             bad: 'Heizt sich in der Sonne stark auf, ist bei Regen laut und rostet ohne Pflege an den Nägeln.',
@@ -1313,6 +1313,7 @@ const SCENARIOS = [
             id: 'concreteflat', text: 'Beton-Flachdach',
             info: 'Gegossene Stahlbetondecke, flach und etwa 10 bis 12 cm dick.',
             ratings: { availability: 2, stability: 5, flood: 5 },
+            usage: { real: { value: 24, kind: 'estimate', note: 'der Haushalte haben ein Dach aus Zement, Beton oder Ziegeln', info: 'Zement, Beton und Ziegel werden zusammen gezählt. Beton- und Ziegeldach teilen sich deshalb diese Zahl.' } },
             hint: 'Beton ist sehr stark, aber auch sehr schwer. Nicht jede Wand kann ihn tragen.',
             good: 'Maximaler Schutz: Das Dach hält Sturm stand, und die Familie kann sich bei Hochwasser darauf retten.',
             bad: 'Teuer, braucht Stahl und Zement, und es hält nur auf Mauerwerk. Auf Lehm oder Blech wäre es viel zu schwer.',
@@ -1322,6 +1323,7 @@ const SCENARIOS = [
             id: 'tilegable', text: 'Tonziegel-Satteldach',
             info: 'Gebrannte Tonziegel auf einem Holzgerüst, nach zwei Seiten geneigt.',
             ratings: { availability: 2, stability: 2, flood: 2 },
+            usage: { real: { value: 24, kind: 'estimate', note: 'der Haushalte haben ein Dach aus Zement, Beton oder Ziegeln', info: 'Zement, Beton und Ziegel werden zusammen gezählt. Beton- und Ziegeldach teilen sich deshalb diese Zahl.' } },
             hint: 'Tonziegel halten lange, aber jeder einzelne ist schwer.',
             good: 'Haltbar, kühl im Sommer und leise bei Regen.',
             bad: 'Das Gewicht drückt auf die Wände. Sind sie vom Wasser aufgeweicht, kann das Dach einstürzen. Bei Sturm fliegen einzelne Ziegel weg.',
@@ -1331,6 +1333,7 @@ const SCENARIOS = [
             id: 'thatch', text: 'Gras-Satteldach',
             info: 'Gebündeltes Stroh oder Gras auf einem Bambusgerüst, nach zwei Seiten geneigt.',
             ratings: { availability: 4, stability: 2, flood: 1 },
+            usage: { real: { value: 1, kind: 'estimate', note: 'der Haushalte haben ein Dach aus leichten Naturmaterialien wie Stroh oder Gras' } },
             hint: 'Gras und Stroh wachsen direkt vor Ort und kosten fast nichts.',
             good: 'Sehr günstig, leicht und hält das Haus angenehm kühl.',
             bad: 'Verrottet bei Wasserkontakt, muss oft erneuert werden und fängt leicht Feuer.',
@@ -1347,7 +1350,9 @@ const SCENARIOS = [
           {
             id: 'platform', text: 'Erdplattform', raise: 112,
             info: 'Die ganze Hausstelle wird mit Erde aufgeschüttet, etwa 1,8 bis 2,1 m hoch, und oben mit Lehm abgedeckt.',
-            floors: { flood: 5 },
+            // Das Haus steht über dem Wasser; die Stabilität hängt nun an der Plattform selbst.
+            sets: { flood: 5, stability: 3 },
+            scores: { availability: 5, stability: 3, flood: 5 },
             hint: 'Erde und Lehm sind gratis. Teuer ist die Arbeit für rund 160 m³ Erde.',
             good: 'Das Haus bleibt bei 1 m Flut komplett trocken, Erde und Lehm kosten nichts.',
             bad: 'Erde bleibt anfällig für Erosion, vor allem an den Rändern, und das Aufschütten macht viel Arbeit.',
@@ -1364,13 +1369,16 @@ const SCENARIOS = [
             usage: { real: { value: 40, kind: 'estimate', info: 'Grobe Zahl aus einer älteren Studie mit 207 Brunnen in drei Flutgebieten, darunter Sirajganj. Etwa 40 % haben eine Plattform. In einer Umfrage nennen 45,8 % die Maßnahme, sie ist aber nicht überall gebaut.' } },
           },
           {
-            id: 'machan', text: 'Machan (Rettungsboden)',
-            info: 'Ein hoch gelegener Zwischenboden aus Bambus und Holz, den man über eine Leiter erreicht.',
-            hint: 'Ein Bambusboden weit über dem Boden, in einigen Flutgebieten üblich.',
-            good: 'Die Familie hat einen trockenen Platz, wenn das Wasser im Haus steht.',
-            bad: 'Das Haus selbst wird dadurch nicht stabiler und nicht trockener.',
-            tip: 'Frag dich bei jeder Besonderheit: Hilft sie dem Haus, oder hilft sie den Menschen darin?',
-            usage: { real: { value: 20, kind: 'estimate', info: 'Schätzwert, nicht belegt. Es wurde keine Zahl gefunden. Das Handbuch nennt den Machan nur „in einigen Flutgebieten“. Geschätzt sind etwa 10 bis 30 %.' } },
+            id: 'vetiver', text: 'Bepflanzung mit Vetivergras',
+            info: 'Rund um die Hausstelle wächst eine Hecke aus Vetivergras. Die Wurzeln reichen bis zu 3 m tief und halten den Boden fest.',
+            // Schützt nur Erde vor Erosion, wirkt also nur beim gestampften Erdsockel.
+            boost: { stability: 1 }, boostWith: 'earth',
+            scores: { availability: 5, stability: 5, flood: 1 },
+            hint: 'Vetivergras schützt in Bangladesch schon Flussufer vor Erosion. Als Hecke kann es Hochwasser bremsen.',
+            good: 'Hält den Boden dauerhaft fest, wird bis zu 50 Jahre alt, ist heimisch und kostet nur rund 5 €.',
+            bad: 'Hebt das Haus nicht an: Bei 1 m Flut steht das Wasser genauso hoch im Haus wie ohne Hecke.',
+            tip: 'Beim Erdsockel bringt Vetivergras Stabilität. Bei Fundamenten ohne Erde hilft es nicht.',
+            usage: { real: { value: 0, label: 'k. A.', kind: 'none', note: 'Keine Zahl zu Haushalten gefunden', info: 'Keine Erhebung gefunden, wie viele Haushalte Vetivergras nutzen. Belegt ist der Einsatz vor allem an Flussufern und Deichen, ein Routine-Anbau ist es nicht.' } },
           },
           {
             id: 'frame', text: 'Verstärktes Tragwerk',
@@ -1425,7 +1433,7 @@ const LOOKS = [['original', 'Original'], ['kurzgesagt', 'Kurzgesagt']];
 let look = 'kurzgesagt';
 
 // Darstellung, per Taste E umschaltbar (siehe buildSettingsMenu).
-const settings = { usage: 'real', info: 'inline' };
+const settings = { usage: 'real', info: 'inline', outcome: 'guided' };
 
 function themed(art) {
   return look === 'kurzgesagt' ? KG_ARTS.get(art) || art : art;
@@ -1518,6 +1526,7 @@ function nav(onBack, onNext, nextLabel = 'Weiter', nextDisabled = false) {
 function go(p) {
   if (cancelTransition) cancelTransition();
   cancelTransition = null;
+  if (p !== RESULT) guided = null;
   page = p;
   render();
 }
@@ -1540,6 +1549,7 @@ function softGo(nextPage, ms = 800) {
 function playFlood(art, buttons, nextPage) {
   if (reducedMotion()) { go(nextPage); return; }
   buttons.querySelectorAll('button').forEach(b => { b.disabled = true; });
+  buttons.classList.add('is-busy');
   const river = art.querySelector('.rv-river');
   art.style.setProperty('--flood-from', getComputedStyle(river).strokeWidth);
   art.classList.add('flooding');
@@ -1564,8 +1574,8 @@ function optionOfKind(kind) {
   return index < 0 ? null : chosenOption(index);
 }
 
-// Mittelwert aller bewerteten Antworten; Besonderheiten können einzelne Werte anheben
-// (floors: Mindestwert, boost: Aufschlag). Brunnen und Machan haben bewusst keinen Wert.
+// Mittelwert aller bewerteten Antworten; Besonderheiten können einzelne Werte ändern
+// (sets: fester Wert, boost: Aufschlag, boostWith: nur bei diesem Fundament). Der Brunnen hat bewusst keinen Wert.
 function houseRatings() {
   const chosen = scenario.steps.map((_, i) => chosenOption(i)).filter(Boolean);
   const rated = chosen.map(o => o.ratings).filter(Boolean);
@@ -1575,8 +1585,10 @@ function houseRatings() {
     result[key] = rated.length ? Math.round(sum / rated.length) : 0;
     if (!rated.length) return;
     chosen.forEach(o => {
-      if (o.floors && o.floors[key]) result[key] = Math.max(result[key], o.floors[key]);
-      if (o.boost && o.boost[key]) result[key] = Math.min(5, result[key] + o.boost[key]);
+      if (o.sets && o.sets[key]) result[key] = o.sets[key];
+      const foundation = optionOfKind('foundation');
+      const applies = !o.boostWith || (foundation && foundation.id === o.boostWith);
+      if (o.boost && o.boost[key] && applies) result[key] = Math.min(5, result[key] + o.boost[key]);
     });
   });
   return result;
@@ -1783,6 +1795,462 @@ function renderOutcome(wrap, backdrop) {
   wrap.addEventListener('animationend', () => drawPointers());
 }
 
+// Geführte Ergebnis-Seite: Punkte zählen hoch, dann erklären Kreise am Haus Stärken und Schwächen, zum Schluss das Fazit.
+// Die alte Fassung ist renderOutcome oben; Umschalten geht im Menü mit Taste E (settings.outcome).
+const COUNT_MS = 3000, COUNT_HOLD_MS = 1800, COUNT_FLY_MS = 850;
+const GOOD_FROM = 4, BAD_UP_TO = 2;
+// Es geht ums Überstehen der Flut: Kreise und Fazit schauen nur auf diese beiden Werte.
+const FLOOD_KEYS = ['stability', 'flood'];
+const PART_SPOTS = { Dach: '.pt-roof', Wand: '.pt-wall', Fundament: '.pt-base', Besonderheit: '.pt-extra' };
+const SPOT_KINDS = {
+  good: { mark: '+', label: 'Das lief gut', text: 'good', test: v => v >= GOOD_FROM },
+  bad: { mark: '!', label: 'Das lief nicht so gut', text: 'bad', test: v => v <= BAD_UP_TO },
+};
+// guided: Stand des Ablaufs. Bleibt beim Wechsel des Looks erhalten und wird beim Verlassen der Seite gelöscht.
+let guided = null;
+
+function scoreVerdict(points) {
+  if (points >= 13) return { word: 'Bombenfest!', lead: `Ey, dein Haus hält! ${points} von 15 Punkten sind richtig stark.` };
+  if (points >= 10) return { word: 'Ganz solide!', lead: `${points} von 15 Punkten: Dein Haus hält einiges aus, aber da geht noch was.` };
+  if (points >= 7) return { word: 'Da geht noch was!', lead: `${points} von 15 Punkten. Das Haus steht, aber bei der nächsten Flut wird es ungemütlich.` };
+  return { word: 'Ui, das wird nass!', lead: `Puh, nur ${points} von 15 Punkten. Die nächste Flut wird für dieses Haus richtig hart.` };
+}
+
+function partScores(option) {
+  return option.ratings || option.scores || null;
+}
+
+// Bauteile, die für diese Runde einen Kreis bekommen. Ohne eigene Werte zählt der Text in beiden Runden.
+function spotsFor(kind) {
+  const config = SPOT_KINDS[kind];
+  return scenario.steps.map((step, i) => {
+    const option = chosenOption(i);
+    if (!option) return null;
+    const scores = partScores(option);
+    const hits = scores ? SCALES.filter(([key]) => FLOOD_KEYS.includes(key) && config.test(scores[key])) : [];
+    if (scores && !hits.length) return null;
+    return { kind, step, option, chips: hits.map(([key, label]) => `${label} ${scores[key]}/5`) };
+  }).filter(Boolean);
+}
+
+function rankedParts() {
+  return scenario.steps
+    .map((step, i) => ({ step, option: chosenOption(i) }))
+    .filter(({ option }) => option && partScores(option))
+    .map(item => ({ ...item, sum: FLOOD_KEYS.reduce((total, key) => total + partScores(item.option)[key], 0) }))
+    .sort((a, b) => b.sum - a.sum);
+}
+
+// Fazit-Karte: Urteil, Punkte, Stärke, Schwäche und eine Einladung zur nächsten Runde.
+function conclusionCard(points, onClose) {
+  const max = SCALES.length * 5;
+  const verdict = scoreVerdict(points);
+  const card = el('div', 'fazit-card');
+  card.style.setProperty('--fazit-tone', `hsl(${Math.round((points / max) * 125)} 70% 40%)`);
+  const close = el('button', 'spot-close', '×');
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Fazit schließen');
+  close.onclick = onClose;
+  const head = el('div', 'fazit-head');
+  const titles = el('div');
+  titles.append(el('span', 'fazit-kicker', 'Dein Fazit'), el('strong', 'fazit-word', verdict.word));
+  const badge = el('span', 'fazit-score');
+  badge.append(el('b', null, String(points)), el('small', null, `/${max}`));
+  head.append(titles, badge);
+  card.append(close, head, el('p', 'fazit-lead', verdict.lead));
+  const ranked = rankedParts();
+  const row = (kind, label, item, text) => {
+    const line = el('div', `fazit-row fazit-row-${kind}`);
+    const body = el('div');
+    body.append(el('span', 'fazit-label', label), el('strong', 'fazit-part', `${item.step.name}: ${item.option.text}`));
+    if (text) body.append(el('p', 'fazit-text', text));
+    line.append(el('span', 'fazit-icon', kind === 'good' ? '+' : '!'), body);
+    card.append(line);
+  };
+  if (ranked.length) row('good', 'Am stärksten', ranked[0], ranked[0].option.good);
+  if (ranked.length > 1) {
+    const worst = ranked[ranked.length - 1];
+    row('bad', 'Luft nach oben', worst, worst.option.tip || worst.option.bad);
+  }
+  const footer = el('div', 'fazit-footer');
+  const back = el('button', 'btn', 'Zurück zur Ergebnisübersicht');
+  back.type = 'button';
+  back.onclick = onClose;
+  const choices = el('div', 'fazit-choices');
+  choices.append(back);
+  footer.append(choices);
+  card.append(footer);
+  return card;
+}
+
+// Sprechblase füllt sich Buchstabe für Buchstabe. Der Rest steht unsichtbar schon da, damit nichts springt.
+const TYPE_MS = 26;
+function typeText(target, text, delay = 0) {
+  if (target.dataset.text === text) return;
+  target.dataset.text = text;
+  target.setAttribute('aria-label', text);
+  const token = {};
+  target.typing = token;
+  const shown = el('span', 'typing-shown');
+  const rest = el('span', 'typing-rest', text);
+  rest.setAttribute('aria-hidden', 'true');
+  target.replaceChildren(shown, rest);
+  if (reducedMotion()) { shown.textContent = text; rest.textContent = ''; return; }
+  let count = 0;
+  const step = () => {
+    if (target.typing !== token || !target.isConnected) return;
+    count = Math.min(text.length, count + (text.length > 120 ? 2 : 1));
+    shown.textContent = text.slice(0, count);
+    rest.textContent = text.slice(count);
+    if (count < text.length) setTimeout(step, TYPE_MS);
+  };
+  setTimeout(step, delay);
+}
+
+function renderGuidedOutcome(wrap, backdrop) {
+  wrap.classList.add('guided');
+  saveSession(true);
+  if (!guided) guided = { phase: 'intro', seen: new Set(), forced: new Set() };
+  const { svg } = siteScene(backdrop, 'site-first');
+  const ratings = houseRatings();
+  const points = SCALES.reduce((sum, [key]) => sum + ratings[key], 0);
+
+  // Hammer oben links
+  const hammer = el('div', 'guided-hammer');
+  const figure = mascotFigure();
+  const speech = el('div', 'guided-speech');
+  const bubble = el('p', 'bubble bubble-side');
+  const nextButton = el('button', 'btn guided-next');
+  nextButton.type = 'button';
+  // Freie Ansicht nach dem Fazit: Gutes, Schlechtes und Fazit beliebig oft, ohne Sperren.
+  const review = el('div', 'review-tabs');
+  review.setAttribute('role', 'group');
+  review.setAttribute('aria-label', 'Nochmal ansehen');
+  const reviewButtons = [['good', 'Gutes'], ['bad', 'Schlechtes'], ['fazit', 'Fazit']].map(([key, label]) => {
+    const b = el('button', `review-tab review-${key}`, label);
+    b.type = 'button';
+    b.onclick = () => {
+      if (key === 'fazit') { enterPhase('fazit'); return; }
+      guided.view = guided.view === key ? null : key;
+      buildSpots(guided.view);
+      updateSpeech();
+    };
+    review.append(b);
+    return [key, b];
+  });
+  speech.append(bubble, nextButton, review);
+  hammer.append(figure, speech);
+
+  // Wertung und Buttons rechts
+  const right = el('div', 'guided-right');
+  const stats = el('div', 'outcome-stats');
+  const score = el('div', 'score');
+  const scoreNumber = el('span', 'score-number', points ? String(points) : '–');
+  score.append(scoreNumber, el('span', 'score-total', `von ${SCALES.length * 5} Punkten`));
+  const scales = el('div', 'scales');
+  SCALES.forEach(([key, label, info]) => scales.append(scaleRow(label, ratings[key], info)));
+  stats.append(score, scales);
+  const actions = el('div', 'outcome-actions');
+  const fresh = el('button', 'btn ghost', 'Neues Szenario');
+  fresh.onclick = () => { answers = []; go(0); };
+  const again = el('button', 'btn', 'Wiederholen');
+  again.onclick = () => { answers = []; go(1); };
+  actions.append(fresh, again);
+  right.append(stats, actions);
+  wrap.append(hammer, right);
+
+  // Kreise und Erklärkarte liegen über dem Haus
+  const layer = el('div', 'spot-layer');
+  backdrop.push(layer);
+  let spots = [], openCard = null;
+
+  const light = name => {
+    PART_ZONES.forEach(zone => svg.querySelectorAll(zone.glow).forEach(part =>
+      part.classList.toggle('is-lit', zone.name === name)));
+  };
+  const closeCard = () => {
+    if (openCard) openCard.remove();
+    openCard = null;
+    spots.forEach(item => item.button.classList.remove('is-open'));
+    light(null);
+  };
+  const placeCard = (card, button) => {
+    const b = button.getBoundingClientRect();
+    const w = card.offsetWidth, h = card.offsetHeight;
+    const toLeft = b.left + b.width / 2 < window.innerWidth / 2;
+    const x = toLeft ? b.left - w - 18 : b.right + 18;
+    const margin = 12;
+    card.style.left = `${Math.max(margin, Math.min(window.innerWidth - w - margin, x))}px`;
+    card.style.top = `${Math.max(margin, Math.min(window.innerHeight - h - margin, b.top + b.height / 2 - h / 2))}px`;
+  };
+  const placeSpots = () => {
+    if (!layer.isConnected) return;
+    spots.forEach(({ button, step }) => {
+      const r = svg.querySelector(PART_SPOTS[step.name]).getBoundingClientRect();
+      button.style.left = `${r.left + r.width / 2}px`;
+      button.style.top = `${r.top + r.height / 2}px`;
+    });
+    if (openCard) placeCard(openCard.card, openCard.button);
+  };
+  const anySeen = () => spots.some(item => guided.seen.has(`${item.kind}:${item.step.name}`));
+  const allSeen = () => spots.every(item => guided.seen.has(`${item.kind}:${item.step.name}`));
+  let speechDelay = 0;
+  const say = text => { typeText(bubble, text, speechDelay); speechDelay = 0; };
+  let fazit = null;
+  const closeFazit = () => {
+    if (fazit) fazit.remove();
+    fazit = null;
+  };
+  // Der Hammer wandert in die Mitte, daneben erscheint die Fazit-Karte.
+  const openFazit = () => {
+    closeFazit();
+    fazit = el('div', 'fazit');
+    const inner = el('div', 'fazit-inner');
+    const big = mascotFigure();
+    big.classList.add('fazit-figure');
+    // Schließen geht über ×, den Button unten oder einen Klick neben die Karte; danach ist alles frei ansehbar.
+    const toReview = () => enterPhase('review');
+    inner.append(big, conclusionCard(points, toReview));
+    const veil = el('div', 'fazit-veil');
+    fazit.addEventListener('click', e => { if (e.target === fazit || e.target === veil || e.target === inner) toReview(); });
+    fazit.append(veil, inner);
+    layer.append(fazit);
+    if (!reducedMotion()) {
+      const from = figure.getBoundingClientRect(), to = big.getBoundingClientRect();
+      if (from.width) {
+        big.animate([
+          { transform: `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width})` },
+          { transform: 'translate(0, -40px) rotate(-8deg)', offset: 0.7 },
+          { transform: 'none' },
+        ], { duration: 900, easing: 'cubic-bezier(.4, 0, .2, 1)' });
+      }
+    }
+  };
+
+  // Der Weiter-Button erscheint nach dem ersten Kreis blass und gestrichelt; farbig wird er, wenn alle Kreise
+  // angesehen sind oder wenn man ihn trotzdem einmal anklickt.
+  const PHASE_TEXT = {
+    good: {
+      button: 'Was lief nicht so gut? →', color: 'grünen',
+      none: 'Hmm, richtig stark war diesmal kein Bauteil. Sollen wir mal schauen, was nicht so gut gelaufen ist?',
+      start: 'Okay, dann schauen wir uns mal an, was gut gelaufen ist. Klick auf die grünen Kreise!',
+      done: 'Stark! Sollen wir mal schauen, was nicht so gut gelaufen ist?',
+    },
+    bad: {
+      button: 'Zum Fazit →', color: 'roten',
+      none: 'Kaum zu glauben: Hier gibt es nichts zu meckern! Wenn du bereit bist, zeig ich dir dein Fazit.',
+      start: 'Das tut jetzt kurz weh. Klick auf die roten Kreise!',
+      done: 'Kein Stress, schau dir ruhig alles in Ruhe an. Wenn du bereit bist, zeig ich dir dein Fazit.',
+    },
+  };
+  const isLocked = () => spots.length > 0 && !allSeen() && !guided.forced.has(guided.phase);
+  function updateSpeech() {
+    const phase = guided.phase;
+    wrap.classList.toggle('is-fazit', phase === 'fazit');
+    review.hidden = phase !== 'review';
+    if (phase === 'review') {
+      nextButton.hidden = true;
+      reviewButtons.forEach(([key, b]) => b.setAttribute('aria-pressed', String(guided.view === key)));
+      say('Willst du dir die einzelnen Punkte nochmal anschauen? Klick einfach, was dich interessiert.');
+      return;
+    }
+    const words = PHASE_TEXT[phase];
+    if (!words) { nextButton.hidden = true; return; }
+    nextButton.textContent = words.button;
+    nextButton.hidden = spots.length > 0 && !anySeen();
+    nextButton.classList.toggle('is-locked', isLocked());
+    nextButton.setAttribute('aria-label', isLocked() ? `${words.button.replace(' →', '')} (erst die anderen Kreise ansehen)` : words.button.replace(' →', ''));
+    if (!spots.length) say(words.none);
+    else if (allSeen()) say(words.done);
+    else if (anySeen()) say(`Stark! Schau dir auch noch die anderen ${words.color} Kreise an.`);
+    else say(words.start);
+  }
+  const showCard = item => {
+    const wasOpen = openCard && openCard.button === item.button;
+    closeCard();
+    if (wasOpen) return;
+    const config = SPOT_KINDS[item.kind];
+    const card = el('div', `spot-card spot-card-${item.kind}`);
+    card.setAttribute('role', 'status');
+    const close = el('button', 'spot-close', '×');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Schließen');
+    close.onclick = closeCard;
+    card.append(close, el('span', 'spot-kicker', config.label),
+      el('strong', 'spot-title', `${item.step.name}: ${item.option.text}`),
+      el('p', 'spot-text', item.option[config.text]));
+    if (item.chips.length) {
+      const chips = el('div', 'spot-chips');
+      item.chips.forEach(chip => chips.append(el('span', 'spot-chip', chip)));
+      card.append(chips);
+    }
+    layer.append(card);
+    openCard = { card, button: item.button, remove: () => card.remove() };
+    item.button.classList.add('is-open', 'is-seen');
+    item.button.querySelector('.spot-mark').textContent = '✓';
+    guided.seen.add(`${item.kind}:${item.step.name}`);
+    placeCard(card, item.button);
+    light(item.step.name);
+    updateSpeech();
+  };
+  const buildSpots = kind => {
+    closeCard();
+    spots.forEach(item => item.button.remove());
+    spots = (kind ? spotsFor(kind) : []).map((item, index) => {
+      const seen = guided.seen.has(`${item.kind}:${item.step.name}`);
+      const button = el('button', `spot spot-${kind}${seen ? ' is-seen' : ''}`);
+      button.type = 'button';
+      button.style.setProperty('--spot-delay', `${index * 120}ms`);
+      button.setAttribute('aria-label', `${SPOT_KINDS[kind].label}: ${item.step.name} ansehen`);
+      button.append(el('span', 'spot-mark', seen ? '✓' : SPOT_KINDS[kind].mark));
+      const entry = { ...item, button };
+      button.onclick = e => { e.stopPropagation(); showCard(entry); };
+      layer.append(button);
+      return entry;
+    });
+    placeSpots();
+  };
+  const enterPhase = phase => {
+    guided.phase = phase;
+    buildSpots(phase === 'good' || phase === 'bad' ? phase : phase === 'review' ? guided.view : null);
+    updateSpeech();
+    if (phase === 'fazit') openFazit(); else closeFazit();
+  };
+  nextButton.onclick = () => {
+    if (isLocked()) {
+      // Erst nachfragen, danach darf man trotzdem weiter.
+      guided.forced.add(guided.phase);
+      nextButton.classList.remove('is-locked');
+      mascotHop(figure);
+      const left = spots.filter(item => !guided.seen.has(`${item.kind}:${item.step.name}`)).length;
+      say(`Willst du wirklich schon weitermachen? Schau dir doch noch ${left === 1 ? 'den anderen Punkt' : 'die anderen Punkte'} an!`);
+      return;
+    }
+    enterPhase(guided.phase === 'good' ? 'bad' : 'fazit');
+  };
+  const closeOutside = e => {
+    if (!layer.isConnected) { document.removeEventListener('click', closeOutside); return; }
+    if (openCard && !openCard.card.contains(e.target)) closeCard();
+  };
+  document.addEventListener('click', closeOutside);
+  drawPointers = placeSpots;
+  wrap.addEventListener('animationend', placeSpots);
+
+  // Nach dem Hochzählen fliegt der Hammer herein, die Blase geht auf und der Text tippt sich.
+  const reveal = () => {
+    wrap.classList.remove('is-waiting');
+    if (!reducedMotion()) {
+      figure.animate([
+        { transform: 'translate(-70vw, -40px) rotate(-540deg) scale(.6)' },
+        { transform: 'translate(20px, -24px) rotate(10deg) scale(1.08)', offset: 0.75 },
+        { transform: 'none' },
+      ], { duration: 950, easing: 'cubic-bezier(.3, .8, .4, 1)' });
+      speech.animate([
+        { opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.7 }, { opacity: 1, transform: 'none' },
+      ], { duration: 450, delay: 800, easing: 'ease-out', fill: 'backwards' });
+      speechDelay = 1200;
+    }
+    enterPhase('good');
+  };
+  if (guided.phase !== 'intro') {
+    queueMicrotask(() => enterPhase(guided.phase));
+  } else if (!points || reducedMotion()) {
+    queueMicrotask(reveal);
+  } else {
+    wrap.classList.add('is-waiting');
+    backdrop.push(scoreIntro(points, scoreNumber, reveal));
+  }
+}
+
+// Vorspann: Die Zahl zählt erst langsam, dann immer schneller hoch und fliegt danach an ihren Platz.
+function scoreIntro(points, target, done) {
+  const max = SCALES.length * 5;
+  const box = el('div', 'score-intro');
+  const shade = el('div', 'score-intro-bg');
+  const content = el('div', 'score-intro-content');
+  const title = el('h1', 'score-intro-title', 'Wie schlägt sich dein Haus?');
+  const row = el('div', 'score-intro-row');
+  const number = el('span', 'score-intro-number', '0');
+  const outOf = el('span', 'score-intro-max', `/${max}`);
+  row.append(number, outOf);
+  const pips = el('div', 'score-intro-pips');
+  for (let i = 0; i < max; i++) pips.append(el('span', 'score-intro-pip'));
+  const word = el('p', 'score-intro-word', scoreVerdict(points).word);
+  content.append(title, row, pips, word);
+  const skipHint = el('span', 'score-intro-skip', 'Klicken zum Überspringen');
+  box.append(shade, content, skipHint);
+
+  const hue = value => `hsl(${Math.round((value / max) * 125)} 75% 42%)`;
+  const showValue = value => {
+    number.textContent = String(value);
+    number.style.color = hue(value);
+    [...pips.children].forEach((pip, i) => {
+      pip.classList.toggle('is-on', i < value);
+      pip.style.background = i < value ? hue(value) : '';
+    });
+    number.animate([{ transform: 'scale(1.32)' }, { transform: 'scale(1)' }], { duration: 170, easing: 'ease-out' });
+  };
+  const timers = [];
+  // Wurzel: Die ersten Schritte liegen weit auseinander, gegen Ende folgen sie immer dichter.
+  for (let value = 1; value <= points; value++) {
+    timers.push(setTimeout(() => showValue(value), COUNT_MS * Math.sqrt(value / points)));
+  }
+
+  const confetti = () => {
+    const colors = ['#ff8a1f', '#ffc53d', '#39d08a', '#1fb0f2', '#f4593a'];
+    for (let i = 0; i < 26; i++) {
+      const piece = el('span', 'score-intro-confetti');
+      piece.style.background = colors[i % colors.length];
+      content.append(piece);
+      const angle = (i / 26) * Math.PI * 2, far = 150 + (i * 37) % 170;
+      const animation = piece.animate([
+        { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${Math.cos(angle) * far}px, ${Math.sin(angle) * far + 70}px) rotate(${i * 67}deg)`, opacity: 0 },
+      ], { duration: 950 + (i * 23) % 300, easing: 'cubic-bezier(.15, .7, .3, 1)' });
+      animation.onfinish = () => piece.remove();
+    }
+  };
+
+  const fly = () => {
+    if (!box.isConnected) return;
+    target.style.visibility = 'hidden';
+    const from = number.getBoundingClientRect(), to = target.getBoundingClientRect();
+    const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+    const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+    const size = to.height / from.height;
+    const fade = { duration: COUNT_FLY_MS * 0.55, fill: 'forwards', easing: 'ease-out' };
+    [title, pips, word, outOf].forEach(part => part.animate({ opacity: [1, 0] }, fade));
+    shade.animate({ opacity: [1, 0] }, { duration: COUNT_FLY_MS, fill: 'forwards' });
+    box.style.pointerEvents = 'none';
+    done();
+    const flight = number.animate([
+      { transform: 'none', color: number.style.color },
+      { transform: `translate(${dx * 0.6}px, ${dy * 0.6 - 30}px) scale(${(1 + size) / 2})`, offset: 0.6 },
+      { transform: `translate(${dx}px, ${dy}px) scale(${size})`, color: getComputedStyle(target).color },
+    ], { duration: COUNT_FLY_MS, easing: 'cubic-bezier(.5, 0, .3, 1)', fill: 'forwards' });
+    flight.onfinish = () => {
+      target.style.visibility = '';
+      box.remove();
+    };
+  };
+  let finished = false;
+  const finish = () => {
+    if (finished || !box.isConnected) return;
+    finished = true;
+    timers.forEach(clearTimeout);
+    showValue(points);
+    word.classList.add('is-on');
+    skipHint.remove();
+    number.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.22)' }, { transform: 'scale(1)' }],
+      { duration: 420, easing: 'cubic-bezier(.3, 1.6, .5, 1)' });
+    confetti();
+    setTimeout(fly, COUNT_HOLD_MS);
+  };
+  timers.push(setTimeout(finish, COUNT_MS + 120));
+  box.onclick = finish;
+  return box;
+}
+
 function render() {
   guideStop();
   renderProgress();
@@ -1821,7 +2289,21 @@ function render() {
     main.append(title, entry);
     const art = el('div', 'start-art');
     art.innerHTML = themed(BUILD_ART);
-    backdrop.push(art);
+    // Unsichtbare Abkürzung für uns: weiter ohne Namen. Ohne session.id wird nichts gespeichert,
+    // darum landen solche Durchläufe nicht in den Testdaten.
+    const skip = el('button', 'name-skip');
+    skip.type = 'button';
+    skip.append(el('span', 'name-skip-label', 'Ohne Namen weiter →'));
+    skip.tabIndex = -1;
+    skip.setAttribute('aria-label', 'Ohne Namen weiter');
+    skip.onclick = () => {
+      session.id = '';
+      session.name = '';
+      answers = [];
+      scenario = null;
+      softGo(0);
+    };
+    backdrop.push(art, skip);
     wrap.append(main);
   } else if (page === 0) {
     wrap.classList.add('select');
@@ -1925,7 +2407,8 @@ function render() {
       el('p', 'text', 'Hier kommt bald die Flut-Simulation mit deinem Haus.'),
       nav(() => go(HOUSE), () => go(RESULT), 'Zum Ergebnis →'));
   } else {
-    renderOutcome(wrap, backdrop);
+    if (settings.outcome === 'classic') renderOutcome(wrap, backdrop);
+    else renderGuidedOutcome(wrap, backdrop);
   }
   stage.replaceChildren(...backdrop, wrap);
   drawPointers();
@@ -1934,14 +2417,19 @@ function render() {
 
 // Ring mit dem Anteil der Haushalte vor Ort, die genau diese Option nutzen.
 // Daten: usage: { real: Eintrag, material?: Eintrag } an der Option. Ein Eintrag hat
-// value (Prozent), kind ('measured' | 'estimate'), info (Hinweis hinter dem i), optional label und line.
+// value (Prozent), kind ('measured' | 'estimate' | 'none' | 'fact'), info (Hinweis hinter dem i), optional label,
+// note (eigener Satz neben dem Ring) und line.
 // Fehlt usage, gibt es noch keine Daten. Ohne material zeigt auch die Materialansicht den realen Wert.
-const RING_R = 44, RING_LEN = 2 * Math.PI * RING_R;
+const RING_R = 47, RING_LEN = 2 * Math.PI * RING_R;
 
 function usageGauge() {
   const box = el('div', 'usage');
   const ring = el('div', 'usage-ringbox');
   ring.innerHTML = `<svg class="usage-ring" viewBox="0 0 110 110" aria-hidden="true">
+    <defs><linearGradient id="usage-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop class="usage-stop-a" offset="0"/><stop class="usage-stop-b" offset="1"/>
+    </linearGradient></defs>
+    <circle class="usage-disc" cx="55" cy="55" r="40"/>
     <circle class="usage-track" cx="55" cy="55" r="${RING_R}"/>
     <circle class="usage-arc" cx="55" cy="55" r="${RING_R}" stroke-dasharray="${RING_LEN}" stroke-dashoffset="${RING_LEN}" transform="rotate(-90 55 55)"/>
   </svg>`;
@@ -1968,12 +2456,17 @@ function usageGauge() {
       box.classList.remove('is-pop');
       number.replaceChildren();
       if (entry && entry.kind === 'estimate' && !entry.label) number.append(el('small', null, 'ca.'));
-      number.append(el('span', null, !entry ? '–'
-        : entry.label || `${value.toLocaleString('de-DE', { maximumFractionDigits: 2 })} %`));
+      if (!entry) number.append(el('span', 'usage-value', '–'));
+      else if (entry.label) number.append(el('span', 'usage-value usage-value-label', entry.label));
+      else {
+        const shown = el('span', 'usage-value', value.toLocaleString('de-DE', { maximumFractionDigits: 1 }));
+        shown.append(el('span', 'usage-percent', '%'));
+        number.append(shown);
+      }
       arc.style.strokeDashoffset = RING_LEN * (1 - value / 100);
       const main = !option ? 'Wähle eine Option.'
         : !entry ? 'Keine Daten'
-        : entry.line || `der Haushalte in ${region} bauen so`;
+        : entry.note || entry.line || `der Haushalte in ${region} bauen so`;
       text.replaceChildren(el('strong', 'usage-main', main));
       if (entry && entry.line) text.append(el('span', 'usage-sub', `der Wände in ${region} bestehen aus diesem Material`));
       text.title = text.textContent;
@@ -1990,6 +2483,10 @@ document.addEventListener('click', e => {
 // Menü mit Taste E: Darstellung der Prozentanzeige und der Infos unter den Optionen.
 // Reihenfolge wie auf der Seite: erst der Text unter den Auswahlmöglichkeiten, dann der Prozentring darunter.
 const SETTING_ROWS = [
+  ['outcome', 'Ergebnis-Seite', [
+    ['guided', 'Geführt (neu)', 'Punkte zählen hoch, danach führt der Hammer mit Kreisen am Haus zum Fazit.'],
+    ['classic', 'Kästen mit Linien (alt)', 'Alle Infos stehen sofort in Kästen, gestrichelte Linien zeigen aufs Haus.'],
+  ]],
   ['info', 'Text unter den Auswahlmöglichkeiten', [
     ['inline', 'Immer aufgeklappt', 'Der Text steht direkt unter der gewählten Option, zum Beispiel unter „Lehmwand“.'],
     ['icon', 'Hinter dem i-Symbol', 'Der Text öffnet sich erst, wenn du rechts im Kasten auf das i klickst.'],
@@ -2006,8 +2503,8 @@ function buildSettingsMenu() {
   const panel = el('div', 'settings-panel');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'true');
-  panel.setAttribute('aria-label', 'Ansicht der Auswahlseiten');
-  panel.append(el('h2', null, 'Ansicht der Auswahlseiten'));
+  panel.setAttribute('aria-label', 'Ansicht');
+  panel.append(el('h2', null, 'Ansicht'));
   const buttons = [];
   SETTING_ROWS.forEach(([key, label, choices]) => {
     const group = el('div', 'settings-row');
@@ -2019,7 +2516,7 @@ function buildSettingsMenu() {
       b.onclick = () => {
         settings[key] = value;
         sync();
-        if (page >= 2 && page <= 5) go(page);
+        if ((page >= 2 && page <= 5) || page === RESULT) go(page);
       };
       buttons.push([key, value, b]);
       row.append(b);
@@ -2142,6 +2639,15 @@ function artMascot(art) {
 
 // Der Hammer macht ab und zu von selbst einen Salto, redet dabei aber nicht.
 const TRICK_MIN_MS = 9000, TRICK_EXTRA_MS = 9000;
+
+function mascotHop(figure) {
+  if (reducedMotion()) return;
+  figure.querySelector('.mascot-art').animate([
+    { transform: 'none' }, { transform: 'translateY(8%) scale(1.1, .86)', offset: 0.2 },
+    { transform: 'translateY(-45%) rotate(-8deg)', offset: 0.55 }, { transform: 'translateY(4%) scale(1.06, .92)', offset: 0.85 },
+    { transform: 'none' },
+  ], { duration: 650, easing: 'ease-out' });
+}
 
 function mascotSalto(figure) {
   if (reducedMotion()) return;
