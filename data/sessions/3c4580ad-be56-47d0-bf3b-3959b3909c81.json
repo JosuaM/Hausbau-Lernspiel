@@ -1,0 +1,32 @@
+{
+  "id": "3c4580ad-be56-47d0-bf3b-3959b3909c81",
+  "startedAt": "2026-11-10T17:31:19.888Z",
+  "name": "",
+  "scenario": "flood",
+  "page": 8,
+  "choices": {
+    "Fundament": {
+      "id": "earth",
+      "text": "Gestampfter Erdsockel"
+    },
+    "Wand": {
+      "id": "brickwall",
+      "text": "Verputzte Ziegelwand"
+    },
+    "Dach": {
+      "id": "thatch",
+      "text": "Gras-Satteldach"
+    },
+    "Besonderheit": {
+      "id": "vetiver",
+      "text": "Bepflanzung mit Vetivergras"
+    }
+  },
+  "ratings": {
+    "availability": 4,
+    "stability": 3,
+    "flood": 2
+  },
+  "finished": true,
+  "updatedAt": "2026-11-10T17:33:30.289Z"
+}

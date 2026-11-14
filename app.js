@@ -2043,6 +2043,10 @@ function renderGuidedOutcome(wrap, backdrop) {
       done: 'Kein Stress, schau dir ruhig alles in Ruhe an. Wenn du bereit bist, zeig ich dir dein Fazit.',
     },
   };
+  // Die Zwei-Bildschirm-Fassung ersetzt hier einzelne Sätze (z. B. „Tippe unten …“ statt „Klick …“).
+  if (window.GUIDED_TEXT) Object.keys(window.GUIDED_TEXT).forEach(key => {
+    PHASE_TEXT[key] = { ...(PHASE_TEXT[key] || {}), ...window.GUIDED_TEXT[key] };
+  });
   const isLocked = () => spots.length > 0 && !allSeen() && !guided.forced.has(guided.phase);
   function updateSpeech() {
     const phase = guided.phase;
@@ -2051,7 +2055,7 @@ function renderGuidedOutcome(wrap, backdrop) {
     if (phase === 'review') {
       nextButton.hidden = true;
       reviewButtons.forEach(([key, b]) => b.setAttribute('aria-pressed', String(guided.view === key)));
-      say('Willst du dir die einzelnen Punkte nochmal anschauen? Klick einfach, was dich interessiert.');
+      say((PHASE_TEXT.review && PHASE_TEXT.review.text) || 'Willst du dir die einzelnen Punkte nochmal anschauen? Klick einfach, was dich interessiert.');
       return;
     }
     const words = PHASE_TEXT[phase];
@@ -2151,6 +2155,17 @@ function renderGuidedOutcome(wrap, backdrop) {
       speechDelay = 1200;
     }
     enterPhase('good');
+  };
+  // Steuerung von außen (Zwei-Bildschirm-Fassung: das iPad öffnet die Kreise oben).
+  wrap.guidedApi = {
+    phase: () => guided.phase,
+    enterPhase(phase, view = null) { guided.view = view; enterPhase(phase); },
+    open(kind, name) {
+      const entry = spots.find(item => item.kind === kind && item.step.name === name);
+      if (!entry || (openCard && openCard.button === entry.button)) return;
+      showCard(entry);
+    },
+    close: closeCard,
   };
   if (guided.phase !== 'intro') {
     queueMicrotask(() => enterPhase(guided.phase));
@@ -2668,8 +2683,12 @@ function mascotTrick() {
   setTimeout(mascotTrick, TRICK_MIN_MS + Math.random() * TRICK_EXTRA_MS);
 }
 
-buildProgress();
-buildLookSwitch();
-buildSettingsMenu();
-render();
-setTimeout(mascotTrick, TRICK_MIN_MS);
+// Die Zwei-Bildschirm-Fassung (zwei-bildschirme.html) nutzt nur Grafiken, Daten und Hilfsfunktionen von hier
+// und baut ihre Seiten selbst (siehe zwei.js).
+if (!window.ZWEI_BILDSCHIRME) {
+  buildProgress();
+  buildLookSwitch();
+  buildSettingsMenu();
+  render();
+  setTimeout(mascotTrick, TRICK_MIN_MS);
+}

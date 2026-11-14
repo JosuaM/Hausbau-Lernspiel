@@ -5,6 +5,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const ROOT = __dirname;
 const DIR = path.join(ROOT, 'data', 'sessions');
@@ -13,7 +14,27 @@ const TYPES = {
   '.json': 'application/json; charset=utf-8', '.csv': 'text/csv; charset=utf-8',
 };
 // Nur diese Dateien werden ausgeliefert, damit data/ und server.js nicht direkt erreichbar sind.
-const PUBLIC = { '/': 'index.html', '/index.html': 'index.html', '/app.js': 'app.js', '/style.css': 'style.css', '/results': 'results.html' };
+const PUBLIC = {
+  '/': 'index.html', '/index.html': 'index.html', '/app.js': 'app.js', '/style.css': 'style.css', '/results': 'results.html',
+  // Zwei Bildschirme: /oben auf dem Laptop (Anzeige), /unten auf dem iPad (Touch-Steuerung)
+  '/zwei': 'zwei-bildschirme.html', '/oben': 'zwei-bildschirme.html', '/unten': 'zwei-bildschirme.html',
+  '/zwei-bildschirme.html': 'zwei-bildschirme.html', '/zwei.js': 'zwei.js', '/zwei.css': 'zwei.css',
+};
+
+// Zwei Bildschirme: Das iPad schickt den Spielstand, der Server reicht ihn per Server-Sent Events an alle Bildschirme weiter.
+let duoState = null;
+const duoClients = new Set();
+function duoBroadcast() {
+  const msg = `data: ${JSON.stringify(duoState)}\n\n`;
+  duoClients.forEach(res => res.write(msg));
+}
+setInterval(() => duoClients.forEach(res => res.write(': ping\n\n')), 20000);
+
+// Adressen im WLAN, unter denen das iPad den Laptop erreicht.
+function lanAddresses() {
+  return Object.values(os.networkInterfaces()).flat()
+    .filter(a => a && a.family === 'IPv4' && !a.internal).map(a => a.address);
+}
 
 fs.mkdirSync(DIR, { recursive: true });
 
@@ -86,6 +107,36 @@ http.createServer((req, res) => {
     });
     return;
   }
+  if (req.method === 'GET' && url === '/api/duo/events') {
+    res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+    res.write('retry: 1500\n\n');
+    if (duoState) res.write(`data: ${JSON.stringify(duoState)}\n\n`);
+    duoClients.add(res);
+    req.on('close', () => duoClients.delete(res));
+    return;
+  }
+  if (req.method === 'POST' && url === '/api/duo') {
+    let body = '', tooBig = false;
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 20000) { tooBig = true; req.destroy(); }
+    });
+    req.on('end', () => {
+      if (tooBig) return;
+      try {
+        const next = JSON.parse(body);
+        if (!next || typeof next !== 'object' || Array.isArray(next)) throw new Error('bad state');
+        duoState = next;
+        duoBroadcast();
+        send(res, 204);
+      } catch (e) { send(res, 400); }
+    });
+    return;
+  }
+  if (req.method === 'GET' && url === '/api/duo/info') {
+    send(res, 200, TYPES['.json'], JSON.stringify({ addresses: lanAddresses(), port: Number(process.env.PORT || 3000) }));
+    return;
+  }
   if (req.method === 'GET' && url === '/api/results') { send(res, 200, TYPES['.json'], JSON.stringify(sorted())); return; }
   if (req.method === 'GET' && url === '/results.csv') { send(res, 200, TYPES['.csv'], csv()); return; }
   const name = req.method === 'GET' ? PUBLIC[url] : null;
@@ -96,4 +147,6 @@ http.createServer((req, res) => {
 }).listen(process.env.PORT || 3000, () => {
   console.log(`Läuft auf http://localhost:${process.env.PORT || 3000}`);
   console.log(`Auswertung: http://localhost:${process.env.PORT || 3000}/results  (${records.size} Durchläufe vorhanden)`);
+  console.log(`Zwei Bildschirme: Laptop http://localhost:${process.env.PORT || 3000}/oben`);
+  lanAddresses().forEach(ip => console.log(`                  iPad   http://${ip}:${process.env.PORT || 3000}/unten`));
 });

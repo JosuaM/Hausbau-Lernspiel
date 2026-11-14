@@ -1,0 +1,32 @@
+{
+  "id": "8cf308a5-41d3-41db-b698-2b309b6e52c4",
+  "startedAt": "2026-11-10T17:10:12.478Z",
+  "name": "",
+  "scenario": "flood",
+  "page": 7,
+  "choices": {
+    "Fundament": {
+      "id": "stilts",
+      "text": "Pfahlbau"
+    },
+    "Wand": {
+      "id": "ferro",
+      "text": "Ferrocement-Wand"
+    },
+    "Dach": {
+      "id": "thatch",
+      "text": "Gras-Satteldach"
+    },
+    "Besonderheit": {
+      "id": "frame",
+      "text": "Verstärktes Tragwerk"
+    }
+  },
+  "ratings": {
+    "availability": 3,
+    "stability": 4,
+    "flood": 3
+  },
+  "finished": true,
+  "updatedAt": "2026-11-10T17:17:02.677Z"
+}
