@@ -1,0 +1,20 @@
+{
+  "id": "d5257db0-fb44-4c36-91a8-912902eaebc7",
+  "startedAt": "2026-11-05T14:07:23.381Z",
+  "name": "x",
+  "scenario": "flood",
+  "page": 5,
+  "choices": {
+    "Besonderheit": {
+      "id": "well",
+      "text": "Erhöhter Brunnen und Latrine"
+    }
+  },
+  "ratings": {
+    "availability": 0,
+    "stability": 0,
+    "flood": 0
+  },
+  "finished": false,
+  "updatedAt": "2026-11-05T14:07:45.155Z"
+}

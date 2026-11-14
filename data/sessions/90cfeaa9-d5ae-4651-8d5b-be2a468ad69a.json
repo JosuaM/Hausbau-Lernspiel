@@ -3,13 +3,22 @@
   "startedAt": "2026-11-05T13:53:43.043Z",
   "name": "dsa",
   "scenario": "flood",
-  "page": 0,
-  "choices": {},
+  "page": 3,
+  "choices": {
+    "Wand": {
+      "id": "ferro",
+      "text": "Ferrocement-Wand"
+    },
+    "Besonderheit": {
+      "id": "well",
+      "text": "Erhöhter Brunnen und Latrine"
+    }
+  },
   "ratings": {
-    "availability": 0,
-    "stability": 0,
-    "flood": 0
+    "availability": 1,
+    "stability": 4,
+    "flood": 5
   },
   "finished": false,
-  "updatedAt": "2026-11-05T13:53:44.653Z"
+  "updatedAt": "2026-11-05T13:58:44.165Z"
 }
