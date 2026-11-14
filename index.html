@@ -3,14 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hausbau Prototyp</title>
-<link rel="stylesheet" href="style.css">
+<title>Hausbau-Lernspiel</title>
+<style>
+  :root { --bg: #ececec; --panel: #fafafa; --btn: #d9d9d9; --btn-hover: #cbcbcb; --line: #b8b8b8; --fg: #222; --muted: #666; --ok: #3c7a4a; --bad: #9a4a3c; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1e1e1e; --panel: #262626; --btn: #3a3a3a; --btn-hover: #484848; --line: #555; --fg: #eee; --muted: #aaa; --ok: #6fbf84; --bad: #d08a7c; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--bg); color: var(--fg); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { width: min(520px, 100%); background: var(--panel); border: 1px solid var(--line); padding: 32px; }
+  h1 { font-size: 1.5rem; font-weight: 600; margin: 0 0 4px; letter-spacing: .01em; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .option { margin-bottom: 12px; }
+  .split { display: flex; border: 1px solid var(--line); }
+  .split > * { background: var(--btn); color: var(--fg); border: 0; font: inherit; cursor: pointer; text-decoration: none; }
+  .split > *:hover { background: var(--btn-hover); }
+  .split .main { flex: 1; display: block; text-align: left; padding: 14px 16px; }
+  .split .main strong { display: block; font-weight: 600; }
+  .split .main span { display: block; color: var(--muted); font-size: .875rem; margin-top: 2px; }
+  .split .side { width: 52px; display: grid; place-items: center; border-left: 1px solid var(--line); }
+  .split svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: square; }
+  .group { border: 1px solid var(--line); padding: 12px; display: grid; gap: 8px; }
+  .group-head span { display: block; color: var(--muted); font-size: .875rem; }
+  .hint { margin: 0 0 6px; font-size: .875rem; color: var(--muted); }
+  .hint a { color: var(--fg); }
+  .running .hint { display: none; }
+  .split.is-disabled { opacity: .45; }
+  .split.is-disabled > * { cursor: not-allowed; pointer-events: none; }
+  .split.is-disabled > *:hover { background: var(--btn); }
+  .sublinks { font-size: .85rem; color: var(--muted); margin: 6px 2px 0; }
+  .sublinks button, .sublinks a { background: none; border: 0; padding: 0; font: inherit; color: var(--fg); text-decoration: underline; cursor: pointer; }
+  [hidden] { display: none !important; }
+</style>
 </head>
 <body>
-<header>
-  <nav id="progress" aria-label="Fortschritt"></nav>
-</header>
-<main id="stage"></main>
-<script src="app.js"></script>
+<main>
+  <h1>Hausbau-Lernspiel</h1>
+  <p class="sub">Auswahl</p>
+
+  <!-- Pro Eintrag: Hauptfläche öffnet hier, Symbol rechts öffnet ein extra Fenster -->
+  <div class="option">
+    <div class="split">
+      <a class="main" href="spiel/spiel.html"><strong>Einzelspiel</strong><span>Ein Bildschirm, Maus oder Touch</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Einzelspiel in extra Fenster öffnen" data-pop="spiel/spiel.html" data-name="hausbau-spiel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+    </div>
+  </div>
+
+  <div class="option group">
+    <div class="group-head"><strong>Zwei Bildschirme</strong><span>Oben anzeigen, unten bedienen. Die Fenster sind miteinander verbunden.</span></div>
+    <div class="split">
+      <a class="main" href="spiel/zwei.html?rolle=oben"><strong>Oberer Bildschirm</strong><span>Zeigt Szenario, Haus und Ergebnis</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Oberen Bildschirm in extra Fenster öffnen" data-pop="spiel/zwei.html?rolle=oben" data-name="hausbau-oben"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+    </div>
+    <div class="split">
+      <a class="main" href="spiel/zwei.html?rolle=unten"><strong>Unterer Bildschirm</strong><span>Touch-Steuerung</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Unteren Bildschirm in extra Fenster öffnen" data-pop="spiel/zwei.html?rolle=unten" data-name="hausbau-unten"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+    </div>
+    <div class="split">
+      <button class="main" id="both" type="button"><strong>Beide in extra Fenstern öffnen</strong><span>Oben und unten zusammen, auf einem Rechner</span></button>
+      <button class="side" type="button" tabindex="-1" aria-hidden="true" id="both-icon"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+    </div>
+  </div>
+
+  <!-- User-Testing: braucht den Server, bis er läuft ist der Button gesperrt -->
+  <div class="option">
+    <p class="hint" id="hint"><span id="status-note">Bitte starte den Server, falls du ein User-Testing machen möchtest.</span>
+      <a href="#" id="start-server">Server starten</a></p>
+    <div class="split is-disabled" id="testing-box">
+      <a class="main" id="testing" href="spiel/spiel.html" aria-disabled="true" tabindex="-1"><strong>User-Testing</strong><span>Durchläufe werden gespeichert</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="User-Testing in extra Fenster öffnen" id="testing-icon" disabled><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  var isFile = location.protocol === 'file:';
+  var SERVER = isFile ? 'http://localhost:3000' : '';
+  var running = false, stopped = false;
+  var DEFAULT_NOTE = 'Bitte starte den Server, falls du ein User-Testing machen möchtest.';
+
+  // Betriebssystem erkennen: passende Start-Datei für den Server.
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  var isWin = /win/i.test(plat) || /Windows/.test(navigator.userAgent);
+  var startFile = isWin ? 'server/start-windows.bat' : 'server/start-mac.command';
+
+  function pop(url, name, i) {
+    var w = Math.round(screen.availWidth * .6), h = Math.round(screen.availHeight * .8);
+    var win = window.open(url, name, 'popup=yes,width=' + w + ',height=' + h + ',left=' + (40 + i * 60) + ',top=' + (40 + i * 40));
+    if (win) win.focus(); else $('status-note').textContent = 'Pop-up blockiert: Bitte Pop-ups für diese Seite erlauben.';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pop]'), function (b) {
+    b.onclick = function () { pop(b.dataset.pop, b.dataset.name, 0); };
+  });
+  function both() { pop('spiel/zwei.html?rolle=oben', 'hausbau-oben', 0); pop('spiel/zwei.html?rolle=unten', 'hausbau-unten', 1); }
+  $('both').onclick = both;
+  $('both-icon').onclick = both;
+  $('testing-icon').onclick = function () { pop('spiel/spiel.html', 'hausbau-spiel', 0); };
+
+  // Ein Browser darf keine Programme starten. Darum wird die Start-Datei geladen; ein Doppelklick startet den Server unsichtbar im Hintergrund.
+  var startLink = $('start-server');
+  startLink.href = startFile; startLink.setAttribute('download', startFile.split('/').pop());
+  startLink.textContent = 'Server starten (' + (isWin ? 'Windows' : 'Mac') + ')';
+  startLink.onclick = function () {
+    $('status-note').textContent = 'Die Datei „' + startFile.split('/').pop() + '“ wurde geladen. Bitte einmal öffnen; diese Seite erkennt den Server dann selbst.' +
+      (isWin ? '' : ' Mac: Falls sie sich nicht öffnen lässt, die Datei im Ordner „server“ per Rechtsklick › Öffnen starten.');
+  };
+
+  $('stop').onclick = function () {
+    fetch('/api/shutdown', { method: 'POST' }).catch(function () {});
+    stopped = true;
+  };
+
+  function setState(info) {
+    running = !!info;
+    document.body.classList.toggle('running', running);
+    $('running-links').hidden = !running;
+    $('testing-box').classList.toggle('is-disabled', !running);
+    $('testing-icon').disabled = !running;
+    $('testing').setAttribute('aria-disabled', running ? 'false' : 'true');
+    $('testing').tabIndex = running ? 0 : -1;
+    if (running) {
+      var ip = (info.addresses || [])[0], port = info.port || location.port;
+      $('ipad').innerHTML = ip ? '<br>iPad (selbes WLAN): <a href="http://' + ip + ':' + port + '/unten">http://' + ip + ':' + port + '/unten</a>' : '';
+    } else if (stopped) {
+      stopped = false; $('status-note').textContent = DEFAULT_NOTE;
+    }
+  }
+
+  function check() {
+    fetch(SERVER + '/api/duo/info').then(function (r) { return r.json(); }).then(function (info) {
+      // Als Datei geöffnet, Server läuft aber: auf die Server-Adresse wechseln, damit alles gespeichert wird.
+      if (isFile) { location.replace('http://localhost:3000/'); return; }
+      setState(info);
+    }).catch(function () { setState(null); }).then(function () { setTimeout(check, 3000); });
+  }
+  check();
+</script>
 </body>
 </html>

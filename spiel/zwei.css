@@ -249,18 +249,6 @@
   .duo-scenarios { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* ---------- Auswahl des Bildschirms ---------- */
-.duo-chooser { width: min(900px, 100%); margin: auto; text-align: center; }
-.duo-chooser h1 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
-.duo-chooser-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 24px; }
-.duo-choice {
-  display: flex; flex-direction: column; gap: 8px; padding: 36px 24px; border-radius: 22px; background: var(--card); color: var(--fg);
-  text-decoration: none; box-shadow: 0 12px 30px rgba(20, 50, 100, .15); transition: transform .2s ease;
-}
-.duo-choice:hover { transform: translateY(-4px); }
-.duo-choice strong { font-size: 1.6rem; }
-.duo-choice span { color: var(--muted); }
-
 @media (prefers-reduced-motion: reduce) {
   .is-rising .sim-water { transition: none; }
   .sim-wave { animation: none; }

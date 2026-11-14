@@ -52,21 +52,35 @@ const sync = (() => {
     if (data.ask) { if (ROLE === 'unten') send(state); return; }
     if (typeof data.rev === 'number') handlers.state(data);
   };
+  // Ohne Server (Datei direkt geöffnet) gibt es zwei Wege: BroadcastChannel und, falls der Browser den für
+  // file:// nicht zulässt, localStorage (löst in den anderen Fenstern ein „storage“-Ereignis aus).
+  const LS_KEY = 'hausbau-zwei-msg';
+  let lsCounter = 0;
+  function lsPost(msg) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ n: Date.now() + '-' + (lsCounter++) + '-' + Math.random(), msg })); } catch (e) { /* kein localStorage */ }
+  }
+  function post(msg) {
+    if (channel) channel.postMessage(msg);
+    lsPost(msg);
+  }
   function send(next) {
-    if (channel) channel.postMessage(next);
-    else if (viaServer) {
+    if (!viaServer) post(next);
+    else {
       fetch('/api/duo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next), keepalive: true })
         .catch(() => handlers.status(false));
     }
   }
   function connect() {
-    if (channel) {
-      channel.onmessage = e => receive(e.data);
-      channel.postMessage({ ask: true });
+    if (!viaServer) {
+      if (channel) channel.onmessage = e => receive(e.data);
+      window.addEventListener('storage', e => {
+        if (e.key !== LS_KEY || !e.newValue) return;
+        try { receive(JSON.parse(e.newValue).msg); } catch (err) { /* kaputte Nachricht überspringen */ }
+      });
+      post({ ask: true });
       handlers.status(true);
       return;
     }
-    if (!viaServer) { handlers.status(false); return; }
     // EventSource verbindet sich nach einem Abbruch von selbst neu.
     const source = new EventSource('/api/duo/events');
     source.onopen = () => handlers.status(true);
@@ -818,35 +832,11 @@ function dotsRow(current) {
   return row;
 }
 
-/* ---------- Auswahl, welcher Bildschirm das hier ist ---------- */
-
-function renderChooser() {
-  const wrap = el('div', 'duo-chooser');
-  wrap.append(el('h1', null, 'Welcher Bildschirm ist das?'));
-  const row = el('div', 'duo-chooser-row');
-  const link = (role, title, note) => {
-    const a = el('a', 'duo-choice');
-    a.href = location.protocol.startsWith('http') ? `/${role}` : `?rolle=${role}`;
-    a.append(el('strong', null, title), el('span', null, note));
-    return a;
-  };
-  row.append(link('oben', 'Oben · Laptop', 'Zeigt Szenario, Haus und Ergebnis an'),
-    link('unten', 'Unten · iPad', 'Touch-Steuerung: Hier wird ausgewählt'));
-  const info = el('p', 'duo-note');
-  wrap.append(row, info);
-  screen.replaceChildren(wrap);
-  if (location.protocol.startsWith('http')) {
-    fetch('/api/duo/info').then(r => r.json()).then(i => {
-      const ip = (i.addresses || [])[0];
-      if (ip) info.textContent = `Auf dem iPad (im selben WLAN) öffnen: http://${ip}:${i.port || location.port}/unten`;
-    }).catch(() => {});
-  }
-}
-
 /* ---------- Start ---------- */
 
 if (!ROLE) {
-  renderChooser();
+  // Ohne Rolle gibt es hier nichts zu sehen: zurück zur Startseite.
+  location.replace('../index.html');
 } else {
   document.body.append(statusDot);
   sync.on('status', setStatus);
