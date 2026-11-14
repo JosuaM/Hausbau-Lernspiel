@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de" data-look="kurzgesagt" data-info="inline">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hausbau – Zwei Bildschirme</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="zwei.css">
+</head>
+<body>
+<!--
+  Zwei Bildschirme:
+    oben  (Laptop) zeigt nur an:        http://localhost:3000/oben (Startseite: http://localhost:3000)
+    unten (iPad)   wird per Touch bedient: http://<IP des Laptops>:3000/unten
+  Beide Geräte müssen im selben WLAN sein, auf dem Laptop läuft server.js.
+-->
+<main id="screen"><p id="duo-loading" style="margin:auto;font:600 1.2rem system-ui;color:#3f5a86">Lädt …</p></main>
+<script>
+  window.ZWEI_BILDSCHIRME = true;
+  // Fehler direkt auf dem Bildschirm zeigen (auf dem iPad gibt es keine Konsole).
+  window.addEventListener('error', function (e) {
+    var box = document.getElementById('duo-error');
+    if (!box) {
+      box = document.createElement('pre');
+      box.id = 'duo-error';
+      box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;margin:0;padding:12px;border-radius:10px;background:#7f1d1d;color:#fff;font:13px/1.4 ui-monospace,monospace;white-space:pre-wrap';
+      document.body.appendChild(box);
+      box.textContent = 'Gerät: ' + navigator.userAgent + '\n';
+    }
+    box.textContent += 'Fehler: ' + e.message + '\n  in ' + (e.filename || '?').split('/').pop() + ' Zeile ' + e.lineno + ':' + e.colno + '\n';
+  });
+</script>
+<script src="app.js"></script>
+<script src="zwei.js"></script>
+</body>
+</html>

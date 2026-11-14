@@ -1,0 +1,15 @@
+{
+  "id": "s179425769476753815e641c5ae8",
+  "startedAt": "2026-11-09T20:55:10.163Z",
+  "name": "",
+  "scenario": "flood",
+  "page": 0,
+  "choices": {},
+  "ratings": {
+    "availability": 0,
+    "stability": 0,
+    "flood": 0
+  },
+  "finished": false,
+  "updatedAt": "2026-11-09T20:55:11.287Z"
+}

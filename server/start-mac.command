@@ -24,6 +24,14 @@ if ! command -v node >/dev/null 2>&1; then
   fi
 fi
 
-echo "Spiel läuft. Dieses Fenster offen lassen, zum Beenden schließen."
-(sleep 1; open http://localhost:3000) &
-node server.js
+if curl -fs http://localhost:3000/api/duo/info >/dev/null 2>&1; then
+  echo "Server läuft schon."
+else
+  # Im Hintergrund starten; dieses Fenster kann danach zu bleiben. Beenden: Startseite > „Server beenden“.
+  nohup node server.js >/dev/null 2>&1 &
+  disown
+  sleep 1
+fi
+open http://localhost:3000
+echo "Server läuft im Hintergrund. Dieses Fenster kann geschlossen werden."
+exit 0

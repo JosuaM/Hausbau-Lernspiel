@@ -25,7 +25,7 @@ if errorlevel 1 (
 )
 
 :run
-echo Spiel laeuft. Dieses Fenster offen lassen, zum Beenden schliessen.
+rem Server unsichtbar im Hintergrund starten (falls er nicht schon laeuft). Beenden: Startseite > "Server beenden".
+powershell -NoProfile -Command "try { Invoke-WebRequest -UseBasicParsing http://localhost:3000/api/duo/info | Out-Null } catch { Start-Process node -ArgumentList 'server.js' -WindowStyle Hidden; Start-Sleep -Seconds 1 }"
 start "" http://localhost:3000
-node server.js
-pause
+exit /b 0

@@ -1,0 +1,255 @@
+/* Zwei Bildschirme: baut auf style.css auf. Oben = Laptop (Anzeige), unten = iPad (Touch). */
+
+#screen { position: relative; }
+.duo-status {
+  position: fixed; top: 12px; right: 12px; z-index: 60; width: 12px; height: 12px; border-radius: 50%;
+  background: #ef4444; box-shadow: 0 0 0 3px rgba(255, 255, 255, .7); transition: background .3s;
+}
+.duo-status.is-ok { background: #22c55e; }
+.eyebrow { font-weight: 700; letter-spacing: .04em; }
+
+/* ---------- Oben (Laptop) ---------- */
+:root[data-role="oben"] body { overflow: hidden; cursor: default; }
+:root[data-role="oben"] main { padding: 32px clamp(24px, 4vw, 72px); }
+
+/* Start: großer Titel über der Baustelle */
+.page.start.duo-start h1 { font-size: clamp(2.4rem, 5.4vw, 5.6rem); margin-bottom: 28px; }
+.duo-start .start-main { padding-top: clamp(32px, 14vh, 160px); }
+.duo-start-hint { margin: 0; font-size: clamp(1.1rem, 1.6vw, 1.5rem); font-weight: 600; color: var(--muted); }
+.duo-connect {
+  position: fixed; left: 20px; bottom: 18px; z-index: 2; padding: 8px 14px; border-radius: 999px;
+  background: rgba(255, 255, 255, .8); color: var(--muted); font-size: .85rem; font-weight: 600;
+}
+
+/* Szenario-Infos: wie die Challenge-Seite, nur ohne Buttons und etwas größer */
+.duo-brief { max-width: 1500px; grid-template-rows: 1fr auto 1fr; grid-template-areas: ". art" "text art" ". art"; }
+.duo-brief .split-art { height: min(80vh, 760px); }
+.duo-brief .challenge-context { font-size: clamp(1rem, 1.25vw, 1.25rem); max-width: 60ch; }
+.duo-brief .challenge-task { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
+.duo-brief.is-locked .split-art { background: #34506b; }
+
+/* Bauschritte: Grafik bildschirmfüllend, Infos liegen darüber */
+.duo-stage { position: fixed; inset: 0; overflow: hidden; background: #5fb2ea; }
+.duo-stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.duo-chip, .duo-gauge, .duo-headline {
+  background: color-mix(in srgb, var(--card) 92%, transparent); border-radius: 20px;
+  box-shadow: 0 14px 36px rgba(20, 50, 100, .18);
+}
+.duo-chip { position: fixed; top: 28px; left: 32px; z-index: 3; padding: 16px 26px; max-width: 46vw; }
+.duo-chip small { display: block; color: var(--muted); font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.duo-chip strong { display: block; margin-top: 4px; font-size: clamp(1.5rem, 2.6vw, 2.4rem); line-height: 1.1; }
+.duo-gauge { position: fixed; right: 32px; top: 28px; z-index: 3; width: min(440px, 32vw); padding: 4px 22px; transition: opacity .4s; }
+.duo-gauge.is-empty { opacity: 0; }
+.duo-gauge .usage { width: 100%; min-height: 0; padding-block: 14px; }
+.duo-gauge .usage-i, .duo-gauge .usage-pop { display: none; }
+.duo-chip-hint { display: block; margin-top: 8px; color: var(--accent); font-size: .95rem; font-weight: 700; }
+/* Hammer unten rechts auf dem Boden, die Sprechblase steht über ihm. */
+.duo-guide { position: fixed; right: 3vw; bottom: 13vh; z-index: 3; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+.duo-guide .mascot-figure { flex: none; width: clamp(84px, 8vw, 130px); }
+.duo-bubble {
+  position: relative; margin: 0; width: min(360px, 24vw); padding: 16px 20px; border-radius: 18px;
+  background: #fff; color: #12234f; font-size: clamp(1rem, 1.25vw, 1.25rem); line-height: 1.4; font-weight: 600;
+  box-shadow: 0 14px 36px rgba(20, 50, 100, .22); animation: fadein .3s ease;
+}
+.duo-bubble::after {
+  content: ""; position: absolute; right: clamp(34px, 3.5vw, 56px); bottom: -9px; width: 18px; height: 18px; background: #fff;
+  transform: rotate(45deg); border-radius: 3px;
+}
+.duo-bubble[hidden] { display: none; }
+
+/* Fertiges Haus und Simulation: Überschrift oben mittig, das Haus ist größer als in der Ein-Bildschirm-Fassung */
+.duo-headline { position: fixed; top: 24px; left: 50%; z-index: 3; transform: translateX(-50%); padding: 14px 34px; text-align: center; max-width: 92vw; }
+.duo-headline .eyebrow { margin-bottom: 4px; }
+.duo-headline h1 { margin: 0; font-size: clamp(1.6rem, 2.8vw, 2.7rem); line-height: 1.15; }
+.duo-headline.is-wet h1 { color: #c2410c; }
+.duo-headline.is-dry h1 { color: #0d8f62; }
+/* Maßstab 1,9 statt 1,5: Boden (y = 480) bleibt auf y = 810, Mitte (x = 280) in der Bildmitte (SITE_SCALE in zwei.js). */
+.duo-site .site-house { transform: translate(-532px, -102px) scale(1.9); }
+
+/* Simulation: Das Wasser kommt von unten (Start steht inline in zwei.js) */
+.sim-wave { animation: sim-wave 3s linear infinite; }
+@keyframes sim-wave { to { transform: translateX(-100px); } }
+
+/* Ergebnis: Gesteuert wird unten, darum oben keine Buttons und keine Klicks */
+:root[data-role="oben"] .duo-guided .guided-next,
+:root[data-role="oben"] .duo-guided .review-tabs,
+:root[data-role="oben"] .duo-guided .outcome-actions,
+:root[data-role="oben"] .fazit-footer,
+:root[data-role="oben"] .spot-close,
+:root[data-role="oben"] .score-intro-skip { display: none !important; }
+:root[data-role="oben"] .spot-layer, :root[data-role="oben"] .spot, :root[data-role="oben"] .score-intro,
+:root[data-role="oben"] .fazit, :root[data-role="oben"] .duo-guided { pointer-events: none !important; }
+
+/* ---------- Unten (iPad) ---------- */
+/* Dunkles Nachtblau statt Schwarz: Die bunten Bauteile heben sich gut ab, ohne zu hart zu wirken. */
+:root[data-role="unten"][data-look="kurzgesagt"] {
+  --bg: #121d3a; --fg: #eef4ff; --muted: #a7b6d6; --card: #1d2b52; --line: #34477a; --accent: #ff8a1f;
+}
+:root[data-role="unten"][data-look="kurzgesagt"] body {
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, #22386a 0%, #131f3e 55%, #0b1428 100%) fixed;
+}
+:root[data-role="unten"] .btn.ghost { background: transparent; color: var(--fg); border: 2px solid var(--line); }
+:root[data-role="unten"] .duo-dot { background: var(--line); }
+:root[data-role="unten"] body {
+  height: 100dvh; overflow: hidden; touch-action: manipulation;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+:root[data-role="unten"] main { align-items: stretch; padding: max(18px, env(safe-area-inset-top)) 24px max(18px, env(safe-area-inset-bottom)); min-height: 0; }
+.duo-pad { width: 100%; max-width: 1400px; margin: 0 auto; min-height: 0; display: flex; flex-direction: column; gap: 16px; }
+.duo-head .eyebrow { margin: 0 0 4px; }
+.duo-title { margin: 0; font-size: clamp(1.6rem, 3vw, 2.3rem); line-height: 1.1; font-weight: 750; }
+.duo-note { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 600; text-align: center; }
+.duo-btn { padding: 16px 30px; font-size: 1.15rem; border-radius: 14px; white-space: nowrap; touch-action: manipulation; }
+.duo-btn:active:not(:disabled) { transform: scale(.97); }
+.duo-cta { padding: 18px 34px; font-size: 1.25rem; box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 35%, transparent); }
+.duo-bar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.duo-bar-mid { display: flex; justify-content: center; }
+
+/* Start: nur der große Knopf */
+.duo-pad-start { justify-content: center; align-items: center; }
+.btn.btn-big.duo-go { padding: clamp(28px, 5vh, 48px) clamp(80px, 12vw, 160px); font-size: clamp(2rem, 4vw, 3rem); border-radius: 24px; }
+
+/* Szenarien */
+.duo-scenarios { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.scenario.duo-scn { height: 100%; cursor: pointer; text-align: left; transition: transform .25s ease, box-shadow .25s ease; }
+.scenario.duo-scn.is-locked { cursor: pointer; text-align: left; }
+.scenario.duo-scn.is-locked .art { filter: saturate(.55); }
+.scenario.duo-scn:hover { transform: none; box-shadow: none; }
+.scenario.duo-scn.is-focus { transform: translateY(-6px); box-shadow: 0 0 0 5px var(--accent), 0 18px 40px rgba(20, 35, 50, .28); }
+.scenario.duo-scn.is-focus .art, .scenario.duo-scn.is-focus .art * { animation-play-state: running; }
+.scenario.duo-scn:hover .art { transform: none; }
+.duo-scn .scenario-label { top: 22px; left: 18px; right: 18px; }
+.duo-scn-foot { position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; justify-content: center; }
+.btn.duo-scn-btn { padding: 12px 24px; font-size: 1rem; box-shadow: 0 6px 16px rgba(20, 35, 50, .25); }
+:root[data-role="unten"] .btn.ghost.duo-scn-btn { background: rgba(255, 255, 255, .85); color: #3f5a86; border: 0; cursor: default; }
+
+/* Bauschritte unten: Bauteile als Bild, darüber Pfeile, darunter Name und Beschreibung */
+.duo-build { position: relative; }
+.duo-pieces { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; gap: 22px; }
+.duo-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; min-width: 0; }
+.duo-arrows { width: 34px; height: 40px; margin-bottom: -4px; }
+.duo-arrows svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.duo-chev { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; opacity: .15; animation: duo-chev 1.8s ease-in-out infinite; }
+.duo-chev-a { animation-delay: .35s; }
+@keyframes duo-chev { 0%, 100% { opacity: .12; transform: translateY(3px); } 45% { opacity: .75; transform: none; } }
+.duo-grab {
+  position: relative; width: 100%; aspect-ratio: 1.25; max-height: 42vh; touch-action: none; cursor: grab;
+  border-radius: 24px; will-change: transform;
+}
+.duo-grab::before {
+  content: ""; position: absolute; inset: 4% 2%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(140, 190, 255, .26), rgba(140, 190, 255, 0));
+}
+.duo-grab.is-dragging { z-index: 10; cursor: grabbing; filter: drop-shadow(0 18px 26px rgba(0, 0, 0, .45)); }
+.duo-piece { position: absolute; inset: 0; pointer-events: none; }
+.duo-piece > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 24px; }
+/* Nur das Bauteil zeigen: Himmel, Wolken, Palmen, Regen und Boden der Grafik ausblenden */
+.duo-piece > svg > *:not(defs):not(.fd-platform):not(.fd-extra):not(.fd-raise):not(.duo-ground) { display: none; }
+.duo-piece .fd-empty { display: none; }
+.duo-piece[data-kind="foundation"] :is(.fd-house, .fd-platform, .fd-extra) { display: none; }
+.duo-piece[data-kind="wall"] :is(.fd-part, .fd-platform, .fd-extra, .fd-roof, .fd-roofs, .fd-outline, .fd-walls) { display: none; }
+.duo-piece[data-kind="roof"] :is(.fd-part, .fd-platform, .fd-extra, .fd-roof, .fd-walls, .fd-wallset, .fd-outline, .fd-door, .fd-window) { display: none; }
+.duo-piece[data-kind="extra"] .fd-house { stroke: #c9d6ee; }
+.duo-badge {
+  position: absolute; top: 46px; left: 50%; z-index: 2; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px;
+  background: #22c55e; color: #fff; font-size: .9rem; font-weight: 800; white-space: nowrap; opacity: 0; transition: opacity .3s;
+}
+.duo-item.is-placed .duo-badge { opacity: 1; }
+.duo-item.is-placed .duo-grab { opacity: .45; }
+.duo-item.is-placed .duo-arrows { visibility: hidden; }
+.duo-item .duo-option-title { margin-top: 4px; }
+.duo-item .duo-option-info { -webkit-line-clamp: 5; }
+/* Beim Ziehen: Zielbereich oben leuchtet auf */
+.duo-dropzone {
+  position: fixed; left: 0; right: 0; top: 0; z-index: 5; height: 18vh; display: grid; place-items: center;
+  color: #fff; font-size: 1.2rem; font-weight: 800; letter-spacing: .04em; pointer-events: none; opacity: 0;
+  background: linear-gradient(rgba(255, 138, 31, .55), rgba(255, 138, 31, 0)); transition: opacity .25s;
+}
+.duo-build.is-dragging .duo-dropzone { opacity: .55; }
+.duo-build.is-ready .duo-dropzone { opacity: 1; }
+
+/* Übersicht „Das hast du gewählt“ */
+.duo-parts { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-content: center; gap: 16px; }
+.duo-part {
+  display: flex; flex-direction: column; gap: 6px; min-height: 0; padding: 10px 10px 14px; border: 3px solid transparent; border-radius: 20px;
+  background: var(--card); color: var(--fg); font: inherit; text-align: left; cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .2); transition: transform .2s ease;
+}
+.duo-part:active { transform: scale(.98); }
+.duo-mini { position: relative; flex: none; aspect-ratio: 1; max-height: 46vh; overflow: hidden; border-radius: 13px; background: #5fb2ea; margin-bottom: 4px; }
+.duo-mini > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.duo-option-title { padding-inline: 6px; font-size: clamp(1rem, 1.6vw, 1.2rem); font-weight: 750; line-height: 1.2; }
+.duo-option-info {
+  padding-inline: 6px; color: var(--muted); font-size: clamp(.78rem, 1.15vw, .9rem); line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.duo-part .part-label { padding-inline: 6px; }
+.duo-part-change { padding-inline: 6px; color: var(--accent); font-size: .85rem; font-weight: 700; }
+.duo-dots { display: flex; gap: 10px; }
+.duo-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); }
+.duo-dot.done { background: var(--accent); }
+.duo-dot.current { background: var(--accent); transform: scale(1.35); }
+
+/* Simulation unten: Wasser steigt von unten über den ganzen Bildschirm */
+.duo-flood { position: fixed; inset: 0; overflow: hidden; display: grid; place-items: center; }
+.duo-flood-water {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 100%; transform: translateY(105%);
+  background: linear-gradient(#5fd0fb, #1593d6 55%, #0b5c9e); transition: transform 3s cubic-bezier(.35, 0, .4, 1);
+}
+.duo-flood-water.is-up { transform: translateY(0); }
+.duo-flood-wave { position: absolute; left: 0; top: -26px; width: 200%; height: 28px; fill: #5fd0fb; animation: duo-wave 2.4s linear infinite; }
+@keyframes duo-wave { to { transform: translateX(-50%); } }
+.duo-flood-btn { position: relative; z-index: 1; font-size: 1.4rem; padding: 22px 40px; }
+.duo-flood-btn[hidden] { display: none; }
+.is-glow { animation: duo-glow 1.6s ease-in-out infinite; }
+@keyframes duo-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent), 0 10px 24px rgba(0, 0, 0, .25); }
+  50% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent) 0%, transparent), 0 10px 30px rgba(0, 0, 0, .3); }
+}
+
+/* Ergebnis unten: Punkte antippen, oben öffnet sich die Erklärung */
+.duo-pad-result { justify-content: center; align-items: center; text-align: center; gap: 22px; }
+.duo-result-head { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.duo-result-head .eyebrow { margin: 0; }
+.duo-result-head .duo-title { font-size: clamp(2rem, 4.4vw, 3.2rem); }
+.duo-score { margin: 0; font-size: 1.3rem; font-weight: 750; color: var(--muted); }
+.duo-result-body { display: flex; flex-direction: column; align-items: center; gap: 18px; width: min(900px, 100%); }
+.duo-wait { animation: duo-breathe 1.8s ease-in-out infinite alternate; }
+@keyframes duo-breathe { from { opacity: .45; } to { opacity: 1; } }
+.duo-kicker { margin: 0; font-size: 1.05rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.duo-kicker-good { color: #4ade80; }
+.duo-kicker-bad { color: #f87171; }
+.duo-spots { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.duo-spot {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 14px; align-items: center;
+  min-width: 230px; padding: 14px 22px 14px 14px; border: 3px solid transparent; border-radius: 18px;
+  background: var(--card); color: var(--fg); font: inherit; text-align: left; cursor: pointer; transition: transform .2s, border-color .2s;
+}
+.duo-spot:active { transform: scale(.97); }
+.duo-spot-mark {
+  grid-row: 1 / 3; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  color: #fff; font-size: 1.5rem; font-weight: 900; animation: duo-pulse 1.8s ease-in-out infinite;
+}
+.duo-spot-good .duo-spot-mark { background: #22c55e; }
+.duo-spot-bad .duo-spot-mark { background: #ef4444; }
+.duo-spot.is-seen .duo-spot-mark { animation: none; }
+.duo-spot.is-open.duo-spot-good { border-color: #22c55e; }
+.duo-spot.is-open.duo-spot-bad { border-color: #ef4444; }
+@keyframes duo-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .45); } 50% { box-shadow: 0 0 0 9px rgba(255, 255, 255, 0); } }
+.duo-spot-part { color: var(--muted); font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.duo-spot-name { font-size: 1.1rem; font-weight: 750; }
+.duo-tabs { display: flex; gap: 10px; }
+.btn.duo-tab.is-on { background: var(--accent); color: #1b1440; border-color: var(--accent); }
+.duo-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.duo-actions[hidden] { display: none; }
+
+/* Hochkant-iPad: Kästen in zwei Reihen */
+@media (orientation: portrait) {
+  .duo-pieces, .duo-parts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .duo-scenarios { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-rising .sim-water { transition: none; }
+  .sim-wave { animation: none; }
+}
