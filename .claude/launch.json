@@ -1,0 +1,85 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static-3d",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765"
+      ],
+      "port": 8765
+    },
+    {
+      "name": "static-3d-tex",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8772"
+      ],
+      "port": 8772
+    },
+    {
+      "name": "ui-v2",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8811",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "/Users/josua/Documents/Hausbau-Lernspiel"
+      ],
+      "port": 8811,
+      "autoPort": false
+    },
+    {
+      "name": "veg-3d",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8779",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "/Users/josua/Documents/Hausbau-Lernspiel"
+      ],
+      "port": 8779,
+      "autoPort": false
+    },
+    {
+      "name": "flut-sim",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8783",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "/Users/josua/Documents/Hausbau-Lernspiel"
+      ],
+      "port": 8783,
+      "autoPort": false
+    },
+    {
+      "name": "schaden-sim",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8841",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "/Users/josua/Documents/Hausbau-Lernspiel"
+      ],
+      "port": 8841,
+      "autoPort": false
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Hausbau-Konfigurator</title>
+<link rel="stylesheet" href="v2.css?v=presets3">
+</head>
+<body>
+<!--
+  Version 2, zwei Bildschirme:
+    ?rolle=oben   zeigt an (Laptop / großer Bildschirm)
+    ?rolle=unten  wird bedient (iPad oder zweites Fenster)
+  Die Startseite (../index.html) öffnet beide Fenster.
+-->
+<div id="backdrop"></div>
+<canvas id="stage3d"></canvas>
+<div id="vignette"></div>
+<div id="focus"></div>
+<main id="ui"><p class="boot">Lädt …</p></main>
+<script>
+  window.addEventListener('error', function (e) {
+    var box = document.getElementById('err');
+    if (!box) {
+      box = document.createElement('pre');
+      box.id = 'err';
+      box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;margin:0;padding:12px;border-radius:6px;background:#7f1d1d;color:#fff;font:13px/1.4 ui-monospace,monospace;white-space:pre-wrap';
+      document.body.appendChild(box);
+      box.textContent = 'Gerät: ' + navigator.userAgent + '\n';
+    }
+    box.textContent += 'Fehler: ' + e.message + '\n  in ' + (e.filename || '?').split('/').pop() + ' Zeile ' + e.lineno + ':' + e.colno + '\n';
+  });
+</script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/texturen.js"></script>
+<script src="haus3d.js?v=perf4k3"></script>
+<script src="flut.js?v=sturm1-nl"></script>
+<script src="schaden.js"></script>
+<script src="daten.js?v=presets1"></script>
+<script src="schnitte.js?v=look3d5"></script>
+<script src="schnitt3d.js?v=6"></script>
+<script src="flug.js"></script>
+<script src="v2.js?v=sx3d1"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+Fremde Bestandteile in diesem Ordner
+
+three.min.js, three-gltf.js
+  three.js r149, MIT-Lizenz, https://github.com/mrdoob/three.js
+
+natur.js (eingebettete 3D-Modelle)
+  Stylized Nature MegaKit [Standard] und Medieval Village MegaKit [Standard] von Quaternius
+  https://quaternius.com - Lizenz CC0 1.0 Universal (gemeinfrei), https://creativecommons.org/publicdomain/zero/1.0/
+  Benutzt: CommonTree_1-5, TwistedTree_1/3, Bush_Common(_Flowers), Grass_*, Fern_1, Plant_1/7, Flower_3/4_Group,
+  Clover_1, Rock_Medium_1-3, Pebble_*, Prop_Crate, Prop_Wagon, Prop_WoodenFence_Single, Prop_Brick1/2.
+  Texturen auf 1024 px verkleinert und als WebP gespeichert.
+
+fonts/  Inter, SIL Open Font License
+
+texturen.js (eingebettete Texturen)
+  Medieval Village MegaKit [Standard]: T_Plaster, T_RedBrick, T_Brick, T_UnevenBrick, T_RoundTiles, T_WoodTrim (zwei Holzstreifen
+  ausgeschnitten), T_BrushedNoise (als Pinsel-Rauschen für die selbst gemalten Texturen).
+  Stylized Nature MegaKit [Standard]: Bark_NormalTree. Beide von Quaternius, https://quaternius.com, Lizenz CC0 1.0.
+  Auf 1024 px verkleinert und als WebP gespeichert.

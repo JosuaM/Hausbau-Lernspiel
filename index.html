@@ -29,6 +29,10 @@
   .split.is-disabled { opacity: .45; }
   .split.is-disabled > * { cursor: not-allowed; pointer-events: none; }
   .split.is-disabled > *:hover { background: var(--btn); }
+  .switch { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); margin: 14px 0 6px; }
+  .switch button { border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 600; padding: 10px 12px; cursor: pointer; }
+  .switch button + button { border-left: 1px solid var(--line); }
+  .switch button.is-on { background: var(--fg); color: var(--panel); }
   .sublinks { font-size: .85rem; color: var(--muted); margin: 6px 2px 0; }
   .sublinks button, .sublinks a { background: none; border: 0; padding: 0; font: inherit; color: var(--fg); text-decoration: underline; cursor: pointer; }
   [hidden] { display: none !important; }
@@ -37,10 +41,14 @@
 <body>
 <main>
   <h1>Hausbau-Lernspiel</h1>
-  <p class="sub">Auswahl</p>
+  <div class="switch" role="tablist" aria-label="Version">
+    <button type="button" role="tab" data-version="1">Version 1 · Original</button>
+    <button type="button" role="tab" data-version="2">Version 2 · Neue Optik</button>
+  </div>
+  <p class="sub" id="version-note"></p>
 
   <!-- Pro Eintrag: Hauptfläche öffnet hier, Symbol rechts öffnet ein extra Fenster -->
-  <div class="option">
+  <div class="option" id="opt-single">
     <div class="split">
       <a class="main" href="spiel/spiel.html"><strong>Einzelspiel</strong><span>Ein Bildschirm, Maus oder Touch</span></a>
       <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Einzelspiel in extra Fenster öffnen" data-pop="spiel/spiel.html" data-name="hausbau-spiel"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
@@ -50,15 +58,15 @@
   <div class="option group">
     <div class="group-head"><strong>Zwei Bildschirme</strong><span>Oben anzeigen, unten bedienen. Die Fenster sind miteinander verbunden.</span></div>
     <div class="split">
-      <a class="main" href="spiel/zwei.html?rolle=oben"><strong>Oberer Bildschirm</strong><span>Zeigt Szenario, Haus und Ergebnis</span></a>
-      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Oberen Bildschirm in extra Fenster öffnen" data-pop="spiel/zwei.html?rolle=oben" data-name="hausbau-oben"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+      <a class="main" id="a-oben" href="spiel/zwei.html?rolle=oben"><strong>Oberer Bildschirm</strong><span>Zeigt Szenario, Haus und Ergebnis</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Oberen Bildschirm in extra Fenster öffnen" data-pop="zwei:oben" data-name="hausbau-oben"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
     </div>
     <div class="split">
-      <a class="main" href="spiel/zwei.html?rolle=unten"><strong>Unterer Bildschirm</strong><span>Touch-Steuerung</span></a>
-      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Unteren Bildschirm in extra Fenster öffnen" data-pop="spiel/zwei.html?rolle=unten" data-name="hausbau-unten"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+      <a class="main" id="a-unten" href="spiel/zwei.html?rolle=unten"><strong>Unterer Bildschirm</strong><span>Touch-Steuerung</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Unteren Bildschirm in extra Fenster öffnen" data-pop="zwei:unten" data-name="hausbau-unten"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
     </div>
     <div class="split">
-      <button class="main" id="both" type="button"><strong>Beide in extra Fenstern öffnen</strong><span>Oben und unten zusammen, auf einem Rechner</span></button>
+      <button class="main" id="both" type="button"><strong id="both-title">Beide in extra Fenstern öffnen</strong><span id="both-sub">Oben und unten zusammen, auf einem Rechner</span></button>
       <button class="side" type="button" tabindex="-1" aria-hidden="true" id="both-icon"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
     </div>
   </div>
@@ -71,8 +79,10 @@
       <a class="main" id="testing" href="spiel/spiel.html" aria-disabled="true" tabindex="-1"><strong>User-Testing</strong><span>Durchläufe werden gespeichert</span></a>
       <button class="side" type="button" title="In extra Fenster öffnen" aria-label="User-Testing in extra Fenster öffnen" id="testing-icon" disabled><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
     </div>
+    <p class="sublinks" id="running-links" hidden>
+      <a id="results-link" href="spiel/results.html">Testdaten ansehen</a> · <button type="button" id="stop">Server beenden</button>
+      <span id="ipad"></span></p>
   </div>
-
 </main>
 
 <script>
@@ -87,18 +97,47 @@
   var isWin = /win/i.test(plat) || /Windows/.test(navigator.userAgent);
   var startFile = isWin ? 'server/start-windows.bat' : 'server/start-mac.command';
 
+  // Version 1 (Original) oder Version 2 (neue Optik, nur zwei Bildschirme)
+  var version = 1;
+  try { version = localStorage.getItem('hausbau-version') === '2' ? 2 : 1; } catch (e) { /* ohne localStorage */ }
+  function zweiUrl(role) { return (version === 2 ? 'spiel2/zwei.html' : 'spiel/zwei.html') + '?rolle=' + role; }
+
   function pop(url, name, i) {
     var w = Math.round(screen.availWidth * .6), h = Math.round(screen.availHeight * .8);
     var win = window.open(url, name, 'popup=yes,width=' + w + ',height=' + h + ',left=' + (40 + i * 60) + ',top=' + (40 + i * 40));
     if (win) win.focus(); else $('status-note').textContent = 'Pop-up blockiert: Bitte Pop-ups für diese Seite erlauben.';
+    return win;
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-pop]'), function (b) {
-    b.onclick = function () { pop(b.dataset.pop, b.dataset.name, 0); };
+    b.onclick = function () {
+      var p = b.dataset.pop;
+      pop(p.indexOf('zwei:') === 0 ? zweiUrl(p.slice(5)) : p, b.dataset.name, p === 'zwei:unten' ? 1 : 0);
+    };
   });
-  function both() { pop('spiel/zwei.html?rolle=oben', 'hausbau-oben', 0); pop('spiel/zwei.html?rolle=unten', 'hausbau-unten', 1); }
+  // Version 1: beide Fenster extra. Version 2: unten als extra Fenster, oben hier (so lässt sich unten auf den zweiten Bildschirm ziehen).
+  function both() {
+    if (version === 2) { if (pop(zweiUrl('unten'), 'hausbau-unten', 1)) location.href = zweiUrl('oben'); return; }
+    pop(zweiUrl('oben'), 'hausbau-oben', 0); pop(zweiUrl('unten'), 'hausbau-unten', 1);
+  }
   $('both').onclick = both;
   $('both-icon').onclick = both;
-  $('testing-icon').onclick = function () { pop('spiel/spiel.html', 'hausbau-spiel', 0); };
+  $('testing-icon').onclick = function () { if (version === 2) both(); else pop('spiel/spiel.html', 'hausbau-spiel', 0); };
+  $('testing').onclick = function (e) { if (version === 2 && running) { e.preventDefault(); both(); } };
+
+  function applyVersion() {
+    var v2 = version === 2;
+    Array.prototype.forEach.call(document.querySelectorAll('.switch button'), function (b) { b.classList.toggle('is-on', Number(b.dataset.version) === version); });
+    $('opt-single').hidden = v2;
+    $('a-oben').href = zweiUrl('oben'); $('a-unten').href = zweiUrl('unten');
+    $('both-title').textContent = v2 ? 'Starten' : 'Beide in extra Fenstern öffnen';
+    $('both-sub').textContent = v2 ? 'Oben in diesem Fenster, unten als extra Fenster zum Verschieben' : 'Oben und unten zusammen, auf einem Rechner';
+    $('testing').href = v2 ? '#' : 'spiel/spiel.html';
+    $('version-note').textContent = v2 ? 'Neue Optik mit 3D-Haus. Vorerst nur mit zwei Bildschirmen.' : 'Ursprüngliche Fassung.';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.switch button'), function (b) {
+    b.onclick = function () { version = Number(b.dataset.version); try { localStorage.setItem('hausbau-version', String(version)); } catch (e) { /* egal */ } applyVersion(); };
+  });
+  applyVersion();
 
   // Ein Browser darf keine Programme starten. Darum wird die Start-Datei geladen; ein Doppelklick startet den Server unsichtbar im Hintergrund.
   var startLink = $('start-server');
@@ -124,7 +163,8 @@
     $('testing').tabIndex = running ? 0 : -1;
     if (running) {
       var ip = (info.addresses || [])[0], port = info.port || location.port;
-      $('ipad').innerHTML = ip ? '<br>iPad (selbes WLAN): <a href="http://' + ip + ':' + port + '/unten">http://' + ip + ':' + port + '/unten</a>' : '';
+      var ipadUrl = ip ? 'http://' + ip + ':' + port + '/' + zweiUrl('unten') : '';
+      $('ipad').innerHTML = ip ? '<br>iPad (selbes WLAN): <a href="' + ipadUrl + '">' + ipadUrl + '</a>' : '';
     } else if (stopped) {
       stopped = false; $('status-note').textContent = DEFAULT_NOTE;
     }

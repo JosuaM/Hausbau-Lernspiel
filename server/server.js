@@ -11,7 +11,7 @@ const ROOT = path.join(__dirname, '..');
 const DIR = path.join(ROOT, 'data', 'sessions');
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json; charset=utf-8', '.csv': 'text/csv; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.csv': 'text/csv; charset=utf-8', '.woff2': 'font/woff2',
 };
 // Nur diese Dateien werden ausgeliefert, damit data/ und server/ nicht direkt erreichbar sind.
 const PUBLIC = {
@@ -23,6 +23,7 @@ const PUBLIC = {
 const REDIRECTS = {
   '/spiel': '/spiel/spiel.html', '/results': '/spiel/results.html', '/zwei': '/',
   '/oben': '/spiel/zwei.html?rolle=oben', '/unten': '/spiel/zwei.html?rolle=unten',
+  '/oben2': '/spiel2/zwei.html?rolle=oben', '/unten2': '/spiel2/zwei.html?rolle=unten',
 };
 
 // Zwei Bildschirme: Das iPad schickt den Spielstand, der Server reicht ihn per Server-Sent Events an alle Bildschirme weiter.
@@ -155,6 +156,14 @@ http.createServer((req, res) => {
   }
   if (req.method === 'GET' && url === '/api/results') { send(res, 200, TYPES['.json'], JSON.stringify(sorted())); return; }
   if (req.method === 'GET' && url === '/results.csv') { send(res, 200, TYPES['.csv'], csv()); return; }
+  // Version 2: alle Dateien aus spiel2/ (Seiten, Skripte, 3D-Bibliothek), aber nichts außerhalb des Ordners.
+  if (req.method === 'GET' && url.startsWith('/spiel2/')) {
+    const rel = path.normalize(decodeURIComponent(url.slice(8)));
+    const file = path.join(ROOT, 'spiel2', rel);
+    if (rel.startsWith('..') || path.isAbsolute(rel) || !TYPES[path.extname(file)]) { send(res, 404); return; }
+    fs.readFile(file, (err, buf) => { if (err) send(res, 404); else send(res, 200, TYPES[path.extname(file)], buf); });
+    return;
+  }
   const name = req.method === 'GET' ? PUBLIC[url] : null;
   if (!name) { send(res, 404); return; }
   fs.readFile(path.join(ROOT, name), (err, buf) => {
