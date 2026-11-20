@@ -63,7 +63,7 @@ const SCENARIOS = [
           {
             id: 'earth', text: 'Gestampfter Erdsockel', lift: 34,
             info: 'Erde oder sandiger Lehm, schichtweise festgestampft, etwa 45 bis 75 cm hoch.',
-            ratings: { availability: 5, stability: 1, flood: 3 },
+            ratings: { availability: 5, stability: 1, flood: 3, reuse: 1 },
             usage: { real: { value: 13, label: '≈ 75 €', kind: 'fact', note: 'kostet der Erdsockel grob, fast nur für die Arbeit (50 bis 100 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
             hint: 'Sandiger Lehm wurde über Jahrtausende angeschwemmt. Er ist fast gratis.',
             good: 'Überall vor Ort zu haben und fast kostenlos.',
@@ -73,7 +73,7 @@ const SCENARIOS = [
           {
             id: 'concrete', text: 'Ebenerdige Betonplatte', lift: 8,
             info: 'Beton mit Ziegelsplitt, 10 bis 15 cm dick, direkt auf Bodenhöhe.',
-            ratings: { availability: 4, stability: 4, flood: 1 },
+            ratings: { availability: 4, stability: 4, flood: 1, reuse: 1 },
             usage: { real: { value: 44, label: '≈ 250 €', kind: 'fact', note: 'kostet die Betonplatte grob, vor allem für Zement und Ziegel (240 bis 260 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
             hint: 'Zement gibt es überall beim Händler. Sein Hauptrohstoff Klinker wird aber zu rund 90 % importiert.',
             good: 'Weicht nicht auf und übersteht die Flut meist ohne größere Schäden.',
@@ -83,7 +83,7 @@ const SCENARIOS = [
           {
             id: 'brick', text: 'Ziegelsockel mit Betonpfeilern', lift: 50,
             info: 'Etwa 90 cm hoher Sockel aus Ziegelwänden, innen mit Erde gefüllt und mit tief verankerten Betonpfeilern.',
-            ratings: { availability: 4, stability: 4, flood: 4 },
+            ratings: { availability: 4, stability: 4, flood: 4, reuse: 1 },
             usage: { real: { value: 93, label: '≈ 530 €', kind: 'fact', note: 'kostet der Ziegelsockel grob, das teuerste Fundament (490 bis 570 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
             hint: 'Die Ziegel kommen aus heimischen Ziegeleien, und die Füllung im Sockel ist einfach Erde von vor Ort.',
             good: 'Hebt das Haus 90 cm an, die Ziegelwände schützen die Erdfüllung vor dem Ausspülen.',
@@ -93,7 +93,7 @@ const SCENARIOS = [
           {
             id: 'stilts', text: 'Pfahlbau', lift: 34,
             info: 'Behandelte Bambusstelzen auf Betonfüßen, etwa 60 cm hoch, darauf eine Plattform aus Koroi-Holz.',
-            ratings: { availability: 4, stability: 3, flood: 3 },
+            ratings: { availability: 4, stability: 3, flood: 3, reuse: 5 },
             usage: { real: { value: 46, label: '≈ 260 €', kind: 'fact', note: 'kostet der Pfahlbau grob, vor allem für das Holz der Plattform (240 bis 280 €)', info: 'Grob geschätzt aus deiner Recherche: Einzelpreise belegt, Mengen, Arbeitszeit und Wechselkurs geschätzt. Der Ring zeigt die Kosten im Vergleich zum teuersten Fundament.' } },
             hint: 'Mit Borsalz hält Bambus doppelt so lang.',
             good: 'Das Wasser fließt unter dem Haus durch, und Bambus gibt es vor Ort.',
@@ -110,7 +110,7 @@ const SCENARIOS = [
           {
             id: 'mud', text: 'Lehmwand',
             info: 'Erde und Lehm werden schichtweise aufgetragen und verdichtet, teils mit Stroh vermischt. Günstig und überall vor Ort, braucht aber regelmäßige Instandhaltung.',
-            ratings: { availability: 2, stability: 1, flood: 1 },
+            ratings: { availability: 2, stability: 1, flood: 1, reuse: 1 },
             usage: { real: { value: 3.76, kind: 'measured', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). 31.519 Haushalte haben Lehmwände.' } },
             hint: 'Lehm ist billig und traditionell, aber er mag kein Wasser.',
             good: 'Traditionell und sehr günstig, der Lehm liegt direkt vor Ort.',
@@ -120,7 +120,7 @@ const SCENARIOS = [
           {
             id: 'tin', text: 'Wellblech-Wand',
             info: 'Verzinkte Stahlbleche auf einem Rahmen aus Holz oder Bambus. Sehr leicht, günstig und schnell aufgebaut, heizt sich aber stark auf.',
-            ratings: { availability: 5, stability: 2, flood: 3 },
+            ratings: { availability: 5, stability: 2, flood: 3, reuse: 5 },
             usage: { real: { value: 76.94, kind: 'measured', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). 644.211 Haushalte haben Wellblechwände.' } },
             hint: 'Wellblech ist überall zu sehen und hält Wasser ab. Nur an Fugen dringt es ein.',
             good: 'Wasserdicht, günstig und leicht. Lässt sich bei Erosion abbauen und woanders wieder aufstellen.',
@@ -130,7 +130,7 @@ const SCENARIOS = [
           {
             id: 'brickwall', text: 'Verputzte Ziegelwand',
             info: 'Gebrannte Ziegel mit Zementmörtel und Zementputz. Robust und langlebig, deutlich widerstandsfähiger als Lehm.',
-            ratings: { availability: 4, stability: 4, flood: 3 },
+            ratings: { availability: 4, stability: 4, flood: 3, reuse: 1 },
             usage: {
               real: { value: 10, kind: 'estimate', info: 'Schätzwert, nicht gemessen. Zement, Beton, Ziegel und Terrakotta werden im Zensus nur zusammen gezählt (157.380 Haushalte). Der Zensus trennt das nicht auf. Etwa 10 % davon sind verputzte Ziegel (Spanne 7 bis 13 %). Ob verputzt wird, fragt der Zensus nicht.' },
               material: { value: 18.8, kind: 'measured', line: 'Zement/Beton/Ziegel zusammen', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). Zement, Beton, Ziegel und Terrakotta werden im Zensus nur zusammen gezählt (157.380 Haushalte). Der Zensus trennt das nicht auf.' },
@@ -143,7 +143,7 @@ const SCENARIOS = [
           {
             id: 'ferro', text: 'Ferrocement-Wand',
             info: 'Dünne Wand aus engmaschigem Metallgitter, vollständig in mehrere Schichten Zement-Sand-Mörtel eingebettet.',
-            ratings: { availability: 1, stability: 4, flood: 5 },
+            ratings: { availability: 1, stability: 4, flood: 5, reuse: 1 },
             usage: {
               real: { value: 0.02, label: 'unter 1 %', kind: 'estimate', info: 'Grobe Schätzung, nicht gemessen. Ferrozement hat im Zensus keine eigene Zeile. Es sind wohl nur einige Hundert Häuser (0,01 bis 0,1 %).' },
               material: { value: 18.8, kind: 'measured', line: 'Zement/Beton/Ziegel zusammen', info: 'Gemessen: BBS-Zensus 2022, Sirajganj (837.249 Haushalte). Zement, Beton, Ziegel und Terrakotta werden im Zensus nur zusammen gezählt (157.380 Haushalte). Der Zensus trennt das nicht auf.' },
@@ -163,7 +163,7 @@ const SCENARIOS = [
           {
             id: 'tinhip', text: 'Wellblech-Walmdach',
             info: 'Verzinkte Wellbleche auf einem Holz- oder Bambusgerüst, nach allen vier Seiten geneigt.',
-            ratings: { availability: 4, stability: 4, flood: 4 },
+            ratings: { availability: 4, stability: 4, flood: 4, reuse: 5 },
             usage: { real: { value: 75, kind: 'estimate', note: 'der Haushalte in Bangladesch haben ein Dach aus Wellblech' } },
             hint: 'Wellblech gibt es bei jedem Händler. Die vier Dachseiten bieten dem Wind wenig Angriffsfläche.',
             good: 'Leicht, wasserdicht und windfest. Das Dach bleibt stehen und lässt sich bei Hochwasser abbauen und bergen.',
@@ -173,7 +173,7 @@ const SCENARIOS = [
           {
             id: 'concreteflat', text: 'Beton-Flachdach',
             info: 'Gegossene Stahlbetondecke, flach und etwa 10 bis 12 cm dick.',
-            ratings: { availability: 2, stability: 5, flood: 5 },
+            ratings: { availability: 2, stability: 5, flood: 5, reuse: 1 },
             usage: { real: { value: 24, kind: 'estimate', note: 'der Haushalte haben ein Dach aus Zement, Beton oder Ziegeln', info: 'Zement, Beton und Ziegel werden zusammen gezählt. Beton- und Ziegeldach teilen sich deshalb diese Zahl.' } },
             hint: 'Beton ist sehr stark, aber auch sehr schwer. Nicht jede Wand kann ihn tragen.',
             good: 'Maximaler Schutz: Das Dach hält Sturm stand, und die Familie kann sich bei Hochwasser darauf retten.',
@@ -183,7 +183,7 @@ const SCENARIOS = [
           {
             id: 'tilegable', text: 'Tonziegel-Satteldach',
             info: 'Gebrannte Tonziegel auf einem Holzgerüst, nach zwei Seiten geneigt.',
-            ratings: { availability: 2, stability: 2, flood: 2 },
+            ratings: { availability: 2, stability: 2, flood: 2, reuse: 2 },
             usage: { real: { value: 24, kind: 'estimate', note: 'der Haushalte haben ein Dach aus Zement, Beton oder Ziegeln', info: 'Zement, Beton und Ziegel werden zusammen gezählt. Beton- und Ziegeldach teilen sich deshalb diese Zahl.' } },
             hint: 'Tonziegel halten lange, aber jeder einzelne ist schwer.',
             good: 'Haltbar, kühl im Sommer und leise bei Regen.',
@@ -193,7 +193,7 @@ const SCENARIOS = [
           {
             id: 'thatch', text: 'Gras-Satteldach',
             info: 'Gebündeltes Stroh oder Gras auf einem Bambusgerüst, nach zwei Seiten geneigt.',
-            ratings: { availability: 4, stability: 2, flood: 1 },
+            ratings: { availability: 4, stability: 2, flood: 1, reuse: 2 },
             usage: { real: { value: 1, kind: 'estimate', note: 'der Haushalte haben ein Dach aus leichten Naturmaterialien wie Stroh oder Gras' } },
             hint: 'Gras und Stroh wachsen direkt vor Ort und kosten fast nichts.',
             good: 'Sehr günstig, leicht und hält das Haus angenehm kühl.',
