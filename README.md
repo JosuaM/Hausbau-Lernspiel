@@ -82,3 +82,33 @@ Bedient wird unten, oben wird angezeigt; Speichern der Testdaten und iPad-Verbin
   das `flut.setClarity` in `flut.js` aufruft. Zustand im Spielstand: `durch` (wird bei jedem Seitenwechsel zurückgesetzt).
 - Einzelne Seiten zum Ausprobieren: `spiel2/zwei.html?rolle=oben&seite=3&antw=1,2` (Seite -1 Start, 0 Szenarien, 1 Challenge,
   2–5 Bauschritte, 6 Haus, 7 Simulation, 8 Ergebnis; Seite 0 mit `&gewaehlt=flood` zeigt die Szenario-Seite, `&detail=2` setzt im Ergebnis den Fokus, `&preset=blech` wählt auf Seite -1 eine Vorlage, `&durch=1` schaltet im Ergebnis den Blick durchs Wasser ein).
+
+## Version 3 (Varianten), Variante „Josua“ (`spiel3/`)
+
+Startseite › „Version 3 · Varianten“ › „Josua“ (oder direkt `spiel3/josua.html`). Die Vorlage ist Version 2 (`spiel2/`, bleibt unverändert).
+Alles läuft auf **einem** Bildschirm und ist für Touch gebaut (große Flächen, Antippen statt Maus).
+
+Ablauf (Texte in `spiel3/inhalt.js`, Seiten in `spiel3/josua.js`):
+Start › Szenario (Bangladesch, B und C folgen) › Challenge-Übersicht (Dialog in der Mitte über der Landschaft) › Lage und Geografie
+(antippbare Lageskizze, optional „Chars entdecken“) › Realitäts-Check (Dashboard, zwei Reiter) › Bauen (4 Schritte) › Zusammenfassung ›
+Simulation mit Stopps › Ergebnis › Rundgang.
+
+- **Chars**: Seite „Chars entdecken“ mit aufklappbaren Themen. Dort wählt man das Grundstück: Festland (Standard) oder Char (schwer: stärkere Strömung
+  und Erosion in der Simulation, 1 Punkt weniger Flutschutz). Die Char ist eine eigene 3D-Welt (Sandinsel mitten im Fluss, `charHeight()` und
+  `clearVillage()` in `spiel3/haus3d.js`). Beim Wechsel wird die Bühne neu aufgebaut (`ensureStage` in `josua.js`).
+- **Simulation mit Stopps**: Die Flut läuft wie in Version 2 (`flut.js`, `schaden.js`). `V3.STOPS` in `inhalt.js` legt fest, wann sie anhält
+  (Pegel, Phase oder Schadensereignis wie „Wand bricht ein“) und was dann steht, je nach gewähltem Material. Jeder Stopp dauert `STOP_SECONDS` (20 s),
+  unten läuft ein Balken herunter, „Weiter“ überspringt ihn. Technisch `stage.setPaused(true)`.
+- **Ergebnis**: Weißer Raum (`stage.setWhiteRoom`), das Haus erscheint ganz und wird dann nach oben auseinandergezogen (`stage.setExplode`).
+  Die Bauteile sind im Bild und unten antippbar (`stage.pick`). „Rundgang starten“ fährt die Kamera nacheinander zu Fundament, Wänden, Dach und
+  Besonderheit (Nahaufnahme, was kaputt ging und warum, aus `damageInfo()` und `V3.WARUM`); „Übersicht“ führt jederzeit zurück.
+- `spiel3/haus3d.js` und `spiel3/flut.js` sind Kopien der Dateien aus `spiel2/` mit Erweiterungen; Bibliotheken, Modelle, Daten und Schadensmodell
+  kommen aus `spiel2/`. Zum Testen einzelner Seiten: `spiel3/josua.html?seite=t1&antw=1,3,0,0&grund=char` (Seiten: start, szenario, challenge,
+  geo, char, real, b0–b3, haus, sim, ergebnis, t0–t3). Zahlenquellen stehen am Anfang von `inhalt.js`.
+
+Stand der Variante „Josua“ nach der Überarbeitung: Fortschritt nur als Striche (Einleitung, Aufbau, Simulation, Ergebnis); Weiter = dunkles Grau,
+Zurück = helles Grau. Lage und Chars sind eine Fläche beziehungsweise Infotafel links, rechts der Blick aufs Grundstück (beim Wechsel ändert sich nur
+der Hintergrund). Realitäts-Check mit Piktogramm und Balken, Quellen über das Buch-Symbol unten rechts (`V3.SRC` in `inhalt.js`). Beim Bauen links die
+Liste, rechts die Infotafel. Zusammenfassung und Ergebnis werden direkt im 3D-Bild angetippt; antippbare Bauteile glänzen nacheinander
+(`stage.setPartFx`), im Rundgang sind die anderen ausgegraut, Rauszoomen per Knopf oder Zwei-Finger-Zusammenziehen. Im Ergebnis läuft kein Wasser und
+keine Schadenssimulation mehr (alles eingefroren). Simulation: Kamera steht, Stopps dauern 15 s.

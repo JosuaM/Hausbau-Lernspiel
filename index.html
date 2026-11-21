@@ -29,7 +29,7 @@
   .split.is-disabled { opacity: .45; }
   .split.is-disabled > * { cursor: not-allowed; pointer-events: none; }
   .split.is-disabled > *:hover { background: var(--btn); }
-  .switch { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); margin: 14px 0 6px; }
+  .switch { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1px solid var(--line); margin: 14px 0 6px; }
   .switch button { border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 600; padding: 10px 12px; cursor: pointer; }
   .switch button + button { border-left: 1px solid var(--line); }
   .switch button.is-on { background: var(--fg); color: var(--panel); }
@@ -44,6 +44,7 @@
   <div class="switch" role="tablist" aria-label="Version">
     <button type="button" role="tab" data-version="1">Version 1 · Original</button>
     <button type="button" role="tab" data-version="2">Version 2 · Neue Optik</button>
+    <button type="button" role="tab" data-version="3">Version 3 · Varianten</button>
   </div>
   <p class="sub" id="version-note"></p>
 
@@ -55,7 +56,19 @@
     </div>
   </div>
 
-  <div class="option group">
+  <!-- Version 3: Varianten. Die Vorlage ist Version 2, „Josua“ ist die Variante mit einem Bildschirm und Touch-Bedienung. -->
+  <div class="option group" id="opt-v3" hidden>
+    <div class="group-head"><strong>Variante wählen</strong><span>Jede Variante baut auf Version 2 auf.</span></div>
+    <div class="split">
+      <button class="main" id="v3-vorlage" type="button"><strong>Vorlage</strong><span>Version 2: zwei Bildschirme, oben anzeigen, unten bedienen</span></button>
+    </div>
+    <div class="split">
+      <a class="main" href="spiel3/josua.html"><strong>Josua</strong><span>Ein Bildschirm, per Touch bedienbar, mit Chars, Simulations-Stopps und Rundgang</span></a>
+      <button class="side" type="button" title="In extra Fenster öffnen" aria-label="Josua in extra Fenster öffnen" data-pop="spiel3/josua.html" data-name="hausbau-josua"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H3v14h14v-5M11 3h6v6M17 3l-8 8"/></svg></button>
+    </div>
+  </div>
+
+  <div class="option group" id="opt-duo">
     <div class="group-head"><strong>Zwei Bildschirme</strong><span>Oben anzeigen, unten bedienen. Die Fenster sind miteinander verbunden.</span></div>
     <div class="split">
       <a class="main" id="a-oben" href="spiel/zwei.html?rolle=oben"><strong>Oberer Bildschirm</strong><span>Zeigt Szenario, Haus und Ergebnis</span></a>
@@ -72,7 +85,7 @@
   </div>
 
   <!-- User-Testing: braucht den Server, bis er läuft ist der Button gesperrt -->
-  <div class="option">
+  <div class="option" id="opt-test">
     <p class="hint" id="hint"><span id="status-note">Bitte starte den Server, falls du ein User-Testing machen möchtest.</span>
       <a href="#" id="start-server">Server starten</a></p>
     <div class="split is-disabled" id="testing-box">
@@ -99,7 +112,7 @@
 
   // Version 1 (Original) oder Version 2 (neue Optik, nur zwei Bildschirme)
   var version = 1;
-  try { version = localStorage.getItem('hausbau-version') === '2' ? 2 : 1; } catch (e) { /* ohne localStorage */ }
+  try { var sv = localStorage.getItem('hausbau-version'); version = sv === '3' ? 3 : sv === '2' ? 2 : 1; } catch (e) { /* ohne localStorage */ }
   function zweiUrl(role) { return (version === 2 ? 'spiel2/zwei.html' : 'spiel/zwei.html') + '?rolle=' + role; }
 
   function pop(url, name, i) {
@@ -125,18 +138,20 @@
   $('testing').onclick = function (e) { if (version === 2 && running) { e.preventDefault(); both(); } };
 
   function applyVersion() {
-    var v2 = version === 2;
+    var v2 = version === 2, v3 = version === 3;
+    $('opt-v3').hidden = !v3; $('opt-duo').hidden = v3; $('opt-test').hidden = v3;
     Array.prototype.forEach.call(document.querySelectorAll('.switch button'), function (b) { b.classList.toggle('is-on', Number(b.dataset.version) === version); });
-    $('opt-single').hidden = v2;
+    $('opt-single').hidden = v2 || v3;
     $('a-oben').href = zweiUrl('oben'); $('a-unten').href = zweiUrl('unten');
     $('both-title').textContent = v2 ? 'Starten' : 'Beide in extra Fenstern öffnen';
     $('both-sub').textContent = v2 ? 'Oben in diesem Fenster, unten als extra Fenster zum Verschieben' : 'Oben und unten zusammen, auf einem Rechner';
     $('testing').href = v2 ? '#' : 'spiel/spiel.html';
-    $('version-note').textContent = v2 ? 'Neue Optik mit 3D-Haus. Vorerst nur mit zwei Bildschirmen.' : 'Ursprüngliche Fassung.';
+    $('version-note').textContent = v3 ? 'Varianten zum Vergleichen. Die Vorlage ist Version 2.' : v2 ? 'Neue Optik mit 3D-Haus. Vorerst nur mit zwei Bildschirmen.' : 'Ursprüngliche Fassung.';
   }
   Array.prototype.forEach.call(document.querySelectorAll('.switch button'), function (b) {
     b.onclick = function () { version = Number(b.dataset.version); try { localStorage.setItem('hausbau-version', String(version)); } catch (e) { /* egal */ } applyVersion(); };
   });
+  $('v3-vorlage').onclick = function () { version = 2; try { localStorage.setItem('hausbau-version', '2'); } catch (e) { /* egal */ } applyVersion(); };
   applyVersion();
 
   // Ein Browser darf keine Programme starten. Darum wird die Start-Datei geladen; ein Doppelklick startet den Server unsichtbar im Hintergrund.

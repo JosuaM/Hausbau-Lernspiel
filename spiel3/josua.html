@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Hausbau-Konfigurator · Josua</title>
+<link rel="stylesheet" href="josua.css?v=12">
+</head>
+<body>
+<!--
+  Version 3, Variante „Josua“: alles auf einem Bildschirm, per Touch bedienbar.
+  Nutzt die 3D-Bibliotheken und Daten von Version 2 (../spiel2/), eigene Erweiterungen in haus3d.js, flut.js und inhalt.js.
+-->
+<div id="backdrop"></div>
+<div id="white"></div>
+<div id="stages"></div>
+<div id="veil" class="is-on"><span>Lädt …</span></div>
+<main id="ui"></main>
+<script>
+  window.addEventListener('error', function (e) {
+    var box = document.getElementById('err');
+    if (!box) {
+      box = document.createElement('pre');
+      box.id = 'err';
+      box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;margin:0;padding:12px;border-radius:6px;background:#7f1d1d;color:#fff;font:13px/1.4 ui-monospace,monospace;white-space:pre-wrap';
+      document.body.appendChild(box);
+    }
+    box.textContent += 'Fehler: ' + e.message + '\n  in ' + (e.filename || '?').split('/').pop() + ' Zeile ' + e.lineno + ':' + e.colno + '\n';
+  });
+</script>
+<script src="../spiel2/vendor/three.min.js"></script>
+<script src="../spiel2/vendor/texturen.js"></script>
+<script src="haus3d.js?v=6"></script>
+<script src="flut.js?v=4"></script>
+<script src="../spiel2/schaden.js"></script>
+<script src="../spiel2/daten.js?v=presets1"></script>
+<script src="../spiel2/schnitte.js?v=look3d5"></script>
+<script src="inhalt.js?v=4"></script>
+<script src="josua.js?v=9"></script>
+</body>
+</html>
