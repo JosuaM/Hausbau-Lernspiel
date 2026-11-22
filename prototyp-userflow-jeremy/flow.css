@@ -527,3 +527,7 @@ body.is-dragging .fl-dropzone { display: grid; }
 
 /* Zusammenfassung: Flut starten dort, wo beim Hausbau das Weiter war */
 .fl-startrow { position: fixed; right: clamp(16px, 3vw, 44px); top: calc(100vh - var(--bar-h) + 20px); margin: 0; z-index: 5; }
+
+.fl-startrow { top: auto; bottom: 120px; }
+.fl-startrow { display: flex; }
+.fl-startrow, .fl-startrow .btn { height: 46px; box-sizing: border-box; padding-top: 0; padding-bottom: 0; align-items: center; }

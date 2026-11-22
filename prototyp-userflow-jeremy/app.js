@@ -1714,6 +1714,14 @@ function renderHouse(wrap, backdrop) {
   wrap.append(main);
   const { svg } = siteScene(backdrop, 'site-right');
   linkPartsToCards(svg, cards);
+  // „Flut starten“ rechts, mit dem Unterrand der untersten Karte auf einer Höhe.
+  const place = () => {
+    if (!parts.isConnected) return;
+    startRow.style.top = `${parts.getBoundingClientRect().bottom - startRow.offsetHeight}px`;
+  };
+  drawPointers = place;
+  setTimeout(place, 0);
+  setTimeout(place, 500);
 }
 
 // Linien von den Infokästen zu den Bauteilen; gemessen, damit sie bei jeder Fenstergröße treffen.
