@@ -335,10 +335,10 @@ html, body { background: var(--bg); color: var(--fg); }
 .fl-pick-text span:not(.fl-prev) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--muted); font-size: .8rem; line-height: 1.35; }
 @media (max-width: 900px) { .fl-pickrow { grid-template-columns: repeat(2, minmax(0, 1fr)); overflow-y: auto; } .fl-pickbar { height: auto; max-height: 60vh; } }
 .site-scene { background: linear-gradient(#456a84 0%, #6e90a6 50%, #a8c0cb 100%); }
-.site-art[data-roof=""] .fd-roof, .site-art[data-roof=""] .fd-roofs, .site-art[data-roof=""] .fd-roofpart { display: none; }
+.site-art.final[data-roof=""] .fd-roof, .site-art.final[data-roof=""] .fd-roofs, .site-art.final[data-roof=""] .fd-roofpart { display: none; }
 .house-main .eyebrow, .house-main .fl-simtext, .page.start .eyebrow, .page.start .fl-lead, .fl-sim .eyebrow { color: #e6eff4; }
 .page.start h1, .house-main h1 { color: #fff; text-shadow: 0 1px 12px rgba(20, 40, 55, .35); }
-.site-art[data-wall=""] .fd-walls, .site-art[data-wall=""] .fd-door, .site-art[data-wall=""] .fd-window { display: none; }
+.site-art.final[data-wall=""] .fd-walls, .site-art.final[data-wall=""] .fd-door, .site-art.final[data-wall=""] .fd-window { display: none; }
 .site-choose .fd-empty { display: none; }
 .fl-pick-text { min-height: 68px; }
 .fl-pick-text { min-height: 80px; }
@@ -353,11 +353,11 @@ html, body { background: var(--bg); color: var(--fg); }
 .fl-story { position: relative; align-self: flex-start; width: min(46vw, 620px); min-height: 440px; padding-bottom: 34px; }
 .fl-story-nav { align-self: flex-start; width: min(46vw, 620px); }
 .fl-skiphint { position: absolute; right: 0; bottom: 0; z-index: 1; margin: 0; padding: 5px 12px; border-radius: 14px; background: color-mix(in srgb, var(--card) 85%, transparent); border: 1px solid var(--line); color: var(--muted); font-size: .78rem; pointer-events: none; }
-.fl-intro-art { position: fixed; top: 0; right: 0; bottom: 0; left: 38%; z-index: -1; padding: 0; border: 0; border-radius: 0; background: transparent; height: auto; min-height: 0; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 34%); mask-image: linear-gradient(to right, transparent 0, #000 34%); }
+.fl-intro-art { position: fixed; top: 0; right: 0; bottom: 0; left: 46%; z-index: -1; padding: 0; border: 0; border-radius: 0; background: transparent; height: auto; min-height: 0; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40%); mask-image: linear-gradient(to right, transparent 0, #000 40%); }
 .fl-map-wrap { background: transparent; }
 .fl-scene { background: transparent; }
 .fl-detail { background: #151f26; }
-.fl-scene .fl-art, .fl-detail .fl-art { filter: saturate(.88) brightness(.94); }
+.fl-scene .fl-art, .fl-detail .fl-art { filter: saturate(1.2); }
 
 /* Karte: Details */
 .fl-map-label.big.end { text-anchor: end; }
@@ -383,3 +383,135 @@ html, body { background: var(--bg); color: var(--fg); }
 .page.fl-intro { padding-left: clamp(24px, 6vw, 100px); }
 .fl-infocard.is-char { color: var(--fg); background: var(--glass); }
 .fl-infocard .fl-card-title { color: var(--fg); }
+.fl-para { white-space: pre-line; }
+.fl-myanmar { fill: #1c2a2e; }
+.fl-border { fill: none; stroke: #7f9aa3; stroke-width: 1.4; stroke-dasharray: 5 4; }
+
+/* fließendes Wasser in der Karte */
+.fl-river-flow { fill: none; stroke: #d5eefa; stroke-width: 2; stroke-dasharray: 3 15; opacity: 0; transition: opacity 1s ease 2.4s; animation: fl-flow 1.3s linear infinite; }
+.fl-river-flow.side { stroke-width: 1.4; }
+.has-rivers .fl-river-flow { opacity: .75; }
+@keyframes fl-flow { to { stroke-dashoffset: -18; } }
+@media (prefers-reduced-motion: reduce) { .fl-river-flow { animation: none; } }
+
+/* Szenen: Zoom beim Einblenden, Abtragen der Insel */
+.fl-scene { transition: opacity .9s ease, transform 1.8s cubic-bezier(.3, 0, .2, 1); }
+.fl-scene.zoom-in:not(.is-on) { transform: none; }
+.is-eroding .sv-island { transform-origin: 348px 372px; }
+.fl-scene.is-on .is-eroding .sv-island { animation: sv-erode 9s ease-in forwards; }
+.fl-scene.is-on .is-eroding .sv-islhouses { animation: sv-lose 9s ease-in forwards; }
+@keyframes sv-erode { from { transform: none; } to { transform: scale(.78, .8); } }
+@keyframes sv-lose { from { opacity: 1; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fl-scene.is-on .is-eroding .sv-island, .fl-scene.is-on .is-eroding .sv-islhouses { animation: none; } }
+
+/* Hausbau: gestricheltes Haus, Einblenden, Ziehen, Querschnitt oben rechts */
+.site-choose .fd-house { stroke: #eaf3f7; }
+.site-choose .fd-roof, .site-choose .fd-walls { fill: #fff; fill-opacity: .14; }
+.page.fl-choose .fl-pickbar { animation: fl-bar-in .6s ease both; }
+@keyframes fl-bar-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.site-choose.site-scene { animation: fadein .7s ease; }
+.flash .site-house { animation: fl-drop .55s cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes fl-drop { from { opacity: .35; transform-box: fill-box; } to { opacity: 1; } }
+.fl-pick { touch-action: none; user-select: none; }
+.fl-pick-pic svg.fr { display: block; width: 100%; height: 100%; }
+.fl-ghost-card { position: fixed !important; z-index: 20; transform: translate(-50%, -60%) rotate(-2deg); pointer-events: none; opacity: .92; box-shadow: 0 14px 34px rgba(0, 0, 0, .45); height: auto !important; }
+.fl-ghost-card .fl-pick-text { display: none; }
+.fl-ghost-card .fl-pick-pic { height: 110px; flex: none; }
+.fl-dropzone { position: fixed; left: 0; right: 0; top: 0; bottom: var(--bar-h); z-index: 2; display: none; place-items: center; pointer-events: none; }
+body.is-dragging .fl-dropzone { display: grid; }
+.fl-dropzone span { padding: 8px 16px; border-radius: 14px; background: var(--glass); color: var(--fg); font-size: .9rem; border: 1px dashed var(--accent-text); opacity: .85; }
+.fl-dropzone.is-over { box-shadow: inset 0 0 0 3px var(--accent-text); background: rgba(124, 195, 224, .12); }
+.fl-section { position: fixed; top: 64px; right: 28px; z-index: 3; width: min(300px, 24vw); padding: 10px 12px 12px; background: var(--glass); border: 1px solid var(--line); border-radius: 10px; text-align: left; animation: fl-in .3s ease both; }
+.fl-section[hidden] { display: none; }
+.fl-section .eyebrow { margin: 0 0 8px; }
+.fl-section-pic { aspect-ratio: 3 / 2; border-radius: 6px; overflow: hidden; background: #1d2832; }
+.fl-section-pic svg { display: block; width: 100%; height: 100%; }
+.fl-section-pic svg.sx > rect:first-child { fill: #1d2832; }
+.fl-section-pic svg.sx > rect:nth-last-child(-n+4) { display: none; }
+.fl-section-name { margin: 8px 0 0; font-size: .82rem; color: var(--muted); }
+
+/* Pop-up für die Frage nach der Extra-Runde */
+.fl-modal { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(8, 12, 16, .6); backdrop-filter: blur(5px); animation: fl-in .4s ease both; }
+.fl-modal-card { width: min(480px, 90vw); padding: 28px 30px 26px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; text-align: left; box-shadow: 0 24px 60px rgba(0, 0, 0, .5); }
+.fl-modal-card h2 { margin: 0 0 12px; font-size: 1.5rem; }
+.fl-modal-card p:not(.eyebrow) { margin: 0 0 22px; color: var(--muted); line-height: 1.55; }
+.fl-modal-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
+
+/* Startseite: heller Tag, Haus im Bau, deutlicher Button */
+.site-scene.start-scene { background: linear-gradient(#5fb2e6 0%, #9bd0ee 45%, #d9eef8 80%); }
+.page.start h1 { color: #0f2e49; text-shadow: none; font-size: clamp(2.6rem, 5vw, 4.6rem); }
+.page.start .btn-big { background: #f4a623; color: #1d2733; font-weight: 750; padding: 20px 56px; font-size: 1.3rem; border-radius: 12px; box-shadow: 0 12px 28px rgba(190, 120, 10, .38); transition: transform .2s ease, box-shadow .2s ease, filter .2s ease; animation: bs-pulse 2.6s ease-in-out infinite; }
+.page.start .btn-big:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(190, 120, 10, .5); filter: brightness(1.06); animation: none; }
+@keyframes bs-pulse { 50% { box-shadow: 0 12px 28px rgba(190, 120, 10, .38), 0 0 0 10px rgba(244, 166, 35, .22); } }
+.bs-halo { transform-origin: 1130px 150px; animation: bs-halo 5s ease-in-out infinite alternate; }
+@keyframes bs-halo { from { transform: scale(.9); opacity: .8; } to { transform: scale(1.12); opacity: 1; } }
+.bs-cloud { animation: bs-drift 120s linear infinite; }
+.bs-c2 { animation-duration: 160s; animation-delay: -60s; } .bs-c3 { animation-duration: 140s; animation-delay: -90s; } .bs-c4 { animation-duration: 180s; animation-delay: -30s; } .bs-c1 { animation-delay: -20s; }
+@keyframes bs-drift { from { transform: translateX(-400px); } to { transform: translateX(1900px); } }
+.bs-bird { animation: bs-fly 38s linear infinite; }
+@keyframes bs-fly { from { transform: translate(-80px, 220px); } 50% { transform: translate(700px, 170px); } to { transform: translate(1550px, 230px); } }
+.bs-rise { transform-box: fill-box; transform-origin: bottom; animation: bs-rise 18s steps(8, end) infinite; }
+.bs-rise-b { animation-name: bs-rise-b; }
+@keyframes bs-rise { 0% { transform: scaleY(0); } 55%, 94% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
+@keyframes bs-rise-b { 0%, 12% { transform: scaleY(0); } 62%, 94% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
+.bs-roof path { stroke-dasharray: 1; animation: bs-roof 18s linear infinite; }
+@keyframes bs-roof { 0%, 58% { stroke-dashoffset: 1; } 80%, 94% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 1; } }
+.bs-arm { transform-origin: 1294px 258px; animation: bs-sway 9s ease-in-out infinite alternate; }
+@keyframes bs-sway { from { transform: rotate(-.7deg); } to { transform: rotate(.9deg); } }
+.bs-cable { transform-origin: 1090px 250px; animation: bs-cable 8s ease-in-out infinite alternate; }
+.bs-pallet { animation: bs-pallet 8s ease-in-out infinite alternate; }
+@keyframes bs-cable { from { transform: scaleY(1); } to { transform: scaleY(.42); } }
+@keyframes bs-pallet { from { transform: translateY(0); } to { transform: translateY(-126px); } }
+.bs-drum { transform-box: fill-box; transform-origin: center; animation: bs-spin 7s linear infinite; }
+@keyframes bs-spin { to { transform: rotate(360deg); } }
+.bs-barrow { transform: translate(880px, 810px); animation: bs-barrow 16s ease-in-out infinite alternate; }
+@keyframes bs-barrow { from { transform: translate(560px, 810px); } to { transform: translate(755px, 810px); } }
+@media (prefers-reduced-motion: reduce) {
+  .bs-halo, .bs-cloud, .bs-bird, .bs-rise, .bs-roof path, .bs-arm, .bs-cable, .bs-pallet, .bs-drum, .bs-barrow, .page.start .btn-big { animation: none; }
+  .bs-cloud { transform: translateX(200px); } .bs-bird { display: none; }
+}
+.start-main { max-width: 820px; }
+.page.start h1 { font-size: clamp(2.4rem, 4.3vw, 4rem); }
+
+/* Szenario-Auswahl: die Mitte größer, die Seiten blasser */
+.page.select { justify-content: center; }
+.scenario-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr); align-items: stretch; gap: 22px; }
+.scenario.is-locked { opacity: .45; filter: saturate(.75); transform: scale(.94); }
+.scenario:not(.is-locked) { box-shadow: 0 18px 44px rgba(0, 0, 0, .4); }
+.scenario:not(.is-locked):hover { transform: translateY(-4px) scale(1.01); }
+
+/* Aufgabe: Bild über die Seite wie in der Einführung */
+.page.fl-brief { padding-left: clamp(20px, 3vw, 48px); }
+.fl-brieftext { width: min(46vw, 640px); text-align: left; padding-top: clamp(8px, 4vh, 40px); }
+.fl-brief .nav { width: min(46vw, 640px); }
+.page.fl-brief h1 { font-size: clamp(2rem, 3.4vw, 3rem); margin-bottom: 18px; }
+.fl-brief .challenge-task { margin-bottom: 26px; }
+.fl-brief .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.fl-brief .fact-value { font-size: 1.25rem; }
+
+/* Frage unter dem Text (Extra-Szenario) */
+.fl-ask { margin-top: 18px; max-width: 52ch; padding: 18px 20px; border: 1px solid var(--accent-text); border-radius: 10px; background: color-mix(in srgb, var(--card) 80%, transparent); animation: fl-in .4s ease both; }
+.fl-ask strong { display: block; font-size: 1.05rem; margin-bottom: 4px; }
+.fl-ask p { margin: 0 0 14px; color: var(--muted); }
+.fl-ask-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.fl-startrow { margin-top: 20px; }
+
+/* Startseite: Button ruhig, Farben kräftiger */
+.site-scene.start-scene { background: linear-gradient(#2b8fe0 0%, #6fbcf0 48%, #bfe6fb 82%); }
+.page.start .btn-big { animation: none; box-shadow: 0 8px 20px rgba(160, 100, 0, .35); background: #f5a000; }
+.page.start .btn-big:hover { box-shadow: 0 12px 26px rgba(160, 100, 0, .45); }
+.site-scene { background: linear-gradient(#3b86c6 0%, #6fa9d6 50%, #a7cde6 100%); }
+.site-scene .site-art { filter: saturate(1.2); }
+
+/* Regenwetter: ab dem Hausbau ist der Himmel bedeckt und trüb */
+.site-scene { background: linear-gradient(#37474f 0%, #5d7080 48%, #8b9ea9 100%); }
+.site-scene .site-art { filter: saturate(.82) brightness(.9); }
+.site-scene.start-scene { background: linear-gradient(#2b8fe0 0%, #6fbcf0 48%, #bfe6fb 82%); }
+.site-scene.start-scene .site-art { filter: saturate(1.15); }
+
+/* Extra-Szenario und Fazit: Bilder wie bei Regen */
+.is-rainy .fl-art { filter: saturate(.62) brightness(.7) contrast(1.05); }
+.is-rainy::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .55; background-image: linear-gradient(105deg, transparent 47%, rgba(205, 225, 240, .55) 50%, transparent 53%); background-size: 30px 80px; animation: fl-rainfall .55s linear infinite; }
+@keyframes fl-rainfall { to { background-position: -9px 80px; } }
+@media (prefers-reduced-motion: reduce) { .is-rainy::after { animation: none; } }
+.fl-next-fixed { z-index: 9; pointer-events: auto; }

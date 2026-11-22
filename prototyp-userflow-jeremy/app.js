@@ -892,6 +892,15 @@ const FD_BUILD = `
       </g>
     </g>
     <path class="fd-outline" d="M150 480V368H410V480"/>
+    <!-- Verstärktes Tragwerk: Kreuzstreben, Pfosten mit Betonfuß und schwarzem Schutzanstrich -->
+    <g class="fd-extra fd-frame" stroke="none" stroke-dasharray="none">
+      <rect x="144" y="366" width="272" height="9" rx="2" fill="#8a6542"/>
+      <rect x="146" y="366" width="10" height="114" fill="#8a6542"/><rect x="404" y="366" width="10" height="114" fill="#8a6542"/>
+      <rect x="146" y="448" width="10" height="22" fill="#2b2b2e"/><rect x="404" y="448" width="10" height="22" fill="#2b2b2e"/>
+      <rect x="141" y="470" width="20" height="12" rx="2" fill="#a9afb3"/><rect x="399" y="470" width="20" height="12" rx="2" fill="#a9afb3"/>
+      <path class="fd-brace" fill="none" stroke="#8a6542" stroke-width="7" stroke-linecap="round" d="M156 408L192 372M404 408L368 372M156 440L196 400M404 440L364 400"/>
+      <path class="fd-gleam" stroke="#fff" stroke-width="3" stroke-linecap="round" d="M151 372V470M409 372V470"/>
+    </g>
     <path class="fd-roof" fill="#fff" fill-opacity=".3" d="M126 368L184 296H376L434 368Z"/>
     <!-- Dächer: Walmdach von vorn als Trapez, Satteldach mit Giebel, Flachdach als Platte -->
     <g class="fd-roofs" stroke="none" stroke-dasharray="none">
@@ -940,15 +949,6 @@ const FD_BUILD = `
     <circle class="pt-roof" cx="300" cy="334" r="1" fill="none" stroke="none"/>
     <circle class="pt-wall" cx="160" cy="400" r="1" fill="none" stroke="none"/>
 
-    <!-- Verstärktes Tragwerk: Kreuzstreben, Pfosten mit Betonfuß und schwarzem Schutzanstrich -->
-    <g class="fd-extra fd-frame" stroke="none" stroke-dasharray="none">
-      <rect x="144" y="366" width="272" height="9" rx="2" fill="#8a6542"/>
-      <rect x="146" y="366" width="10" height="114" fill="#8a6542"/><rect x="404" y="366" width="10" height="114" fill="#8a6542"/>
-      <rect x="146" y="448" width="10" height="22" fill="#2b2b2e"/><rect x="404" y="448" width="10" height="22" fill="#2b2b2e"/>
-      <rect x="141" y="470" width="20" height="12" rx="2" fill="#a9afb3"/><rect x="399" y="470" width="20" height="12" rx="2" fill="#a9afb3"/>
-      <path class="fd-brace" fill="none" stroke="#8a6542" stroke-width="7" stroke-linecap="round" d="M156 408L192 372M404 408L368 372M156 440L196 400M404 440L364 400"/>
-      <path class="fd-gleam" stroke="#fff" stroke-width="3" stroke-linecap="round" d="M151 372V470M409 372V470"/>
-    </g>
   </g>
   </g>
 `;
@@ -1486,7 +1486,7 @@ function el(tag, cls, text) {
 // Seiten-Namen (nach Seitennummer) und die beiden Leisten: erste Runde, Extra-Runde auf der Char (beginnt neu).
 const PAGE_NAMES = ['Szenario', 'Einführung', 'Aufgabe', 'Fundament', 'Wand', 'Dach', 'Besonderheit', 'Zusammenfassung', 'Simulation', 'Ergebnis', 'Extra-Szenario', 'Fazit'];
 const UFER_FLOW = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const CHAR_FLOW = [10, 3, 4, 5, 6, 7, 8, 9];
+const CHAR_FLOW = [10, 3, 4, 5, 6, 7, 8, 9, 11];
 
 function setLook(value) {
   look = value;
@@ -1705,7 +1705,12 @@ function renderHouse(wrap, backdrop) {
     cards[step.name] = partCard(step, i);
     parts.append(cards[step.name]);
   });
-  main.append(parts, nav(() => go(HOUSE - 1), () => go(SIMULATION), 'Flut starten →'));
+  const start = el('button', 'btn fl-simnext', 'Flut starten →');
+  start.type = 'button';
+  start.onclick = () => go(SIMULATION);
+  const startRow = el('div', 'fl-startrow');
+  startRow.append(start);
+  main.append(parts, startRow);
   wrap.append(main);
   const { svg } = siteScene(backdrop, 'site-right');
   linkPartsToCards(svg, cards);
@@ -1743,6 +1748,11 @@ function startTyping(node, text, done) {
   return { skip: finish };
 }
 
+// Lesezeit: Ein Absatz bleibt so lange stehen, wie man bei READ_CPS Zeichen pro Sekunde zum Lesen braucht (plus eine Sekunde).
+// Das Tippen zählt schon dazu, es wird abgezogen. Längere Absätze bekommen so mehr Zeit, kürzere weniger (mindestens 1,5 s Pause).
+const READ_CPS = 16;
+const readPause = text => Math.max(1500, (text.length / READ_CPS + 1) * 1000 - text.length * TYPE_MS);
+
 // Gemeinsamer Ablauf: Absätze werden nacheinander getippt, das Bild rechts wechselt mit dem Absatz.
 // cfg: eyebrow, title, beats [{ text, view }], art { el, show(view) }, back (Funktion), onDone(actions), instant
 function runStory(wrap, cfg) {
@@ -1778,7 +1788,7 @@ function runStory(wrap, cfg) {
 
   const text = b => (typeof b.text === 'function' ? b.text() : b.text);
   let i = -1, typing = null, pause = null, done = false;
-  const finishAll = () => { done = true; hint.hidden = true; cfg.onDone(actions); };
+  const finishAll = () => { done = true; hint.hidden = true; cfg.onDone(actions, col); };
   const next = () => {
     if (!paras.isConnected) return;
     clearTimeout(pause);
@@ -1792,7 +1802,7 @@ function runStory(wrap, cfg) {
     cfg.art.show(beat.view, i);
     typing = startTyping(p, text(beat), () => {
       typing = null;
-      if (last) finishAll(); else pause = setTimeout(next, 1800 + text(beat).length * 26);
+      if (last) finishAll(); else pause = setTimeout(next, readPause(text(beat)));
     });
     scrollUp();
   };
@@ -1857,17 +1867,17 @@ function mapArt() {
   const L = (t, lon, lat, cls = '') => `<text class="fl-map-label ${cls}" x="${MAPX(lon).toFixed(1)}" y="${MAPY(lat).toFixed(1)}">${t}</text>`;
   const svg = `<svg class="fl-map" viewBox="-10 -40 540 730" role="img" aria-label="Karte von Bangladesch mit den großen Flüssen">
     <rect x="-1500" y="-1500" width="4000" height="4000" fill="#151f26"/>
-    <path d="${sea}" fill="#0d2a3d"/><path d="${sea}" fill="url(#fl-wave)" opacity=".7"/><path d="${sea}" fill="none" stroke="#2f6f8c" stroke-width="2" opacity=".6"/>
+    <path class="fl-myanmar" d="${mapPoly([[92.673, 22.041], [92.652, 21.324], [92.303, 21.475], [92.369, 20.671], [92.7, 20.0], [96, 19.0], [96, 23.9], [93.3, 23.1]])}"/><path class="fl-border" d="${mapCurve([[92.673, 22.041], [92.95, 22.5], [93.3, 23.1], [96, 24.2]])}"/><path d="${sea}" fill="#0d2a3d"/><path d="${sea}" fill="url(#fl-wave)" opacity=".7"/><path d="${sea}" fill="none" stroke="#2f6f8c" stroke-width="2" opacity=".6"/>
     <defs><pattern id="fl-wave" width="44" height="16" patternUnits="userSpaceOnUse"><path d="M0 8Q11 0 22 8T44 8" fill="none" stroke="#2c6482" stroke-width="1.3"/></pattern><clipPath id="fl-clip"><path d="${mapBlob(BD_OUTLINE)}"/></clipPath></defs>
     <g class="cam">
       <path class="fl-land" d="${mapBlob(BD_OUTLINE)}"/>
       <g class="fl-plain-tint"><path d="${mapBlob(BD_OUTLINE)}"/></g>
       <g class="fl-hills" clip-path="url(#fl-clip)">${BD_HILLS.map(h => `<path d="${mapPoly(h.pts)}"/>`).join('')}</g>
-      <g class="fl-rivers" fill="none" stroke-linecap="round" stroke-linejoin="round">${BD_RIVERS.map(r => `<path class="fl-river ${r.cls}" pathLength="1" d="${mapCurve(r.pts)}"/>`).join('')}</g>
+      <g class="fl-rivers" fill="none" stroke-linecap="round" stroke-linejoin="round">${BD_RIVERS.map(r => `<path class="fl-river ${r.cls}" pathLength="1" d="${mapCurve(r.pts)}"/>`).join('')}${BD_RIVERS.map(r => `<path class="fl-river-flow ${r.cls}" d="${mapCurve(r.pts)}"/>`).join('')}</g>
       <path class="fl-land-line" d="${mapBlob(BD_OUTLINE)}"/>
-      ${L('Indien', 89.2, 26.85, 'big')}${L('Indien', 90.9, 25.75, 'big')}${L('Myanmar', 92.8, 21.7, 'big')}
+      ${L('Indien', 89.2, 26.85, 'big')}${L('Myanmar', 92.85, 21.55, 'big')}
       <text class="fl-map-label sea-big" x="${MAPX(90.15).toFixed(1)}" y="${MAPY(21.05).toFixed(1)}" text-anchor="middle">Golf von Bengalen</text>
-      ${L('Bangladesch', 89.9, 23.85, 'country')}
+      ${L('Bangladesch', 90.55, 24.85, 'country')}
       <g class="fl-sundarbans" clip-path="url(#fl-clip)"><path d="${mapBlob([[89.0, 22.05], [89.45, 21.95], [89.85, 22.04], [89.78, 22.45], [89.3, 22.78], [89.0, 22.5]])}"/><text class="fl-map-label hill" x="${MAPX(89.12).toFixed(1)}" y="${MAPY(22.2).toFixed(1)}">Sundarbans</text></g>
       <g class="fl-cities">${[['Dhaka', 90.41, 23.81], ['Chattogram', 91.83, 22.34], ['Khulna', 89.55, 22.82], ['Rajshahi', 88.6, 24.37]].map(([n, lo, la]) => `<circle cx="${MAPX(lo).toFixed(1)}" cy="${MAPY(la).toFixed(1)}" r="3"/><text class="fl-map-label city" x="${(MAPX(lo) + 6).toFixed(1)}" y="${(MAPY(la) + 4).toFixed(1)}">${n}</text>`).join('')}</g>
       <g class="fl-river-labels">${L('Jamuna', 89.8, 25.45)}${L('Padma', 89.1, 23.62)}${L('Meghna', 91.0, 23.7)}${L('Teesta', 88.7, 26.35)}</g>
@@ -1915,74 +1925,76 @@ const SV_DEFS = `<defs>
 const svUse = (id, x, y, fill = '', s = 1) => `<use href="#${id}" transform="translate(${x} ${y})${s !== 1 ? ` scale(${s})` : ''}"${fill ? ` fill="${fill}"` : ''}/>`;
 const svLabel = (t, x, y, anchor = 'start', size = 19) => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Inter, system-ui, sans-serif" font-size="${size}" font-weight="700" fill="#fff" stroke="#2f4a3a" stroke-width="4.5" paint-order="stroke" stroke-linejoin="round">${t}</text>`;
 const svRiver = (d, w, sandExtra = 10) => `<path fill="none" stroke="#dcc892" stroke-width="${w + sandExtra * 2}" stroke-linecap="round" d="${d}"/><path fill="none" stroke="#7fc3da" stroke-width="${w + sandExtra}" stroke-linecap="round" d="${d}"/><path fill="none" stroke="#3f8fb2" stroke-width="${w - 18}" stroke-linecap="round" d="${d}"/>
-  <g fill="none" stroke="#a9dcea" stroke-linecap="round" opacity=".75"><path stroke-width="3" stroke-dasharray="16 44" d="${d}"/><path stroke-width="2" stroke-dasharray="10 50" transform="translate(${w / 5} 4)" d="${d}"/><path stroke-width="2" stroke-dasharray="12 48" transform="translate(${-w / 5} -3)" d="${d}"/></g>`;
-const SV_LAND = `<rect width="560" height="680" fill="#8fb56b"/><path fill="#a4c67c" d="M300-10H570V130L450 150L340 90Z"/><path fill="#7ea65d" d="M-10 200L90 180L180 260L150 360L-10 390Z"/><path fill="#b3cf88" d="M340 440L570 420V600L430 640L370 560Z"/><path fill="#9dbf74" d="M-10 560L90 540L180 690H-10Z"/>`;
-const svScene = (inner, label) => `<svg class="fl-art" viewBox="0 0 560 680" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${label}">${SV_DEFS}${inner}</svg>`;
+  <g fill="none" stroke="#a9dcea" stroke-linecap="round" opacity=".75"><path class="rv-flow" stroke-width="3" stroke-dasharray="16 44" d="${d}"/><path class="rv-flow" stroke-width="2" stroke-dasharray="10 50" transform="translate(${w / 5} 4)" d="${d}"/><path class="rv-flow" stroke-width="2" stroke-dasharray="12 48" transform="translate(${-w / 5} -3)" d="${d}"/></g>`;
+// Land: großzügig über den Bildrand hinaus gezeichnet, damit die Bilder die ganze Fläche füllen, auch wenn sie herausgezoomt sind.
+const SV_LAND = `<rect x="-700" y="-500" width="2000" height="1900" fill="#8fb56b"/><path fill="#a4c67c" d="M300-10H570V130L450 150L340 90Z"/><path fill="#7ea65d" d="M-10 200L90 180L180 260L150 360L-10 390Z"/><path fill="#b3cf88" d="M340 440L570 420V600L430 640L370 560Z"/><path fill="#9dbf74" d="M-10 560L90 540L180 690H-10Z"/><path fill="#a4c67c" d="M560 -40L760 -60V200L620 220Z"/><path fill="#7ea65d" d="M-300 380L-80 360L-20 520L-300 560Z"/>`;
+// Ausschnitt: etwas herausgezoomt (viewBox größer als das Motiv), der Inhalt liegt in der rechten Hälfte, weil links der Text steht.
+const svScene = (inner, label) => `<svg class="fl-art" viewBox="-70 -50 700 780" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${label}">${SV_DEFS}${inner}</svg>`;
+// Flüsse laufen über den oberen und unteren Rand hinaus
+const svLong = d => d.replace(/^M(\S+) -60/, 'M$1 -400L$1 -60').replace(/(\S+) 740$/, '$1 740L$1 1100');
 
-// Sirajganj am Jamuna: breiter Fluss von oben nach unten, in der Mitte eine Char, das Haus steht am Ufer
-function geoArt() {
-  const d = 'M250 -60C225 120 305 210 280 340S235 540 270 740';
+// Sirajganj am Jamuna: breiter Fluss von oben nach unten, in der Mitte eine runde Char, das Haus steht am rechten Ufer
+function geoArt(arrow = false) {
+  const d = svLong('M300 -60C275 120 355 210 330 340S285 540 320 740');
   return svScene(`${SV_LAND}${svRiver(d, 190, 10)}
-    <path d="M272 215C318 232 330 330 306 430C285 485 250 470 244 410C236 330 238 235 272 215Z" fill="#e4cf98" stroke="#c9b178" stroke-width="3"/>
-    <use href="#sv-tuft" x="268" y="300"/><use href="#sv-tuft" x="290" y="372"/><use href="#sv-tuft" x="262" y="410"/>
-    <use href="#sv-boat" transform="translate(205 150) rotate(95)"/><use href="#sv-boat" transform="translate(352 560) rotate(80)"/>
-    ${svUse('sv-tuft', 40, 90)}${svUse('sv-tuft', 470, 80)}
-    <g transform="translate(64 150)"><use href="#sv-palm"/></g>${svUse('sv-hut', 100, 300, '#c1553a', 1.25)}${svUse('sv-bush', 46, 360, '#5f9150')}
-    <g transform="translate(150 420)"><use href="#sv-palm"/></g>${svUse('sv-hut', 450, 190, '#8c9ba2')}<g transform="translate(500 120)"><use href="#sv-palm"/></g>
-    ${svUse('sv-hut', 470, 520, '#c1553a')}${svUse('sv-bush', 400, 610, '#6b9b58')}
-    ${svLabel('Jamuna', 338, 150)}${svLabel('Char', 322, 336)}${svLabel('Dein Haus am Ufer', 36, 226, 'start', 16)}`, 'Der Jamuna bei Sirajganj mit einer Flussinsel in der Mitte');
+    <g class="sv-island"><ellipse cx="332" cy="348" rx="50" ry="60" fill="#e4cf98" stroke="#c9b178" stroke-width="3.5"/>
+    <use href="#sv-tuft" x="320" y="338"/><use href="#sv-tuft" x="346" y="372"/><use href="#sv-tuft" x="332" y="318"/></g>
+    <use href="#sv-boat" transform="translate(252 150) rotate(95)"/><use href="#sv-boat" transform="translate(402 560) rotate(80)"/>
+    ${svUse('sv-tuft', 60, 120)}${svUse('sv-tuft', 120, 560)}${svUse('sv-bush', 110, 300, '#5f9150')}${svUse('sv-bush', 90, 640, '#6b9b58')}
+    <g transform="translate(150 200)"><use href="#sv-palm"/></g><g transform="translate(120 450)"><use href="#sv-palm"/></g>
+    ${svUse('sv-hut', 150, 330, '#c1553a', 1.3)}${svUse('sv-hut', 90, 400, '#8c9ba2', .9)}${svUse('sv-hut', 130, 590, '#b8693f', 1.1)}${svUse('sv-bush', 60, 470, '#6b9b58')}
+    ${svUse('sv-hut', 535, 410, '#c1553a', 1.25)}<g transform="translate(590 230)"><use href="#sv-palm"/></g>${svUse('sv-bush', 450, 470, '#6b9b58')}
+    ${svUse('sv-hut', 540, 140, '#8c9ba2')}${svUse('sv-hut', 530, 540, '#c1553a')}${svUse('sv-bush', 470, 630, '#6b9b58')}
+    ${svLabel('Jamuna', 420, 100)}${arrow ? '' : svLabel('Char', 420, 350)}
+    ${arrow ? `<path d="M520 262C470 262 430 300 392 336" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M381 346L408 336L394 318Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>${svLabel('Char', 540, 250, 'end', 24)}` : ''}`, 'Der Jamuna bei Sirajganj mit einer runden Flussinsel in der Mitte');
 }
 
 // Drei Hausarten, von einfach zu massiv
 function wealthArt() {
+  const row = (y, id, title, sub) => `<g transform="translate(250 ${y})">${svUse(id, 0, 0, '', 1.6)}</g>${svLabel(title, 330, y - 12)}${svLabel(sub, 330, y + 13, 'start', 14)}`;
   return svScene(`${SV_LAND}
-    ${svUse('sv-tuft', 60, 80)}${svUse('sv-tuft', 500, 640)}${svUse('sv-bush', 500, 60, '#6b9b58')}${svUse('sv-bush', 60, 630, '#5f9150')}
-    <g transform="translate(120 188)">${svUse('sv-mud', 0, 0, '', 1.9)}</g>${svLabel('Lehm und Gras', 220, 176)}${svLabel('wer wenig hat', 220, 202, 'start', 15)}
-    <g transform="translate(120 378)">${svUse('sv-tin', 0, 0, '', 1.9)}</g>${svLabel('Wellblech', 220, 366)}${svLabel('günstig und leicht', 220, 392, 'start', 15)}
-    <g transform="translate(120 568)">${svUse('sv-brick', 0, 0, '', 1.9)}</g>${svLabel('Ziegel und Beton', 220, 556)}${svLabel('wer es sich leisten kann', 220, 582, 'start', 15)}
-    `, 'Drei Hausarten: Lehm und Gras, Wellblech, Ziegel und Beton');
+    ${svUse('sv-tuft', 140, 70)}${svUse('sv-tuft', 560, 650)}${svUse('sv-bush', 560, 40, '#6b9b58')}${svUse('sv-bush', 140, 640, '#5f9150')}
+    ${row(190, 'sv-mud', 'Lehm und Gras', 'wer wenig hat')}${row(380, 'sv-tin', 'Wellblech', 'günstig und leicht')}${row(570, 'sv-brick', 'Ziegel und Beton', 'wer es sich leisten kann')}`, 'Drei Hausarten: Lehm und Gras, Wellblech, Ziegel und Beton');
 }
 
 // Festland nahe am Ufer: Fluss links, Dorf auf dem Land rechts
 function bankScene() {
-  const d = 'M100 -60C80 140 150 270 120 410S95 600 130 740';
+  const d = svLong('M160 -60C140 140 210 270 180 410S155 600 190 740');
   return svScene(`${SV_LAND}${svRiver(d, 96, 12)}
-    <use href="#sv-boat" transform="translate(112 200) rotate(96)"/>
-    ${svUse('sv-tuft', 250, 70)}${svUse('sv-hut', 330, 130, '#c1553a')}<g transform="translate(450 150)"><use href="#sv-palm"/></g>${svUse('sv-hut', 440, 230, '#8c9ba2')}
-    ${svUse('sv-bush', 270, 260, '#6b9b58')}${svUse('sv-hut', 340, 340, '#b8693f')}${svUse('sv-hut', 450, 430, '#c1553a')}<g transform="translate(260 470)"><use href="#sv-palm"/></g>
-    ${svUse('sv-hut', 330, 540, '#8c9ba2')}${svUse('sv-bush', 480, 600, '#5f9150')}${svUse('sv-tuft', 400, 640)}
-    ${svLabel('Festland am Ufer', 250, 150)}`, 'Dorf auf dem Festland am Flussufer');
+    <use href="#sv-boat" transform="translate(172 200) rotate(96)"/>
+    ${svUse('sv-tuft', 290, 70)}${svUse('sv-hut', 380, 130, '#c1553a')}<g transform="translate(500 150)"><use href="#sv-palm"/></g>${svUse('sv-hut', 490, 230, '#8c9ba2')}
+    ${svUse('sv-bush', 310, 260, '#6b9b58')}${svUse('sv-hut', 390, 340, '#b8693f')}${svUse('sv-hut', 500, 430, '#c1553a')}<g transform="translate(310 470)"><use href="#sv-palm"/></g>
+    ${svUse('sv-hut', 380, 540, '#8c9ba2')}${svUse('sv-bush', 530, 600, '#5f9150')}${svUse('sv-tuft', 450, 640)}`, 'Dorf auf dem Festland am Flussufer');
 }
 
 // Flussinsel (Char): Wasser rundherum
-function charScene(withHouse = true) {
-  const d = 'M280 -60C245 130 320 250 285 380S250 570 280 740';
-  return svScene(`${SV_LAND}${svRiver(d, 330, 12)}
-    <path d="M280 205C390 190 450 290 420 390C395 480 300 510 220 480C130 450 120 330 160 260C190 215 235 210 280 205Z" fill="#e4cf98" stroke="#c9b178" stroke-width="3.5"/>
-    ${svUse('sv-tuft', 210, 300)}${svUse('sv-tuft', 380, 440)}${svUse('sv-tuft', 330, 250)}
-    ${withHouse ? `${svUse('sv-tin', 270, 360, '', 1.35)}${svUse('sv-tin', 345, 420, '', 1.1)}<g transform="translate(200 440)"><use href="#sv-palm"/></g>` : ''}
-    <use href="#sv-boat" transform="translate(110 520) rotate(80)"/><use href="#sv-boat" transform="translate(465 140) rotate(100)"/>
-    ${svLabel('Char', 40, 170)}${svLabel('Insel aus Sand und Schlamm', 40, 196, 'start', 15)}`, 'Flussinsel (Char) mit Wasser rundherum');
+function charScene(withHouse = true, erode = false) {
+  const d = svLong('M340 -60C305 130 380 250 345 380S310 570 340 740');
+  const svg = svScene(`${SV_LAND}${svRiver(d, 330, 12)}
+    <g class="sv-island"><ellipse cx="348" cy="372" rx="108" ry="116" fill="#e4cf98" stroke="#c9b178" stroke-width="3.5"/>
+    ${svUse('sv-tuft', 300, 310)}${svUse('sv-tuft', 410, 440)}${svUse('sv-tuft', 380, 296)}</g>
+    ${withHouse ? `<g class="sv-islhouses">${svUse('sv-tin', 330, 372, '', 1.3)}${svUse('sv-tin', 398, 432, '', 1.05)}<g transform="translate(290 438)"><use href="#sv-palm"/></g></g>` : ''}
+    <use href="#sv-boat" transform="translate(190 520) rotate(80)"/><use href="#sv-boat" transform="translate(520 620) rotate(100)"/>`, 'Flussinsel (Char) mit Wasser rundherum');
+  return erode ? svg.replace('class="fl-art"', 'class="fl-art is-eroding"') : svg;
 }
 
 // Hügelland: Hügel, Bambus, Häuser auf Stelzen
 function hillScene() {
-  return svScene(`<rect width="560" height="680" fill="#86a874"/>
-    <path fill="#7ea65d" d="M-10 120Q130 20 280 110T570 90V330H-10Z"/>
-    <path fill="#6f9a52" d="M-10 260Q150 160 300 260T570 230V500H-10Z"/>
-    <path fill="#5f8c47" d="M-10 420Q170 320 320 420T570 400V690H-10Z"/>
-    <path d="M-10 120Q130 20 280 110T570 90M-10 260Q150 160 300 260T570 230M-10 420Q170 320 320 420T570 400" fill="none" stroke="#a9c78a" stroke-width="3" opacity=".7"/>
-    ${svUse('sv-bamboo', 70, 200)}${svUse('sv-bamboo', 110, 215)}${svUse('sv-bamboo', 470, 330)}${svUse('sv-bamboo', 505, 345)}${svUse('sv-bamboo', 60, 560)}${svUse('sv-bamboo', 100, 575)}
-    ${svUse('sv-stilt', 300, 205, '', 1.4)}${svUse('sv-stilt', 190, 400, '', 1.2)}${svUse('sv-stilt', 400, 520, '', 1.4)}
-    ${svUse('sv-tuft', 250, 300)}${svUse('sv-tuft', 450, 460)}${svUse('sv-tuft', 150, 620)}
-    ${svLabel('Hügelland', 40, 170)}${svLabel('Bambus auf Stelzen', 40, 196, 'start', 15)}`, 'Hügelland mit Häusern auf Stelzen');
+  return svScene(`<rect x="-700" y="-500" width="2000" height="1900" fill="#86a874"/>
+    <path fill="#7ea65d" d="M-400 120Q130 20 280 110T900 90V330H-400Z"/>
+    <path fill="#6f9a52" d="M-400 260Q150 160 300 260T900 230V500H-400Z"/>
+    <path fill="#5f8c47" d="M-400 420Q170 320 320 420T900 400V900H-400Z"/>
+    <path d="M-400 120Q130 20 280 110T900 90M-400 260Q150 160 300 260T900 230M-400 420Q170 320 320 420T900 400" fill="none" stroke="#a9c78a" stroke-width="3" opacity=".7"/>
+    ${svUse('sv-bamboo', 170, 200)}${svUse('sv-bamboo', 210, 215)}${svUse('sv-bamboo', 540, 330)}${svUse('sv-bamboo', 575, 345)}${svUse('sv-bamboo', 160, 560)}${svUse('sv-bamboo', 200, 575)}
+    ${svUse('sv-stilt', 360, 205, '', 1.4)}${svUse('sv-stilt', 270, 400, '', 1.2)}${svUse('sv-stilt', 450, 520, '', 1.4)}
+    ${svUse('sv-tuft', 320, 300)}${svUse('sv-tuft', 500, 460)}${svUse('sv-tuft', 240, 620)}`, 'Hügelland mit Häusern auf Stelzen');
 }
 
 // Bildwechsel: jede Ansicht ist eine Ebene, die ein- und ausblendet
-function sceneArt(layers) {
-  const box = el('div', 'fl-scenes');
+function sceneArt(layers, zoomKeys = [], rainy = false) {
+  const box = el('div', `fl-scenes${rainy ? ' is-rainy' : ''}`);
   const nodes = {};
-  Object.entries(layers).forEach(([key, html]) => { const d = el('div', 'fl-scene'); d.innerHTML = html; nodes[key] = d; box.append(d); });
+  Object.entries(layers).forEach(([key, html]) => { const d = el('div', `fl-scene${zoomKeys.includes(key) ? ' zoom-in' : ''}`); d.innerHTML = html; nodes[key] = d; box.append(d); });
   return {
     el: box, nodes,
     show(view) { Object.entries(nodes).forEach(([key, d]) => d.classList.toggle('is-on', key === view)); },
@@ -1991,19 +2003,19 @@ function sceneArt(layers) {
 
 /* ---------- Einführung in zwei Teilen (Geografie, Gesellschaft) ---------- */
 const GEO_BEATS = [
-  { view: 'outline', text: 'Bangladesch liegt in Südasien, am Golf von Bengalen, und grenzt fast rundum an Indien. Auf knapp 150.000 km² leben mehr als 170 Millionen Menschen.' },
-  { view: 'rivers', text: 'Das Land liegt im Delta von drei riesigen Strömen: dem Ganges (in Bangladesch Padma genannt), dem Brahmaputra (hier Jamuna) und der Meghna. Dazu kommen hunderte kleinere Flüsse und Nebenarme, die sich ständig verzweigen.' },
+  { view: 'outline', text: 'Bangladesch liegt in Südasien, am Golf von Bengalen. Es grenzt an Indien und an Myanmar. Auf knapp 150.000 km² leben mehr als 170 Millionen Menschen.' },
+  { view: 'rivers', text: 'Das Land liegt im Delta von drei riesigen Strömen:\nDem Padma, dem Jamuna und der Meghna. Dazu kommen hunderte kleinere Flüsse und Nebenarme, die sich ständig verzweigen.' },
   { view: 'plain', text: 'Die Flüsse haben das Land über Jahrtausende selbst aufgeschüttet. Rund 80 % von Bangladesch sind flaches Schwemmland. Nur im Südosten und im Nordosten gibt es Hügel.' },
-  { view: 'flood', text: 'Setzt der Monsun ein und kommt Schmelzwasser aus dem Himalaya dazu, treten die Flüsse über die Ufer. Deshalb ist die Überflutungsgefahr hier so hoch, und das macht das Bauen schwierig: Ein Haus muss Wasser, Strömung und aufgeweichtem Boden standhalten, und das mit den Mitteln, die man vor Ort hat.' },
-  { view: 'zoom', text: 'Wir schauen uns eine Region genauer an: Sirajganj, mitten im Land am Jamuna, einem der größten Flüsse der Welt.' },
-  { view: 'detail', text: 'Der Jamuna ist mehrere Kilometer breit und verlegt ständig seinen Lauf. Sand und Schlamm lagern sich ab, und mitten im Fluss entstehen Flussinseln, die Chars. Es gibt Menschen, die auf dem Festland nahe am Fluss leben, und andere direkt auf diesen Inseln.' },
+  { view: 'flood', text: 'Setzt der Monsun ein und kommt Schmelzwasser aus dem Himalaya dazu, treten die Flüsse über die Ufer. Deshalb ist die Überflutungsgefahr hier so hoch, und das macht das Bauen schwierig:\nEin Haus muss Wasser, Strömungen und aufgeweichtem Boden standhalten, und das mit den Mitteln, die man vor Ort hat.' },
+  { view: 'zoom', text: 'Für die kommende Aufgabe befinden wir uns in Sirajganj, mitten im Land am Jamuna, einem der größten Flüsse der Welt.' },
+  { view: 'detail', text: 'Der Jamuna verlegt ständig seinen Lauf. Aus Sand und Schlamm entstehen mitten im Fluss Flussinseln, die Chars. Menschen leben auf dem Festland am Ufer und auf diesen Inseln.' },
 ];
 const SOC_BEATS = [
   { view: 'wealth', text: 'Wie in vielen anderen Ländern entscheidet auch in Bangladesch der Wohlstand darüber, wo du lebst und aus welchen Materialien du dein Haus zusammenbauen kannst.' },
   { view: 'bank', text: 'Die meisten Menschen leben auf dem flachen Festland, in dicht besiedelten Dörfern nahe an den Flüssen. Wer es sich leisten kann, baut mit Ziegeln und Beton oder mit Wellblech und schüttet den Boden etwas auf.' },
   { view: 'char', text: 'Auf den Chars wohnen oft die, die sich kein anderes Land leisten können, meist ohne gesicherte Landrechte und ohne Schutz durch Deiche. Dort baut man mit dem, was leicht und günstig ist. Etwa 10 Millionen Menschen leben auf Chars.' },
   { view: 'hills', text: 'Nur wenige Menschen leben in den Hügeln im Südosten und Nordosten. Dort baut man häufig leicht aus Bambus und auf Stelzen.' },
-  { view: 'bank', text: 'Genug Hintergrund: Schauen wir uns jetzt dein Szenario an, deine Challenge.' },
+  { view: 'bank', text: 'Genug Hintergrund:\nSchauen wir uns jetzt dein Szenario an, deine Challenge.' },
 ];
 
 function renderIntro(wrap) {
@@ -2036,27 +2048,54 @@ function renderExtra(wrap) {
   const turn = good
     ? 'Aber auf den Chars würde das Ganze vielleicht ganz anders funktionieren. Chars sind Flussinseln aus Sand und Schlamm. Dort leben etwa 6 % der Menschen in Bangladesch, das sind ungefähr 10 Millionen.'
     : 'Dafür könnte dein Haus auf einer Char sogar die bessere Wahl sein. Chars sind Flussinseln aus Sand und Schlamm. Dort leben etwa 6 % der Menschen in Bangladesch, das sind ungefähr 10 Millionen, und dort gelten andere Regeln.';
-  const art = sceneArt({ bank: bankScene(), char: charScene() });
+  const art = sceneArt({ river: geoArt(true), char: charScene(), erode: charScene(true, true) }, [], true);
   runStory(wrap, {
     eyebrow: 'Extra-Szenario', title: 'Und auf einer Char?',
     beats: [
-      { view: 'bank', text: verdict },
+      { view: 'river', text: verdict },
       { view: 'char', text: turn },
-      { view: 'char', text: 'Dort unterscheidet sich das Bauen: Der Fluss trägt die Insel nach wenigen Jahren wieder ab. Deshalb müssen die Materialien wiederverwendbar sein, damit die Familie ihr Haus abbauen und woanders wieder aufbauen kann. Der Flutschutz bleibt trotzdem wichtig.' },
-      { view: 'char', text: 'Hast du Lust auf eine Extra-Runde auf einer Char? Oder wählst du lieber ein neues Szenario?' },
+      { view: 'erode', text: 'Dort unterscheidet sich das Bauen: Der Fluss trägt die Insel nach wenigen Jahren wieder ab. Deshalb müssen die Materialien wiederverwendbar sein, damit die Familie ihr Haus abbauen und woanders wieder aufbauen kann. Der Flutschutz bleibt trotzdem wichtig.' },
     ],
     art,
     back: () => go(RESULT),
-    onDone(actions) {
-      actions.replaceChildren();
-      const no = el('button', 'btn ghost', 'Neues Szenario');
-      no.type = 'button';
-      no.onclick = () => resetAll();
-      const yes = el('button', 'btn fl-simnext', 'Extra-Runde auf der Char →');
+    onDone(actions, col) {
+      // Die Frage steht mit Rahmen unter dem Text (kein Pop-up).
+      const card = el('div', 'fl-ask');
+      const yes = el('button', 'btn', 'Extra-Runde auf der Char →');
       yes.type = 'button';
       // Die Auswahl der ersten Runde ist vorausgewählt und lässt sich ändern.
       yes.onclick = () => { prevAnswers = answers.slice(); round = 'char'; go(FIRST_STEP); };
-      actions.append(no, yes);
+      const no = el('button', 'btn ghost', 'Neues Szenario');
+      no.type = 'button';
+      no.onclick = () => resetAll();
+      const row = el('div', 'fl-ask-actions');
+      row.append(no, yes);
+      card.append(el('strong', null, 'Hast du Lust auf eine Extra-Runde auf einer Char?'), el('p', null, 'Oder wählst du lieber ein neues Szenario?'), row);
+      col.append(card);
+    },
+  });
+}
+
+/* ---------- Kurzes Fazit nach der Char-Runde ---------- */
+function renderFazit(wrap) {
+  const points = (runs.char && runs.char.points) || 0;
+  const verdict = points >= 8 ? 'Das hat richtig gut geklappt: Dein Haus übersteht die Flut und lässt sich gut mitnehmen.'
+    : points >= 5 ? 'Das hat halbwegs geklappt: Das Haus hält die Flut aus, aber ein Teil davon bleibt auf der Insel zurück.'
+      : 'Das war nicht ganz so gut: Viele Teile deines Hauses würden auf der Insel zurückbleiben.';
+  runStory(wrap, {
+    eyebrow: 'Fazit', title: 'Was auf einer Char zählt',
+    beats: [
+      { view: 'char', text: verdict },
+      { view: 'char', text: 'Auf einer Char zählt vor allem, dass sich ein Haus abbauen und woanders wieder aufbauen lässt. Der Flutschutz bleibt wichtig, aber Ziegel und Beton helfen nichts, wenn die Insel verschwindet.' },
+      { view: 'char', text: 'Klasse! Dann lass uns doch mal ein anderes Szenario ausprobieren.' },
+    ],
+    art: sceneArt({ char: charScene() }, [], true),
+    back: () => go(RESULT),
+    onDone(actions) {
+      const next = el('button', 'btn fl-simnext', 'Zu den Szenarien →');
+      next.type = 'button';
+      next.onclick = () => resetAll();
+      actions.append(next);
     },
   });
 }
@@ -2193,7 +2232,9 @@ function simEvents() {
 }
 
 /* ---------- Simulation ---------- */
-const SIM_RISE_MS = 7000, SIM_HOLD_MS = 8000;
+// Wie lange die Flut bei einer Meldung steht: 5 Sekunden je 100 Zeichen, mindestens 3 Sekunden.
+const SIM_RISE_MS = 7000;
+const simHold = text => Math.max(3000, text.length * 50);
 
 function renderSimulation(wrap, backdrop) {
   wrap.classList.add('house', 'fl-sim');
@@ -2221,10 +2262,12 @@ function renderSimulation(wrap, backdrop) {
     li.append(body);
     // Ladebalken an der Meldung: zeigt, wie lange die Flut noch steht.
     const bar = el('i', 'fl-event-bar');
-    bar.style.animationDuration = `${SIM_HOLD_MS}ms`;
+    bar.style.animationDuration = `${simHold(ev.text)}ms`;
     li.append(bar);
     list.append(li);
-    return { text, typing: startTyping(text, ev.text, () => {}) };
+    const rec = { done: false, li };
+    rec.typing = startTyping(text, ev.text, () => { rec.done = true; });
+    return rec;
   };
   const finish = () => {
     if (!list.isConnected) return;
@@ -2261,13 +2304,21 @@ function renderSimulation(wrap, backdrop) {
 
     if (reducedMotion()) {
       level(1);
-      events.forEach(ev => { const { text, typing } = addEvent(ev); typing.skip(); });
+      events.forEach(ev => { addEvent(ev).typing.skip(); });
       list.querySelectorAll('.fl-event').forEach((li, i, all) => { if (i < all.length - 1) li.classList.add('is-past'); });
       finish();
       return;
     }
     // Der Pegel steigt gleichmäßig. An jedem Ereignis wird er langsam, solange der Text getippt und gelesen wird.
-    let f = 0, last = 0, slowUntil = 0, next = 0;
+    let f = 0, last = 0, slowUntil = 0, next = 0, current = null;
+    // Ein Klick überspringt: erst das Tippen, dann die Wartezeit der Flut.
+    const skip = e => {
+      if (!list.isConnected) { document.removeEventListener('click', skip); return; }
+      if (e.target.closest('button') || !current) return;
+      if (!current.done) current.typing.skip();
+      else if (slowUntil) { slowUntil = 0; const bar = current.li.querySelector('.fl-event-bar'); if (bar) bar.style.display = 'none'; }
+    };
+    document.addEventListener('click', skip);
     const frame = t => {
       if (!list.isConnected) return;
       last = last || t;
@@ -2277,8 +2328,8 @@ function renderSimulation(wrap, backdrop) {
       level(f);
       while (next < events.length && f >= events[next].at) {
         const ev = events[next++];
-        addEvent(ev);
-        slowUntil = t + SIM_HOLD_MS;
+        current = addEvent(ev);
+        slowUntil = t + simHold(ev.text);
       }
       if (f >= 1 && t >= slowUntil) { finish(); return; }
       requestAnimationFrame(frame);
@@ -2365,16 +2416,7 @@ function renderResult(wrap, backdrop) {
   const showHint = () => {
     card.className = 'fl-infocard is-hint';
     card.replaceChildren();
-    if (char) {
-      const parts = runs[round].parts;
-      const names = list => list.map(p => p.step).join(', ');
-      const take = parts.filter(p => p.reuse >= 3), stay = parts.filter(p => p.reuse <= 2);
-      card.classList.add('is-char');
-      card.append(el('strong', 'fl-card-title', 'Was auf einer Char zählt'),
-        el('p', null, 'Der Fluss trägt die Insel oft nach wenigen Jahren ab. Familien bauen deshalb leicht und nehmen ihr Haus mit.'),
-        el('p', null, `${take.length ? `Aufs Boot kommen: ${names(take)}.` : 'Nichts davon lässt sich mitnehmen.'}${stay.length ? ` Zurück bleiben: ${names(stay)}.` : ''}`),
-        el('p', null, 'Ziegel und Beton schützen gut vor der Flut, bleiben aber zurück. Wellblech und Bambus schützen weniger, ziehen aber mit um.'),
-        el('p', 'fl-card-note', 'Tippe auf die Punkte am Haus für Details.'));
+    if (false) {
     } else {
       card.append(el('p', null, 'Tippe auf die Punkte am Haus: Grün lief gut, Rot lief schlecht.'));
     }
@@ -2429,10 +2471,10 @@ function renderResult(wrap, backdrop) {
   setTimeout(place, 700);
 
   // Weiter unten rechts
-  const goOn = el('button', 'btn fl-next-fixed', char ? 'Neues Szenario →' : 'Weiter →');
+  const goOn = el('button', 'btn fl-next-fixed', 'Weiter →');
   goOn.type = 'button';
   goOn.hidden = true;
-  goOn.onclick = () => (char ? resetAll() : go(EXTRA));
+  goOn.onclick = () => go(char ? FAZIT : EXTRA);
   backdrop.push(goOn);
 
   const reveal = () => {
@@ -2462,45 +2504,102 @@ function resetAll() {
   go(0);
 }
 
-// Startbild: ein Haus im Rohbau (Mauerwerk, Gerüst aus Bambus, Kran). Ruhige Farben, ohne Figuren.
+/* ---------- Bilder der Auswahlmöglichkeiten: Frontalansicht ----------
+   Schlichte, flache Zeichnungen (240 × 160) ohne Papier-Optik. Der Querschnitt dazu erscheint in einem kleinen Fenster oben rechts. */
+const FR_INK = '#27323b';
+const FR_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="fr-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46657c"/><stop offset="1" stop-color="#8fb0c0"/></linearGradient>
+  <pattern id="fr-brick" width="24" height="12" patternUnits="userSpaceOnUse"><rect width="24" height="12" fill="#b5654a"/><path d="M0 0H24M0 6H24M12 0V6M0 6V12M24 6V12" stroke="#e3c7a8" stroke-width="1.2" fill="none"/></pattern>
+  <pattern id="fr-tin" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#9aa4a8"/><path d="M0 0V10M5 0V10" stroke="#c4cbce" stroke-width="1.6"/></pattern>
+  <pattern id="fr-tile" width="16" height="11" patternUnits="userSpaceOnUse"><rect width="16" height="11" fill="#a65a3c"/><path d="M0 11Q8 4 16 11M-8 5.5Q0 -1.5 8 5.5M8 5.5Q16 -1.5 24 5.5" stroke="#d58a68" stroke-width="1.3" fill="none"/></pattern>
+  <pattern id="fr-straw" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#c8ad63"/><path d="M0 3L11 5M1 9L12 8" stroke="#977a34" stroke-width="1.2"/><path d="M3 0L5 11" stroke="#e0c987" stroke-width="1"/></pattern>
+  <pattern id="fr-mud" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#8a6b4d"/><path d="M3 6q5-3 9 0M12 16q5-3 9-1M2 19q4 2 8-1" stroke="#b79a73" stroke-width="1.3" fill="none"/></pattern>
+  <pattern id="fr-earth" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#9e7d58"/><circle cx="5" cy="6" r="1.3" fill="#82633f"/><circle cx="15" cy="4" r="1" fill="#b99971"/><circle cx="12" cy="15" r="1.4" fill="#82633f"/></pattern>
+  <pattern id="fr-conc" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#a7a49b"/><circle cx="4" cy="5" r=".9" fill="#8b887f"/><circle cx="12" cy="11" r=".8" fill="#bcb9b0"/></pattern>
+  <pattern id="fr-wood" width="30" height="8" patternUnits="userSpaceOnUse"><rect width="30" height="8" fill="#9f784c"/><path d="M0 2Q8 1 15 2T30 2M0 6Q8 7 15 6T30 6" stroke="#7d5c37" stroke-width="1" fill="none"/></pattern>
+</defs></svg>`;
+const frGrass = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})" fill="#5f9150"><path d="M-9 0Q-13-14-20-23Q-7-12-4 0ZM-2 0Q-6-18 0-31Q6-18 3 0ZM4 0Q7-12 18-25Q11-8 9 0Z"/></g>`;
+const frGround = (y = 122) => `<rect y="${y}" width="240" height="${160 - y}" fill="#7f5f42"/><rect y="${y - 3}" width="240" height="5" fill="#6f9a62"/>`;
+const frDoor = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#3b2e22"/>`;
+const frWin = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#c6d6dc" stroke="${FR_INK}" stroke-width="2"/><path d="M${x + w / 2} ${y}V${y + h}M${x} ${y + h / 2}H${x + w}" stroke="${FR_INK}" stroke-width="1.5"/>`;
+const frWall = (fill, extra = '') => `<rect x="40" y="48" width="160" height="74" fill="${fill}" stroke="${FR_INK}" stroke-width="2"/>${extra}${frWin(60, 66, 38, 30)}${frDoor(142, 74, 32, 48)}`;
+
+const FRONT = {
+  // Fundamente
+  earth: () => `${frGround()}<path d="M36 122L68 80H172L204 122Z" fill="url(#fr-earth)" stroke="${FR_INK}" stroke-width="2"/><path d="M52 104H188M60 92H180" stroke="#7a5d3c" stroke-width="2" stroke-dasharray="14 8" fill="none"/><path d="M68 80H172" stroke="#6f9a62" stroke-width="5"/>${frGrass(30, 122)}${frGrass(212, 122)}`,
+  concrete: () => `${frGround(112)}<rect x="30" y="106" width="180" height="14" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="2"/><rect x="30" y="120" width="180" height="8" fill="url(#fr-brick)" stroke="${FR_INK}" stroke-width="1.5"/><rect x="58" y="46" width="124" height="60" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2" opacity=".55" stroke-dasharray="8 6"/>${frGrass(20, 112)}${frGrass(222, 112)}`,
+  brick: () => `${frGround()}<rect x="46" y="76" width="148" height="46" fill="url(#fr-brick)" stroke="${FR_INK}" stroke-width="2"/><rect x="40" y="68" width="160" height="9" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="2"/><rect x="42" y="76" width="10" height="46" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="1.5"/><rect x="188" y="76" width="10" height="46" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="1.5"/>${frGrass(24, 122)}${frGrass(218, 122)}`,
+  stilts: () => `${frGround()}${[60, 100, 140, 180].map(x => `<rect x="${x}" y="82" width="7" height="40" fill="#ada661" stroke="${FR_INK}" stroke-width="1.5"/><rect x="${x - 6}" y="116" width="19" height="9" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="1.5"/><path d="M${x} 98H${x + 7}M${x} 110H${x + 7}" stroke="#7d7a3c" stroke-width="1.5"/>`).join('')}<rect x="42" y="74" width="156" height="9" fill="url(#fr-wood)" stroke="${FR_INK}" stroke-width="2"/>${frGrass(22, 122)}${frGrass(220, 122)}`,
+  // Wände
+  mud: () => `${frGround()}${frWall('url(#fr-mud)', '<path d="M40 60Q70 56 100 62T200 58" stroke="#6f5339" stroke-width="2" fill="none" opacity=".6"/>')}${frGrass(22, 122)}`,
+  tin: () => `${frGround()}${frWall('url(#fr-tin)', `<path d="M40 48V122M200 48V122" stroke="#6c777b" stroke-width="3"/>`)}${frGrass(222, 122)}`,
+  brickwall: () => `${frGround()}${frWall('#d9cdb2', `<path d="M40 100h24v-8h-12v-8h-12ZM176 54l8 14-6 8 10 12" fill="none" stroke="#a7977a" stroke-width="1.4"/><rect x="40" y="100" width="22" height="22" fill="url(#fr-brick)"/>`)}${frGrass(22, 122)}`,
+  ferro: () => `${frGround()}<rect x="40" y="48" width="160" height="74" rx="10" fill="#b4b2ab" stroke="${FR_INK}" stroke-width="2"/><path d="M40 70H200M40 96H200" stroke="#9c9a93" stroke-width="1.5" fill="none"/>${frWin(60, 66, 38, 30)}${frDoor(142, 74, 32, 48)}${frGrass(222, 122)}`,
+  // Dächer
+  tinhip: () => `${frGround(128)}<rect x="56" y="88" width="128" height="40" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2"/>${frDoor(110, 100, 20, 28)}<path d="M26 90L62 44H178L214 90Z" fill="url(#fr-tin)" stroke="${FR_INK}" stroke-width="2" stroke-linejoin="round"/><path d="M62 44H178" stroke="${FR_INK}" stroke-width="4"/>`,
+  concreteflat: () => `${frGround(128)}<rect x="56" y="76" width="128" height="52" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2"/>${frDoor(110, 100, 20, 28)}<rect x="30" y="58" width="180" height="18" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="2"/><path d="M30 76H210" stroke="#6f6c64" stroke-width="3"/><path d="M52 70h6M78 70h6M104 70h6M130 70h6M156 70h6M182 70h6" stroke="#6f6c64" stroke-width="2.2" stroke-linecap="round"/>`,
+  tilegable: () => `${frGround(128)}<rect x="58" y="88" width="124" height="40" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2"/>${frDoor(110, 100, 20, 28)}<path d="M26 92L120 32L214 92Z" fill="url(#fr-tile)" stroke="${FR_INK}" stroke-width="2" stroke-linejoin="round"/>`,
+  thatch: () => `${frGround(128)}<rect x="58" y="88" width="124" height="40" fill="#a98763" stroke="${FR_INK}" stroke-width="2"/>${frDoor(110, 100, 20, 28)}<path d="M24 96L120 26L216 96Z" fill="url(#fr-straw)" stroke="${FR_INK}" stroke-width="2" stroke-linejoin="round"/>`,
+  // Besonderheiten
+  platform: () => `${frGround(124)}<path d="M8 124L58 74H182L232 124Z" fill="url(#fr-earth)" stroke="${FR_INK}" stroke-width="2"/><path d="M58 74H182" stroke="#6f9a62" stroke-width="5"/><rect x="92" y="40" width="56" height="34" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2"/>${frDoor(112, 52, 16, 22)}<path d="M86 42L120 20L154 42Z" fill="#c1553a" stroke="${FR_INK}" stroke-width="2" stroke-linejoin="round"/>${frGrass(22, 124)}`,
+  well: () => `${frGround()}<rect x="30" y="106" width="104" height="16" fill="url(#fr-conc)" stroke="${FR_INK}" stroke-width="2"/><rect x="62" y="64" width="10" height="42" fill="#3b6a8f" stroke="${FR_INK}" stroke-width="1.5"/><rect x="54" y="54" width="28" height="13" rx="3" fill="#2f5877" stroke="${FR_INK}" stroke-width="1.5"/><path d="M82 60H100V66H82Z" fill="#2f5877"/><path d="M58 56L42 40" stroke="${FR_INK}" stroke-width="5" stroke-linecap="round"/><circle cx="98" cy="74" r="3" fill="#6fc7ee"/><rect x="148" y="62" width="48" height="60" fill="#b08a5a" stroke="${FR_INK}" stroke-width="2"/><path d="M140 64L172 38L204 64Z" fill="#7f8e9b" stroke="${FR_INK}" stroke-width="2" stroke-linejoin="round"/>${frDoor(162, 82, 20, 40)}`,
+  vetiver: () => `${frGround()}<rect x="84" y="62" width="72" height="60" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2"/>${frDoor(110, 86, 20, 36)}<path d="M78 64L120 36L162 64Z" fill="#8c9ba2" stroke="${FR_INK}" stroke-width="2" stroke-linejoin="round"/>${[16, 34, 52, 188, 206, 224].map((x, i) => frGrass(x, 124, 1.5 + (i % 2) * .3)).join('')}`,
+  frame: () => `${frGround()}<rect x="52" y="52" width="136" height="70" fill="#d9cdb2" stroke="${FR_INK}" stroke-width="2" opacity=".6"/><g fill="#8a6542" stroke="${FR_INK}" stroke-width="1.5"><rect x="48" y="48" width="144" height="8" rx="2"/><rect x="48" y="48" width="9" height="76"/><rect x="183" y="48" width="9" height="76"/></g><rect x="48" y="100" width="9" height="20" fill="#2b2b2e"/><rect x="183" y="100" width="9" height="20" fill="#2b2b2e"/><path d="M57 92L92 56M183 92L148 56M57 118L96 82M183 118L144 82" stroke="#8a6542" stroke-width="6" stroke-linecap="round" fill="none"/>`,
+};
+if (document.body) document.body.insertAdjacentHTML('afterbegin', FR_DEFS);
+const frontSvg = id => (FRONT[id] ? `<svg class="fr" viewBox="0 0 240 160" preserveAspectRatio="xMidYMid slice" role="img" aria-hidden="true"><rect width="240" height="160" fill="url(#fr-bg)"/>${FRONT[id]()}</svg>` : '');
+
+// Startbild: Ein Haus wächst im Rohbau. Das Mauerwerk wird Lage für Lage hochgezogen, der Kran hebt Ziegel, Wolken ziehen, Palmen wiegen sich.
+// Die Bewegung kommt aus flow.css (Klassen bs-*); bei „weniger Bewegung“ steht das Bild still und zeigt das fertige Mauerwerk.
 function buildArt() {
-  const brick = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#bs-brick)"/>`;
-  const stack = (x, y, cols, rows) => Array.from({ length: rows }, (_, r) => Array.from({ length: cols - (r % 2) }, (_, c) => `<rect x="${x + c * 22 + (r % 2) * 11}" y="${y - (r + 1) * 11}" width="21" height="10" fill="#b5654a" stroke="#8d4a35" stroke-width="1"/>`).join('')).join('');
-  const lattice = Array.from({ length: 16 }, (_, i) => `<path d="M${1281} ${810 - i * 34}L${1307} ${810 - (i + 1) * 34}M${1307} ${810 - i * 34}L${1281} ${810 - (i + 1) * 34}" />`).join('');
+  const stack = (x, y, cols, rows) => Array.from({ length: rows }, (_, r) => Array.from({ length: cols - (r % 2) }, (_, c) => `<rect x="${x + c * 22 + (r % 2) * 11}" y="${y - (r + 1) * 11}" width="21" height="10" fill="#d2693f" stroke="#8d4a35" stroke-width="1"/>`).join('')).join('');
+  const lattice = Array.from({ length: 16 }, (_, i) => `<path d="M1281 ${810 - i * 34}L1307 ${810 - (i + 1) * 34}M1307 ${810 - i * 34}L1281 ${810 - (i + 1) * 34}"/>`).join('');
+  const cloud = (x, y, k, cls) => `<g class="bs-cloud ${cls}" fill="#fff" opacity=".92"><g transform="translate(${x} ${y}) scale(${k})"><circle cx="0" cy="0" r="30"/><circle cx="34" cy="-12" r="38"/><circle cx="74" cy="0" r="30"/><circle cx="36" cy="12" r="30"/></g></g>`;
+  const palm = (x, y, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})"><g class="rv-sway"><path d="M0 0Q-3-30 6-58" fill="none" stroke="#7a5a3a" stroke-width="5" stroke-linecap="round"/><g fill="#2fae4a" transform="translate(6 -58)">${[-165, -115, -62, -15, 32, 150].map(r => `<path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(${r})"/>`).join('')}</g></g></g>`;
   return `<svg class="site-art start-build" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <defs>
-    <pattern id="bs-brick" width="34" height="17" patternUnits="userSpaceOnUse"><rect width="34" height="17" fill="#b5654a"/><path d="M0 0H34M0 8.5H34M17 0V8.5M0 8.5V17M34 8.5V17" stroke="#e3c7a8" stroke-width="1.5" fill="none"/></pattern>
+    <pattern id="bs-brick" width="34" height="17" patternUnits="userSpaceOnUse"><rect width="34" height="17" fill="#d2693f"/><path d="M0 0H34M0 8.5H34M17 0V8.5M0 8.5V17M34 8.5V17" stroke="#ecd0b0" stroke-width="1.5" fill="none"/></pattern>
+    <clipPath id="bs-clip-l"><rect class="bs-rise" x="814" y="560" width="126" height="148"/></clipPath>
+    <clipPath id="bs-clip-r"><rect class="bs-rise bs-rise-b" x="1040" y="620" width="126" height="88"/></clipPath>
+    <radialGradient id="bs-sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3c2" stop-opacity=".95"/><stop offset="1" stop-color="#fff3c2" stop-opacity="0"/></radialGradient>
   </defs>
-  <path fill="#7f9fae" d="M-3000 742C-1200 722 -400 748 200 730S900 716 1400 738S2600 726 4500 742V820H-3000Z" opacity=".75"/>
-  <path fill="#6c909f" d="M-3000 764C-1000 756 100 770 800 760S2000 754 4500 764V820H-3000Z" opacity=".85"/>
-  <rect x="-3000" y="810" width="7500" height="1200" fill="#7f5f42"/><rect x="-3000" y="804" width="7500" height="12" fill="#6f9a62"/>
-  <path fill="none" stroke="#6b4e35" stroke-width="2.5" stroke-dasharray="30 22" d="M-2000 858H3500"/>
-  <!-- Fundamentplatte und Mauerwerk im Bau -->
-  <rect x="800" y="796" width="380" height="14" fill="#a7a49b"/>
-  ${brick(820, 706, 340, 90)}
-  <rect x="948" y="706" width="64" height="90" fill="#2d2118"/>
-  ${brick(820, 566, 112, 140)}${brick(1048, 626, 112, 80)}
-  <rect x="820" y="556" width="112" height="10" fill="#a7a49b"/>
-  <g fill="#8a6a45" stroke="#5e4630" stroke-width="1.5"><rect x="814" y="500" width="12" height="296"/><rect x="990" y="470" width="12" height="326"/><rect x="1156" y="520" width="12" height="276"/></g>
-  <g stroke="#8a6a45" stroke-width="9" stroke-linecap="round"><path d="M820 500H1162"/><path d="M820 500L996 400"/><path d="M1162 500L996 400"/><path d="M880 466V500M940 432V500M1056 436V500"/></g>
-  <path d="M996 400L1060 436" stroke="#8a6a45" stroke-width="7" stroke-linecap="round"/>
-  <!-- Gerüst aus Bambus -->
-  <g stroke="#cdbb77" stroke-width="7" stroke-linecap="round"><path d="M770 810V430M1190 810V470M770 700H1190M770 590H850M770 480H850"/><path d="M770 700L850 590M770 590L850 480" stroke-width="5"/></g>
-  <rect x="764" y="586" width="96" height="8" fill="#9f784c"/><rect x="764" y="476" width="96" height="8" fill="#9f784c"/>
+  <circle class="bs-halo" cx="1130" cy="150" r="120" fill="url(#bs-sun)"/><circle cx="1130" cy="150" r="46" fill="#ffd95a"/>
+  ${cloud(150, 130, 1.1, 'bs-c1')}${cloud(620, 90, .8, 'bs-c2')}${cloud(300, 300, .7, 'bs-c3')}${cloud(900, 260, .9, 'bs-c4')}
+  <g class="bs-bird" fill="none" stroke="#35506a" stroke-width="2.5" stroke-linecap="round"><path d="M0 0Q8-9 16 0Q24-9 32 0"/><path transform="translate(40 14)" d="M0 0Q6-7 12 0Q18-7 24 0"/></g>
+  <path fill="#98e0ad" d="M-3000 700C-1200 640 -300 700 300 668S900 636 1500 690S2600 650 4500 700V830H-3000Z"/>
+  <path fill="#62cf84" d="M-3000 760C-1000 722 100 770 800 742S1900 724 4500 766V830H-3000Z"/>
+  <rect x="-3000" y="810" width="7500" height="1200" fill="#9a6c3e"/><rect x="-3000" y="800" width="7500" height="16" fill="#3fbf5a"/>
+  <path fill="none" stroke="#6f5339" stroke-width="2.5" stroke-dasharray="30 22" d="M-2000 858H3500"/>
+  ${palm(470, 810, 1.15)}${palm(690, 810, .9)}${palm(1390, 810, 1)}
+  <!-- Fundament und Mauerwerk: erste Lage steht, der Rest wächst -->
+  <rect x="800" y="796" width="380" height="14" fill="#b2afa6"/>
+  <rect x="820" y="706" width="340" height="90" fill="url(#bs-brick)"/>
+  <rect x="948" y="706" width="64" height="90" fill="#33261c"/>
+  <g clip-path="url(#bs-clip-l)"><g class="bs-wall"><rect x="820" y="566" width="112" height="140" fill="url(#bs-brick)"/><rect x="820" y="556" width="112" height="10" fill="#b2afa6"/></g></g>
+  <g clip-path="url(#bs-clip-r)"><g class="bs-wall bs-wall-b"><rect x="1048" y="626" width="112" height="80" fill="url(#bs-brick)"/></g></g>
+  <g fill="#9a7550" stroke="#5e4630" stroke-width="1.5"><rect x="814" y="500" width="12" height="296"/><rect x="990" y="470" width="12" height="326"/><rect x="1156" y="520" width="12" height="276"/></g>
+  <g class="bs-roof" stroke="#9a7550" stroke-width="9" stroke-linecap="round" fill="none"><path pathLength="1" d="M820 500H1162"/><path pathLength="1" d="M820 500L996 400"/><path pathLength="1" d="M1162 500L996 400"/><path pathLength="1" d="M880 466V500M940 432V500M1056 436V500"/></g>
+  <g stroke="#d9c783" stroke-width="7" stroke-linecap="round"><path d="M770 810V430M1190 810V470M770 700H1190M770 590H850M770 480H850"/><path d="M770 700L850 590M770 590L850 480" stroke-width="5"/></g>
+  <rect x="764" y="586" width="96" height="8" fill="#a98355"/><rect x="764" y="476" width="96" height="8" fill="#a98355"/>
   <!-- Kran -->
-  <g stroke="#c9a237" stroke-width="5" fill="none" stroke-linecap="round"><path d="M1281 810V258M1307 810V258"/><g stroke-width="3">${lattice}</g><path d="M1000 246H1440M1000 246L1294 190L1440 246" stroke-width="6"/><path d="M1294 190V258"/></g>
-  <rect x="1380" y="246" width="52" height="38" fill="#6d7378"/><rect x="1262" y="258" width="64" height="34" fill="#c9a237" stroke="#9a7b25" stroke-width="2"/>
-  <path d="M1090 250V468" stroke="#3b3f43" stroke-width="2.5"/><path d="M1090 468L1064 490M1090 468L1116 490" stroke="#3b3f43" stroke-width="2"/>
-  <g transform="translate(1056 490)">${[0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${c * 22 + (r % 2) * 5}" y="${r * 11}" width="21" height="10" fill="#b5654a" stroke="#8d4a35" stroke-width="1"/>`).join('')).join('')}<rect x="-2" y="33" width="74" height="6" fill="#8a6a45"/></g>
-  <!-- Materialien am Boden -->
+  <g class="bs-crane">
+    <g stroke="#f2b705" stroke-width="5" fill="none" stroke-linecap="round"><path d="M1281 810V258M1307 810V258"/><g stroke-width="3">${lattice}</g></g>
+    <rect x="1262" y="258" width="64" height="34" fill="#f2b705" stroke="#b88a05" stroke-width="2"/>
+    <g class="bs-arm"><g stroke="#f2b705" stroke-width="6" fill="none" stroke-linecap="round"><path d="M1000 246H1440M1000 246L1294 190L1440 246"/><path d="M1294 190V258"/></g><rect x="1380" y="246" width="52" height="38" fill="#7d858b"/>
+      <g class="bs-cable"><path d="M1090 250V468" stroke="#3b3f43" stroke-width="2.5"/></g>
+      <g class="bs-pallet"><path d="M1090 468L1064 490M1090 468L1116 490" stroke="#3b3f43" stroke-width="2" fill="none"/><g transform="translate(1056 490)">${[0, 1, 2].map(r => [0, 1, 2].map(c => `<rect x="${c * 22 + (r % 2) * 5}" y="${r * 11}" width="21" height="10" fill="#d2693f" stroke="#8d4a35" stroke-width="1"/>`).join('')).join('')}<rect x="-2" y="33" width="74" height="6" fill="#9a7550"/></g></g>
+    </g>
+  </g>
+  <!-- Materialien, Mischer, Schubkarre -->
   ${stack(560, 810, 5, 4)}${stack(1320, 810, 5, 3)}
-  <path d="M640 810L700 748L770 810Z" fill="#cdb98a"/><path d="M640 810L700 748L735 779Z" fill="#b9a574" opacity=".6"/>
-  <g transform="translate(470 810)"><path d="M0 0Q-3-30 6-58" fill="none" stroke="#6d5236" stroke-width="4.5" stroke-linecap="round"/><g fill="#3f7a46" transform="translate(6 -58)"><path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(-165)"/><path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(-110)"/><path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(-55)"/><path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(-10)"/><path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(35)"/><path d="M0 0Q16-13 38 1Q16-4 0 0Z" transform="rotate(150)"/></g></g>
+  <path d="M640 810L700 748L770 810Z" fill="#e0cb98"/><path d="M640 810L700 748L735 779Z" fill="#cdb67f" opacity=".7"/>
+  <g transform="translate(1230 810)"><path d="M-22 0L-14-22H14L22 0Z" fill="#6d7378"/><g transform="translate(0 -40)"><g class="bs-drum"><path d="M-26 -8L26 -8L18 22L-18 22Z" fill="#f2b705" stroke="#b88a05" stroke-width="2"/><path d="M-20 0H20M-14 10H14" stroke="#b88a05" stroke-width="2"/></g></g><circle cx="-14" cy="0" r="6" fill="#33383c"/><circle cx="14" cy="0" r="6" fill="#33383c"/></g>
   </svg>`;
 }
 
 function render() {
   drawPointers = () => {};
+  document.querySelectorAll('.fl-modal').forEach(m => m.remove());
   renderProgress();
   const wrap = el('div', 'page');
   const backdrop = [];
@@ -2508,7 +2607,7 @@ function render() {
     wrap.classList.add('start');
     const main = el('div', 'start-main');
     const title = el('h1');
-    title.append('Kann dein Haus', el('br'), 'überleben?');
+    title.append('Kannst du das perfekte', el('br'), 'Haus bauen?');
     const begin = el('button', 'btn btn-big', 'Let’s go');
     begin.type = 'button';
     begin.onclick = () => {
@@ -2522,13 +2621,12 @@ function render() {
       softGo(0);
     };
     main.append(title, begin);
-    const scene = el('div', 'site-scene');
+    const scene = el('div', 'site-scene start-scene');
     scene.innerHTML = buildArt();
     backdrop.push(scene);
     wrap.append(main);
   } else if (page === 0) {
     wrap.classList.add('select');
-    wrap.append(el('h1', null, 'Wo willst du dein Haus bauen?'));
     const row = el('div', 'scenario-row');
     SCENARIOS.forEach(s => {
       // Gesperrte Szenarien zeigen nur ihre Grafik und lassen sich nicht auswählen.
@@ -2555,12 +2653,12 @@ function render() {
   } else if (page === INTRO) {
     renderIntro(wrap);
   } else if (page === BRIEF) {
-    wrap.classList.add('split', 'brief');
-    const text = el('div', 'split-main');
+    wrap.classList.add('fl-intro', 'fl-brief');
+    const text = el('div', 'fl-brieftext');
     text.append(el('p', 'eyebrow', `${scenario.title} · ${scenario.subtitle}`),
       el('h1', null, 'Deine Aufgabe'),
       el('p', 'challenge-context', scenario.challenge.context),
-      el('p', 'challenge-task', `Aufgabe: ${scenario.challenge.task}`),
+      el('p', 'challenge-task', scenario.challenge.task),
       el('p', 'challenge-context', 'Bewertet wird, wie stabil dein Haus ist und wie gut es vor der Flut schützt.'));
     const facts = el('dl', 'facts');
     scenario.facts.forEach(f => {
@@ -2571,18 +2669,43 @@ function render() {
       facts.append(fact);
     });
     text.append(facts);
-    const art = el('div', 'split-art');
+    const art = el('div', 'fl-intro-art');
     art.innerHTML = themed(scenario.briefArt);
     if (reducedMotion()) art.firstElementChild.pauseAnimations();
     const buttons = nav(() => { introStep = 1; introInstant = true; go(INTRO); }, () => playFlood(art.firstElementChild, buttons, FIRST_STEP), 'Hausbau starten →');
     wrap.append(text, art, buttons);
   } else if (page < HOUSE) {
-    // Das Haus steht groß in der Mitte, unten liegen die Möglichkeiten nebeneinander mit Bild und Kurzbeschreibung.
+    // Das Haus steht groß in der Mitte (gestrichelt, solange noch nichts gewählt ist), unten liegen die Möglichkeiten nebeneinander.
+    // Eine Karte antippen oder ins Haus ziehen baut das Teil ein; oben rechts zeigt ein kleines Fenster den Querschnitt dazu.
     const i = page - FIRST_STEP, step = scenario.steps[i], char = round === 'char';
     wrap.classList.add('fl-choose');
     const { svg } = siteScene(backdrop, 'site-choose');
-    svg.setAttribute('viewBox', '0 260 1440 590');
+    svg.classList.remove('final');
     svg.setAttribute('preserveAspectRatio', 'xMidYMax slice');
+    // Mit Erdplattform ist das Haus höher: dann etwas herauszoomen, damit es ganz zu sehen ist.
+    const fit = () => {
+      const extra = optionOfKind('extra');
+      svg.setAttribute('viewBox', extra && extra.id === 'platform' ? '-200 145 1840 705' : '0 260 1440 590');
+    };
+    fit();
+
+    const section = el('div', 'fl-section');
+    const sectionPic = el('div', 'fl-section-pic');
+    const sectionName = el('p', 'fl-section-name');
+    section.append(el('p', 'eyebrow', 'Querschnitt'), sectionPic, sectionName);
+    const showSection = o => {
+      section.hidden = !o || !Schnitt.has(o.id);
+      if (section.hidden) return;
+      sectionPic.innerHTML = Schnitt.svg(o.id);
+      sectionName.textContent = o.text;
+    };
+    // Beim Fundament gibt es kein Querschnitt-Fenster.
+    const withSection = i > 0;
+    showSection(withSection ? chosenOption(i) : null);
+    const dropzone = el('div', 'fl-dropzone');
+    dropzone.append(el('span', null, 'Hier ins Haus ziehen'));
+    backdrop.push(section, dropzone);
+
     const bar = el('div', 'fl-pickbar');
     const head = el('div', 'fl-pickhead');
     const titles = el('div', 'fl-picktitles');
@@ -2591,28 +2714,72 @@ function render() {
     const next = nav(() => go(page - 1), () => go(page + 1), 'Weiter', answers[i] == null);
     head.append(titles, next);
     const row = el('div', 'fl-pickrow');
+    const choose = j => {
+      answers[i] = j;
+      row.querySelectorAll('.fl-pick').forEach((x, k) => {
+        x.classList.toggle('selected', k === j);
+        x.setAttribute('aria-pressed', String(k === j));
+      });
+      next.lastChild.disabled = false;
+      updateHouse(svg);
+      fit();
+      svg.classList.remove('flash');
+      void svg.getBoundingClientRect();
+      svg.classList.add('flash');
+      if (withSection) showSection(step.options[j]);
+      saveSession();
+    };
     step.options.forEach((o, j) => {
       const b = el('button', 'fl-pick' + (answers[i] === j ? ' selected' : ''));
       b.type = 'button';
       b.title = o.info;
       b.setAttribute('aria-pressed', String(answers[i] === j));
       const pic = el('span', 'fl-pick-pic');
-      pic.innerHTML = Schnitt.has(o.id) ? Schnitt.svg(o.id) : '';
+      pic.innerHTML = frontSvg(o.id);
       const text = el('span', 'fl-pick-text');
       const name = el('strong', null, o.text);
       if (char && prevAnswers[i] === j) name.append(el('span', 'fl-prev', 'Wahl am Ufer'));
       text.append(name, el('span', null, o.hint));
       b.append(pic, text);
-      b.onclick = () => {
-        answers[i] = j;
-        row.querySelectorAll('.fl-pick').forEach((x, k) => {
-          x.classList.toggle('selected', k === j);
-          x.setAttribute('aria-pressed', String(k === j));
-        });
-        next.lastChild.disabled = false;
-        updateHouse(svg);
-        saveSession();
-      };
+      if (withSection) {
+        b.addEventListener('pointerenter', () => showSection(o));
+        b.addEventListener('pointerleave', () => showSection(chosenOption(i)));
+      }
+      // Antippen oder ins Haus ziehen
+      let dragged = false;
+      b.addEventListener('pointerdown', e => {
+        if (e.button !== 0) return;
+        const x0 = e.clientX, y0 = e.clientY;
+        let ghost = null;
+        const move = ev => {
+          if (!ghost && Math.hypot(ev.clientX - x0, ev.clientY - y0) > 8) {
+            ghost = b.cloneNode(true);
+            ghost.classList.add('fl-ghost-card');
+            ghost.style.width = `${Math.min(220, b.offsetWidth)}px`;
+            document.body.append(ghost);
+            document.body.classList.add('is-dragging');
+          }
+          if (ghost) {
+            ghost.style.left = `${ev.clientX}px`;
+            ghost.style.top = `${ev.clientY}px`;
+            dropzone.classList.toggle('is-over', ev.clientY < bar.getBoundingClientRect().top);
+          }
+        };
+        const up = ev => {
+          window.removeEventListener('pointermove', move);
+          if (!ghost) return;
+          const inside = ev.clientY < bar.getBoundingClientRect().top;
+          ghost.remove();
+          document.body.classList.remove('is-dragging');
+          dropzone.classList.remove('is-over');
+          dragged = true;
+          setTimeout(() => { dragged = false; }, 0);
+          if (inside) choose(j);
+        };
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', up, { once: true });
+      });
+      b.onclick = () => { if (!dragged) choose(j); };
       row.append(b);
     });
     bar.append(head, row);
@@ -2625,6 +2792,8 @@ function render() {
     renderResult(wrap, backdrop);
   } else if (page === EXTRA) {
     renderExtra(wrap);
+  } else if (page === FAZIT) {
+    renderFazit(wrap);
   }
   stage.replaceChildren(...backdrop, wrap);
   drawPointers();
