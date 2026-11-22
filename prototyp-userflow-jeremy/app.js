@@ -1990,11 +1990,19 @@ function hillScene() {
     ${svUse('sv-tuft', 320, 300)}${svUse('sv-tuft', 500, 460)}${svUse('sv-tuft', 240, 620)}`, 'Hügelland mit Häusern auf Stelzen');
 }
 
+// Regen über den Bildern: wenige, feine, schräge Tropfen, die langsam fallen (wie in der großen Szene).
+function rainLayer() {
+  const d = el('div', 'fl-rain');
+  d.innerHTML = `<svg width="100%" height="100%" aria-hidden="true"><defs><pattern id="fl-drops" width="180" height="180" patternUnits="userSpaceOnUse"><path d="M26 14l-4 16M120 60l-4 16M62 118l-4 16M150 140l-4 16M92 8l-3 12" stroke="#dbe9f2" stroke-width="1.6" stroke-linecap="round" fill="none"/></pattern></defs><rect class="fl-rain-move" x="-300" y="-300" width="3200" height="2200" fill="url(#fl-drops)"/></svg>`;
+  return d;
+}
+
 // Bildwechsel: jede Ansicht ist eine Ebene, die ein- und ausblendet
 function sceneArt(layers, zoomKeys = [], rainy = false) {
   const box = el('div', `fl-scenes${rainy ? ' is-rainy' : ''}`);
   const nodes = {};
   Object.entries(layers).forEach(([key, html]) => { const d = el('div', `fl-scene${zoomKeys.includes(key) ? ' zoom-in' : ''}`); d.innerHTML = html; nodes[key] = d; box.append(d); });
+  if (rainy) box.append(rainLayer());
   return {
     el: box, nodes,
     show(view) { Object.entries(nodes).forEach(([key, d]) => d.classList.toggle('is-on', key === view)); },
