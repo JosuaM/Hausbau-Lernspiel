@@ -531,3 +531,6 @@ body.is-dragging .fl-dropzone { display: grid; }
 .fl-startrow { top: auto; bottom: 120px; }
 .fl-startrow { display: flex; }
 .fl-startrow, .fl-startrow .btn { height: 46px; box-sizing: border-box; padding-top: 0; padding-bottom: 0; align-items: center; }
+
+.fl-para strong { font-weight: 750; color: #fff; }
+.fl-para.is-past strong { color: #b6c0c8; }

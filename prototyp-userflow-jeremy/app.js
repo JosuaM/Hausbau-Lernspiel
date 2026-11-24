@@ -1733,23 +1733,46 @@ window.addEventListener('scroll', () => drawPointers(), { passive: true });
 
 // Text erscheint Buchstabe für Buchstabe; der Rest steht unsichtbar schon da, damit nichts springt.
 const TYPE_MS = 22;
-function startTyping(node, text, done) {
-  const shown = el('span'), rest = el('span', 'fl-rest', text);
+// Einfache Auszeichnung in Texten: **fett**. parseRich liefert den reinen Text und die fetten Bereiche.
+function parseRich(t) {
+  const ranges = []; let plain = '', bold = null;
+  t.split('**').forEach((part, i) => {
+    if (i > 0) { if (bold == null) bold = plain.length; else { ranges.push([bold, plain.length]); bold = null; } }
+    plain += part;
+  });
+  return { plain, ranges };
+}
+const escapeHtml = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// HTML für plain[from, to) mit <strong> um die fetten Bereiche
+function richHtml(plain, ranges, from, to) {
+  let out = '', pos = from;
+  ranges.forEach(([a, b]) => {
+    const s0 = Math.max(a, from), e0 = Math.min(b, to);
+    if (e0 <= s0) return;
+    out += escapeHtml(plain.slice(pos, s0)) + '<strong>' + escapeHtml(plain.slice(s0, e0)) + '</strong>';
+    pos = e0;
+  });
+  return out + escapeHtml(plain.slice(pos, to));
+}
+function startTyping(node, source, done) {
+  const { plain: text, ranges } = parseRich(source);
+  const shown = el('span'), rest = el('span', 'fl-rest');
+  rest.innerHTML = richHtml(text, ranges, 0, text.length);
   node.replaceChildren(shown, rest);
   let n = 0, timer = null, finished = false;
   const finish = () => {
     if (finished) return;
     finished = true;
     clearTimeout(timer);
-    shown.textContent = text;
+    shown.innerHTML = richHtml(text, ranges, 0, text.length);
     rest.remove();
     done();
   };
   const tick = () => {
     if (finished || !node.isConnected) return;
     n = Math.min(text.length, n + 1);
-    shown.textContent = text.slice(0, n);
-    rest.textContent = text.slice(n);
+    shown.innerHTML = richHtml(text, ranges, 0, n);
+    rest.innerHTML = richHtml(text, ranges, n, text.length);
     if (n >= text.length) finish(); else timer = setTimeout(tick, TYPE_MS);
   };
   if (reducedMotion()) setTimeout(finish, 0); else setTimeout(tick, 0);
@@ -1759,7 +1782,7 @@ function startTyping(node, text, done) {
 // Lesezeit: Ein Absatz bleibt so lange stehen, wie man bei READ_CPS Zeichen pro Sekunde zum Lesen braucht (plus eine Sekunde).
 // Das Tippen zählt schon dazu, es wird abgezogen. Längere Absätze bekommen so mehr Zeit, kürzere weniger (mindestens 1,5 s Pause).
 const READ_CPS = 16;
-const readPause = text => Math.max(1500, (text.length / READ_CPS + 1) * 1000 - text.length * TYPE_MS);
+const readPause = source => { const n = parseRich(source).plain.length; return Math.max(1500, (n / READ_CPS + 1) * 1000 - n * TYPE_MS); };
 
 // Gemeinsamer Ablauf: Absätze werden nacheinander getippt, das Bild rechts wechselt mit dem Absatz.
 // cfg: eyebrow, title, beats [{ text, view }], art { el, show(view) }, back (Funktion), onDone(actions), instant
@@ -1808,6 +1831,7 @@ function runStory(wrap, cfg) {
     const p = el('p', 'fl-para is-current');
     inner.append(p);
     cfg.art.show(beat.view, i);
+    if (beat.next) { const at = i; setTimeout(() => { if (paras.isConnected && i === at) cfg.art.show(beat.next, at); }, beat.nextAfter || 3500); }
     typing = startTyping(p, text(beat), () => {
       typing = null;
       if (last) finishAll(); else pause = setTimeout(next, readPause(text(beat)));
@@ -1823,8 +1847,8 @@ function runStory(wrap, cfg) {
   document.addEventListener('click', onClick);
   // Nach „Zurück“ steht schon alles da.
   if (cfg.instant) {
-    cfg.beats.forEach((b, k) => inner.append(el('p', `fl-para ${k === cfg.beats.length - 1 ? 'is-current' : 'is-past'}`, text(b))));
-    setTimeout(() => { inner.style.transition = 'none'; scrollUp(); cfg.art.show(cfg.beats[cfg.beats.length - 1].view, cfg.beats.length - 1, true); }, 0);
+    cfg.beats.forEach((b, k) => { const p = el('p', `fl-para ${k === cfg.beats.length - 1 ? 'is-current' : 'is-past'}`); const r = parseRich(text(b)); p.innerHTML = richHtml(r.plain, r.ranges, 0, r.plain.length); inner.append(p); });
+    setTimeout(() => { inner.style.transition = 'none'; scrollUp(); const lastBeat = cfg.beats[cfg.beats.length - 1]; cfg.art.show(lastBeat.next || lastBeat.view, cfg.beats.length - 1, true); }, 0);
     finishAll();
     return;
   }
@@ -2020,17 +2044,17 @@ function sceneArt(layers, zoomKeys = [], rainy = false) {
 /* ---------- Einführung in zwei Teilen (Geografie, Gesellschaft) ---------- */
 const GEO_BEATS = [
   { view: 'outline', text: 'Bangladesch liegt in Südasien, am Golf von Bengalen. Es grenzt an Indien und an Myanmar. Auf knapp 150.000 km² leben mehr als 170 Millionen Menschen.' },
-  { view: 'rivers', text: 'Das Land liegt im Delta von drei riesigen Strömen:\nDem Padma, dem Jamuna und der Meghna. Dazu kommen hunderte kleinere Flüsse und Nebenarme, die sich ständig verzweigen.' },
-  { view: 'plain', text: 'Die Flüsse haben das Land über Jahrtausende selbst aufgeschüttet. Rund 80 % von Bangladesch sind flaches Schwemmland. Nur im Südosten und im Nordosten gibt es Hügel.' },
-  { view: 'flood', text: 'Setzt der Monsun ein und kommt Schmelzwasser aus dem Himalaya dazu, treten die Flüsse über die Ufer. Deshalb ist die Überflutungsgefahr hier so hoch, und das macht das Bauen schwierig:\nEin Haus muss Wasser, Strömungen und aufgeweichtem Boden standhalten, und das mit den Mitteln, die man vor Ort hat.' },
-  { view: 'zoom', text: 'Für die kommende Aufgabe befinden wir uns in Sirajganj, mitten im Land am Jamuna, einem der größten Flüsse der Welt.' },
-  { view: 'detail', text: 'Der Jamuna verlegt ständig seinen Lauf. Aus Sand und Schlamm entstehen mitten im Fluss Flussinseln, die Chars. Menschen leben auf dem Festland am Ufer und auf diesen Inseln.' },
+  { view: 'rivers', text: 'Das Land liegt im Delta von drei riesigen Strömen. Dazu kommen hunderte kleinere Flüsse und Nebenarme, die sich ständig verzweigen.' },
+  { view: 'plain', text: 'Diese Flüsse haben das Land über Jahrtausende selbst aufgeschüttet. 80 % von Bangladesch sind flaches Schwemmland.' },
+  { view: 'flood', text: 'Setzt der Monsun ein und kommt Schmelzwasser aus dem Himalaya dazu, treten die Flüsse über die Ufer. Deshalb ist die Überflutungsgefahr hier so hoch, und das macht das Bauen schwierig:\n\nEin Haus muss **Wasser, Strömungen und aufgeweichtem Boden** standhalten.' },
+  { view: 'zoom', text: 'Für die kommende Aufgabe befinden wir uns in Sirajganj.' },
 ];
 const SOC_BEATS = [
   { view: 'wealth', text: 'Wie in vielen anderen Ländern entscheidet auch in Bangladesch der Wohlstand darüber, wo du lebst und aus welchen Materialien du dein Haus zusammenbauen kannst.' },
-  { view: 'bank', text: 'Die meisten Menschen leben auf dem flachen Festland, in dicht besiedelten Dörfern nahe an den Flüssen. Wer es sich leisten kann, baut mit Ziegeln und Beton oder mit Wellblech und schüttet den Boden etwas auf.' },
-  { view: 'char', text: 'Auf den Chars wohnen oft die, die sich kein anderes Land leisten können, meist ohne gesicherte Landrechte und ohne Schutz durch Deiche. Dort baut man mit dem, was leicht und günstig ist. Etwa 10 Millionen Menschen leben auf Chars.' },
-  { view: 'hills', text: 'Nur wenige Menschen leben in den Hügeln im Südosten und Nordosten. Dort baut man häufig leicht aus Bambus und auf Stelzen.' },
+  { view: 'bank', text: 'Die Menschen leben auf dem Festland am Ufer, auf Flussinseln, den Chars, oder auf Hügeln.' },
+  { view: 'bank', text: 'Die meisten leben auf dem Festland, in dicht besiedelten Dörfern nahe an den Flüssen. Wer es sich leisten kann, baut mit Ziegeln und Beton oder mit Wellblech und schüttet den Boden etwas auf, damit das Wasser nicht ins Haus kommt.' },
+  { view: 'char', text: 'Chars sind Inseln aus Sand und Schlamm, die die Flüsse selbst ablagern. Dort wohnen oft die, die sich kein anderes Land leisten können, meist ohne gesicherte Landrechte und ohne Schutz durch Deiche. Etwa 10 Millionen Menschen leben auf Chars.' },
+  { view: 'hills', text: 'Nur wenige Menschen leben in den Hügeln im Südosten und Nordosten, den wenigen Gebieten, die nicht flaches Schwemmland sind. Dort baut man häufig leicht aus Bambus und auf Stelzen.' },
   { view: 'bank', text: 'Genug Hintergrund:\nSchauen wir uns jetzt dein Szenario an, deine Challenge.' },
 ];
 
