@@ -858,17 +858,19 @@ const Haus3D = (() => {
 
   // Bodenschatten + festgetretener Erdring + Tropfkante rund um ein Haus. 9-Slice-Textur: u, v ∈ [.25, .75] ist die
   // Grundfläche, außen der Rand (gleich breit, egal wie groß das Haus ist).
-  let groundRectTexC = null;
-  function groundRectTex() {
-    if (groundRectTexC) return groundRectTexC;
+  // soft: für das eigene Haus. Dort liegen Fundamente mit runden Ecken, Pfähle und Plattformen darüber; mit dem kräftigen
+  // Schatten der Nachbarhäuser sähe man darunter ein schwarzes Rechteck.
+  const groundRectTexC = {};
+  function groundRectTex(soft = false) {
+    if (groundRectTexC[soft]) return groundRectTexC[soft];
     const S = 512, r = rng(88), f = noiseField(S, S, r, 8, 8, 4, .55);
-    groundRectTexC = decalTex(S, S, g => {
+    const tex = decalTex(S, S, g => {
       const img = g.createImageData(S, S), d = img.data;
       for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
         const u = px / S, v = py / S, i = py * S + px;
         const dx = u < .25 ? (.25 - u) / .25 : u > .75 ? (u - .75) / .25 : 0, dy = v < .25 ? (.25 - v) / .25 : v > .75 ? (v - .75) / .25 : 0;
         const dd = Math.hypot(dx, dy), inside = !dx && !dy;
-        const ao = inside ? .75 : .62 * Math.pow(Math.max(0, 1 - dd / .5), 2.2);
+        const ao = (soft ? .2 : 1) * (inside ? .75 : .62 * Math.pow(Math.max(0, 1 - dd / .5), 2.2));
         const soil = 1 - sstep(.4, .95, dd + (f[i] - .5) * .5);
         const drip = Math.exp(-Math.pow((dd - .42 - (f[i] - .5) * .12) / .11, 2)) * sstep(.35, .7, f[i]) * .55;
         const k = Math.min(1, ao * 1.25 + drip * .4);
@@ -877,8 +879,8 @@ const Haus3D = (() => {
       }
       g.putImageData(img, 0, 0);
     }, 88);
-    groundRectTexC.wrapS = groundRectTexC.wrapT = THREE.ClampToEdgeWrapping;
-    return groundRectTexC;
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    return (groundRectTexC[soft] = tex);
   }
   // Fläche für groundRectTex: Haus w × d, Rand m; xf(x, z) -> [x, y, z] zum Auflegen aufs Gelände
   function footprintGeo(w, d, m, xf = null) {
@@ -1010,7 +1012,7 @@ const Haus3D = (() => {
     }
   }
 
-  function buildWalls(id, gableRise, M_) {
+  function buildWalls(id, gableRise, M_, lift = 0) {
     const cfg = WALLS[id], t = cfg.t, mat = M_[cfg.mat]();
     const g = new THREE.Group();
     const door = { x: -1.1, y: 0, w: .98, h: 1.95 }, win1 = { x: 1.45, y: .95, w: 1.2, h: 1.0 };
@@ -1049,6 +1051,11 @@ const Haus3D = (() => {
       ring(M_.trim(), .16, H - .16, .06); ring(M_.trim(), .05, H - .23, .035);
       if (id === 'brickwall') [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([sx, sz]) => g.add(box(.32, H - .5, .32, M_.trim(), sx * (W / 2 - .14), .27, sz * (D / 2 - .14))));
     } else if (id === 'mud') ring(M_.woodDark(), .1, H - .1, .04);
+    // Ringbalken zwischen Wandkrone und geneigtem Dach (an den Giebelseiten übernimmt das der Giebel)
+    if (lift) {
+      [1, -1].forEach(s => g.add(box(W - .04, lift, t * .8, M_.woodDark(), 0, H, s * (D / 2 - t / 2))));
+      if (!gableRise) [1, -1].forEach(s => g.add(box(t * .8, lift, D - t, M_.woodDark(), s * (W / 2 - t / 2), H, 0)));
+    }
     // Glühbirne neben der Tür, Kabel zur Traufe
     if (id !== 'tin') {
       const bx = door.x + door.w / 2 + .34, zf = D / 2;
@@ -1086,6 +1093,10 @@ const Haus3D = (() => {
     return g;
   }
 
+  // Geneigte Dächer liegen um dieses Maß über der Wandkrone, sonst stechen Gesims, Eckpfosten und Fensterdächer durch.
+  // Die Lücke darunter schließt ein Ringbalken (buildWalls).
+  const ROOF_LIFT = { tinhip: .11, tilegable: .14, thatch: .14 };
+
   function buildRoof(id, M_) {
     const g = new THREE.Group();
     const o = .5;
@@ -1102,7 +1113,7 @@ const Haus3D = (() => {
     }
     if (id === 'tinhip') {
       const p = Math.tan(24 * Math.PI / 180), X = W / 2 + o, Z = D / 2 + o, rise = (D / 2) * p, drop = o * p, rl = (W - D) / 2;
-      const y0 = H - drop, yr = H + rise;
+      const y0 = H - drop + ROOF_LIFT[id], yr = H + rise + ROOF_LIFT[id];
       const e = [[-X, y0, Z], [X, y0, Z], [X, y0, -Z], [-X, y0, -Z]], r1 = [-rl, yr, 0], r2 = [rl, yr, 0];
       const m = M_.tin(), skin = (pts, side) => { const s = slab(pts, .045, m); s.userData.skin = { pts, th: .045, side, kind: 'tin' }; g.add(s); };
       skin([e[0], e[1], r2, r1], 'tuer'); skin([e[2], e[3], r1, r2], 'fluss'); skin([e[1], e[2], r2], 'ost'); skin([e[3], e[0], r1], 'west');
@@ -1127,7 +1138,7 @@ const Haus3D = (() => {
     // Satteldächer (Ziegel, Gras)
     const thatch = id === 'thatch';
     const pitch = (thatch ? 40 : 30) * Math.PI / 180, p = Math.tan(pitch), ov = thatch ? .6 : .5;
-    const X = W / 2 + ov, Z = D / 2 + ov, rise = (D / 2) * p, drop = ov * p, y0 = H - drop, yr = H + rise;
+    const X = W / 2 + ov, Z = D / 2 + ov, rise = (D / 2) * p, drop = ov * p, y0 = H - drop + ROOF_LIFT[id], yr = H + rise + ROOF_LIFT[id];
     const th = thatch ? .3 : .1, mat = thatch ? M_.thatch() : M_.tile();
     const e = [[-X, y0, Z], [X, y0, Z], [X, y0, -Z], [-X, y0, -Z]];
     [[[e[0], e[1], [X, yr, 0], [-X, yr, 0]], 'tuer'], [[e[2], e[3], [-X, yr, 0], [X, yr, 0]], 'fluss']].forEach(([pts, side]) => {
@@ -1151,8 +1162,8 @@ const Haus3D = (() => {
   }
 
   function gableRiseOf(id) {
-    if (id === 'tilegable') return (D / 2) * Math.tan(30 * Math.PI / 180) - .02;
-    if (id === 'thatch') return (D / 2) * Math.tan(40 * Math.PI / 180) - .02;
+    if (id === 'tilegable') return (D / 2) * Math.tan(30 * Math.PI / 180) + ROOF_LIFT[id] - .06;
+    if (id === 'thatch') return (D / 2) * Math.tan(40 * Math.PI / 180) + ROOF_LIFT[id] - .06;
     return 0;
   }
 
@@ -4050,7 +4061,7 @@ const Haus3D = (() => {
     const aoTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const rg = g.createRadialGradient(64, 64, 30, 64, 64, 64); rg.addColorStop(0, 'rgba(0,0,0,.3)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
     // Übergang Haus–Boden: dunkler Kontaktschatten an der Wand, festgetretener Erdring, Tropfkante unter der Traufe
     const CONTACT_FOOT = [W + .7, D + .7];
-    const contact = new THREE.Mesh(footprintGeo(CONTACT_FOOT[0], CONTACT_FOOT[1], 1.3), decalMat(groundRectTex(), { roughness: 1, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
+    const contact = new THREE.Mesh(footprintGeo(CONTACT_FOOT[0], CONTACT_FOOT[1], 1.3), decalMat(groundRectTex(true), { roughness: 1, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
     contact.position.y = .02; contact.renderOrder = 4; contact.receiveShadow = true; site.add(contact);
     void aoTex;
     // Unkraut und Grasbüschel, die sich an den Sockel drängen (an der Tür frei)
@@ -4398,11 +4409,11 @@ const Haus3D = (() => {
       }
       if (!lifted || !anim) { foundG.position.y = baseY; houseG.position.y = state.floorY; foundG.userData.lerpTo = houseG.userData.lerpTo = null; }
 
-      const gableRise = gableRiseOf(next.roof), wallKey = `${next.wall}|${gableRise > 0}`;
+      const gableRise = gableRiseOf(next.roof), lift = ROOF_LIFT[next.roof] || 0, wallKey = `${next.wall}|${gableRise.toFixed(2)}|${lift}`;
       if (state.wallKey !== wallKey) {
         const changed = old.wall !== next.wall;
         if (anim && changed) { cancelBuild('wall'); leave(wallG, !!next.wall); } else { cancelBuild('wall'); clearGroup(wallG); }
-        if (next.wall) { wallG.add(buildWalls(next.wall, gableRise, M_)); if (anim && changed) startBuild('wall', wallG, next.wall); }
+        if (next.wall) { wallG.add(buildWalls(next.wall, gableRise, M_, lift)); if (anim && changed) startBuild('wall', wallG, next.wall); }
         state.wallKey = wallKey;
       }
       if (old.roof !== next.roof || fresh) {

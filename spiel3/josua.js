@@ -9,6 +9,8 @@ const STEPS = SCEN.steps;
 const KINDS = STEPS.map(s => s.kind);           // foundation, wall, roof, extra
 const SCORE_KEYS = ['stability', 'flood'];
 const STOP_SECONDS = 15;                         // so lange steht ein Stopp in der Simulation
+const SIM_END_MS = 6000;                         // so lange nach Höchststand und letztem Schaden folgt das Ergebnis
+const PRESET_MS = 28000;                         // Wechsel der Hausvorlage auf der Startseite
 const SIM_DELAY_MS = 900;
 
 /* ---------- Helfer ---------- */
@@ -47,7 +49,6 @@ const ICONS = {
   globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
   chart: '<path d="M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-3"/>',
   book: '<path d="M5 4.5h9a3 3 0 013 3V20H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h9"/>',
-  zoomout: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2M8 11h6"/>',
 };
 function icon(name) {
   const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -148,6 +149,23 @@ async function ensureStage(ground) {
   veil(false);
 }
 
+// Touchpad am Laptop: zwei Finger zusammenziehen zoomt im Rundgang heraus. Chrome, Edge und Firefox melden das als
+// Mausrad mit Strg-Taste, Safari als „gesture“-Ereignis. Der Seitenzoom des Browsers bleibt dabei aus.
+{
+  let sum = 0, last = 0;
+  const zoomOut = () => { sum = 0; if (/^t\d$/.test(state.page)) go('ergebnis'); };
+  addEventListener('wheel', e => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    if (e.timeStamp - last > 300) sum = 0;
+    last = e.timeStamp;
+    sum = Math.max(0, sum + e.deltaY);
+    if (sum > 25) zoomOut();
+  }, { passive: false });
+  addEventListener('gesturestart', e => e.preventDefault());
+  addEventListener('gesturechange', e => { e.preventDefault(); if (e.scale < .8) zoomOut(); });
+}
+
 // Antippen im Bild: Zusammenfassung, Ergebnis und Rundgang. Beim Drücken glänzt das Bauteil kräftig, Zwei-Finger-Zusammenziehen zoomt im Rundgang heraus.
 const pickPages = /^(haus|ergebnis|t\d)$/;
 function attachPick(c) {
@@ -205,7 +223,7 @@ function applyStage() {
   if (page === 'start' || page === 'szenario') {
     s.setView('house'); s.setPole(false);
     const showPreset = () => { const p = PRESETS[startPreset % PRESETS.length]; s.setHouse(Object.fromEntries(STEPS.map(st => [st.kind, p.pick[st.kind] || null])), { animate: true }); };
-    if (page === 'start') { startPreset = Math.floor(Math.random() * PRESETS.length); showPreset(); startTimer = setInterval(() => { startPreset++; showPreset(); }, 14000); }
+    if (page === 'start') { startPreset = Math.floor(Math.random() * PRESETS.length); showPreset(); startTimer = setInterval(() => { startPreset++; showPreset(); }, PRESET_MS); }
     else s.setHouse(SAMPLE, { animate: false });
     s.focus('start'); s.setAuto(.015); s.setFlood(false, false); s.setShift(page === 'start' ? .17 : 0);
     return;
@@ -358,6 +376,27 @@ const RING_R = 44, RING_LEN = 2 * Math.PI * RING_R;
 function ringSvg(value) {
   return `<svg viewBox="0 0 110 110" aria-hidden="true"><circle class="disc" cx="55" cy="55" r="40"/><circle class="track" cx="55" cy="55" r="${RING_R}"/><circle class="arc" cx="55" cy="55" r="${RING_R}" stroke-dasharray="${RING_LEN}" stroke-dashoffset="${RING_LEN * (1 - Math.min(100, value) / 100)}" transform="rotate(-90 55 55)"/></svg>`;
 }
+
+/* ---------- Stopps in der Simulation ---------- */
+
+// Angehalten wird nur, wenn etwas kaputtgeht. Texte zu Wand, Dach und Pfahl kommen aus inhalt.js.
+const stopOf = id => V3.STOPS.find(st => st.id === id);
+const hasEvent = (d, test) => (d.events || []).some(e => test.test(e.what));
+const DAMAGE_STOPS = [
+  stopOf('bruch'),
+  {
+    id: 'blech', icon: 'x',
+    when: (f, d) => hasEvent(d, /^wall:tin:flap/),
+    make: () => ({ title: 'Ein Wandblech reißt los', text: 'Der Sturm zerrt an den Ecken. Ein Blech löst sich aus den Nägeln und schlägt im Wind, durch die Öffnung dringen Wind und Wasser ein.' }),
+  },
+  stopOf('dach'),
+  stopOf('pfahl'),
+  {
+    id: 'erdsockel', icon: 'x',
+    when: (f, d, cfg) => cfg.foundation === 'earth' && d.tilt > .8,
+    make: () => ({ title: 'Der Erdsockel rutscht ab', text: 'Strömung und Wellen haben den Sockel ausgespült. Er gibt an einer Seite nach, und das Haus sackt schief.' }),
+  },
+];
 
 /* ---------- Seiten ---------- */
 
@@ -647,9 +686,7 @@ PAGE.haus = {
   build() {
     const wrap = el('div', 'view');
     const note = state.ground === 'char' ? 'Grundstück: Char (Flussinsel), schwerer' : 'Grundstück: Festland am Ufer';
-    const hint = el('p', 'taphint top', 'Tippe ein Bauteil im Haus an, um es zu ändern');
-    hint.prepend(icon('tap'));
-    wrap.append(head(`${SCEN.title} · ${SCEN.subtitle}`, 'Dein fertiges Haus', note), hint,
+    wrap.append(head(`${SCEN.title} · ${SCEN.subtitle}`, 'Dein fertiges Haus', note),
       bar(backBtn(() => go(`b${STEPS.length - 1}`)), el('span', 'grow'), button('Flut starten', () => go('sim', { run: state.run + 1 }), 'primary big', 'drop', true)));
     return { nodes: [wrap] };
   },
@@ -673,10 +710,12 @@ PAGE.sim = {
     const timer = el('div', 'stoptimer'), tfill = el('i'), tlabel = el('span', null, '');
     timer.append(tlabel, el('div', 'tbar'));
     $('.tbar', timer).append(tfill);
-    wrap.append(hud, card, timer);
+    // Unsichtbare Abkürzung unten rechts (erscheint nur unter der Maus): überspringt die ganze Flut
+    const skip = button('Flut überspringen', () => finish(), 'skip', 'next', true);
+    wrap.append(hud, card, timer, skip);
 
     const cfg = houseConfig(), fired = new Set();
-    let raf = 0, stop = null, stopTimer = 0, tick = 0, finished = false;
+    let raf = 0, stop = null, stopTimer = 0, tick = 0, finished = false, calmSince = 0;
     const depthCm = () => Math.max(0, Math.round((1 - (stage.state.floorY || 0)) * 100));
     function startStop(st) {
       fired.add(st.id);
@@ -696,11 +735,10 @@ PAGE.sim = {
     }
     function endStop() {
       if (!stop) return;
-      const last = stop.last; stop = null;
+      stop = null; calmSince = 0;
       clearTimeout(stopTimer); clearInterval(tick);
       card.classList.remove('is-on'); timer.classList.remove('is-on'); wrap.classList.remove('is-stop');
       stage.setPaused(false);
-      if (last) finish();
     }
     function finish() { if (finished) return; finished = true; go('ergebnis'); }
     const loop = () => {
@@ -711,8 +749,9 @@ PAGE.sim = {
       if (f.phaseText && phase.textContent !== f.phaseText) phase.textContent = f.phaseText;
       if (!stop && floodOn) {
         const d = stage.damageState() || {};
-        const next = V3.STOPS.find(st => !fired.has(st.id) && st.when(f, d, cfg, state.ground));
+        const next = DAMAGE_STOPS.find(st => !fired.has(st.id) && st.when(f, d, cfg, state.ground));
         if (next) startStop(next);
+        else if (f.done) { calmSince = calmSince || performance.now(); if (performance.now() - calmSince > SIM_END_MS) finish(); }
       }
       raf = requestAnimationFrame(loop);
     };
@@ -765,13 +804,12 @@ PAGE.ergebnis = {
     const side = el('div', 'side-info');
     side.append(el('span', 'tag', 'Zusatzinfo · zählt nicht zur Punktzahl'), el('b', null, `${scaleName('availability')}: ${ratings.availability || 0} von 5`));
     left.append(side);
-    const hint = el('p', 'taphint', 'Tippe ein Bauteil im Bild an'); hint.prepend(icon('tap'));
-    wrap.append(left, hint, bar(el('span', 'grow'), button('Rundgang starten', () => go('t0'), 'primary', 'play')), endActions());
+    wrap.append(left, bar(el('span', 'grow'), button('Rundgang starten', () => go('t0'), 'primary', 'play')), endActions());
     return { nodes: [wrap] };
   },
 };
 
-// Rundgang: Die Kamera fährt zu einem Bauteil, die anderen sind ausgegraut. Rauszoomen (Knopf oder zwei Finger zusammenziehen) = Übersicht.
+// Rundgang: Die Kamera fährt zu einem Bauteil, die anderen sind ausgegraut. Übersicht-Knopf oder zwei Finger zusammenziehen = Übersicht.
 PAGE.tour = {
   key: s => s.page,
   build(s) {
@@ -793,9 +831,8 @@ PAGE.tour = {
     const left = pane(el('p', 'eyebrow', `${i + 1} von ${STEPS.length} · ${step.name}`), el('h1', null, o ? o.text : step.name), Object.assign(el('span', `verdict ${v.kind}`), { textContent: v.label }), body);
     left.classList.add('tour-pane');
     const last = i === STEPS.length - 1;
-    const hint = el('p', 'taphint', 'Zwei Finger zusammenziehen oder rauszoomen'); hint.prepend(icon('zoomout'));
-    wrap.append(left, hint, bar(backBtn(() => go(i === 0 ? 'ergebnis' : `t${i - 1}`)), el('span', 'grow'),
-      iconButton('zoomout', 'Rauszoomen', () => go('ergebnis'), 'ghost round'), button('Übersicht', () => go('ergebnis'), 'ghost', 'grid'),
+    wrap.append(left, bar(backBtn(() => go(i === 0 ? 'ergebnis' : `t${i - 1}`)), el('span', 'grow'),
+      button('Übersicht', () => go('ergebnis'), 'ghost', 'grid'),
       button(last ? 'Zur Übersicht' : 'Weiter', () => go(last ? 'ergebnis' : `t${i + 1}`), 'primary', 'next', true)));
     return { nodes: [wrap] };
   },
