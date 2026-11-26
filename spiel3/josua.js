@@ -801,6 +801,88 @@ PAGE.tour = {
   },
 };
 
+/* ---------- Entwicklermenü (Taste E) ----------
+   Stellt die Bau-Animation (data-bau am <html>, siehe haus3d.js), die Querschnitt-Bilder (data-schnitt), den Randeffekt und den
+   Fokus aufs Haus ein und führt zurück zur Versionsauswahl. Eigener Speicherplatz: Version 2 hat andere Standardwerte. */
+{
+  const KEY = 'hausbau.dev.josua';
+  const DEFAULTS = { bau: 'aufbau', sx: 'zeichnung', rim: '#ffffff', k: 0, focus: false, fk: 1 };
+  const cfg = { ...DEFAULTS };
+  try { Object.assign(cfg, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* ohne Speicher: Standardwerte */ }
+  const root = document.documentElement;
+  const rgb = hex => { const m = /^#?([0-9a-f]{6})$/i.exec(hex); const n = parseInt(m ? m[1] : 'ffffff', 16); return `${n >> 16} ${(n >> 8) & 255} ${n & 255}`; };
+  let box = null;
+
+  function sync() {
+    if (!box) return;
+    const on = (sel, test) => box.querySelectorAll(sel).forEach(b => b.classList.toggle('is-on', test(b.dataset)));
+    on('[data-bau]', d => d.bau === cfg.bau);
+    on('[data-sx]', d => d.sx === cfg.sx);
+    on('[data-rim]', d => (d.rim === 'aus' ? cfg.k === 0 : cfg.k > 0 && d.rim === cfg.rim.toLowerCase()));
+    on('[data-focus]', d => (d.focus === 'an') === cfg.focus);
+    $('input[type=color]', box).value = cfg.rim;
+    $('input[data-k]', box).value = Math.round(cfg.k * 100);
+    $('.dv-pct', box).textContent = `${Math.round(cfg.k * 100)} %`;
+    $('input[data-fk]', box).value = Math.round(cfg.fk * 100);
+    $('.dv-fpct', box).textContent = `${Math.round(cfg.fk * 100)} %`;
+  }
+  function apply() {
+    root.dataset.bau = cfg.bau;   // 'aufbau' oder 'wolke'
+    root.dataset.schnitt = cfg.sx === '3d' ? '3d' : 'zeichnung';
+    root.dataset.focus = cfg.focus ? 'an' : 'aus';
+    root.style.setProperty('--rim-rgb', rgb(cfg.rim));
+    root.style.setProperty('--rim-k', cfg.k);
+    root.style.setProperty('--focus-k', cfg.fk);
+    try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (e) { /* egal */ }
+    sync();
+  }
+  // Nur die Bauschritte zeigen Querschnitte: nach dem Umschalten mit den neuen Bildern neu aufbauen
+  function redrawPictures() { if (pageType(state.page) === 'build') { view = null; show(); } }
+  function build() {
+    box = el('aside'); box.id = 'devmenu'; box.hidden = true;
+    box.innerHTML = `<header><b>Entwicklermenü</b><span>E oder Esc zum Schließen</span></header>
+      <section><h4>Bau-Animation</h4><div class="dv-seg"><button type="button" data-bau="aufbau">Aufbau</button><button type="button" data-bau="wolke">Wolke</button></div></section>
+      <section><h4>Querschnitt-Bilder</h4><div class="dv-seg"><button type="button" data-sx="zeichnung">Zeichnung</button><button type="button" data-sx="3d">3D-Schnitt</button></div></section>
+      <section><h4>Randeffekt</h4>
+        <div class="dv-seg"><button type="button" data-rim="aus">Aus</button><button type="button" data-rim="#ffffff">Weiß</button><button type="button" data-rim="#000000">Schwarz</button>
+        <label class="dv-col" title="Eigene Farbe"><input type="color" value="#ffffff"><span>Farbe</span></label></div>
+        <div class="dv-row"><span>Stärke</span><input type="range" data-k min="0" max="200" step="5"><b class="dv-pct"></b></div>
+      </section>
+      <section><h4>Fokus aufs Haus</h4>
+        <div class="dv-seg"><button type="button" data-focus="aus">Aus</button><button type="button" data-focus="an">An</button></div>
+        <div class="dv-row"><span>Stärke</span><input type="range" data-fk min="20" max="150" step="5"><b class="dv-fpct"></b></div>
+      </section>
+      <footer><a href="../index.html">Zur Versionsauswahl</a><button type="button" data-reset>Zurücksetzen</button></footer>`;
+    box.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      const sx = cfg.sx;
+      if (b.dataset.bau) cfg.bau = b.dataset.bau;
+      else if (b.dataset.sx) cfg.sx = b.dataset.sx;
+      else if (b.dataset.rim === 'aus') cfg.k = 0;
+      else if (b.dataset.rim) { cfg.rim = b.dataset.rim; if (cfg.k === 0) cfg.k = 1; }
+      else if (b.dataset.focus) cfg.focus = b.dataset.focus === 'an';
+      else if ('reset' in b.dataset) Object.assign(cfg, DEFAULTS);
+      apply();
+      if (cfg.sx !== sx) redrawPictures();
+    });
+    $('input[type=color]', box).addEventListener('input', e => { cfg.rim = e.target.value; if (cfg.k === 0) cfg.k = 1; apply(); });
+    $('input[data-k]', box).addEventListener('input', e => { cfg.k = e.target.value / 100; apply(); });
+    $('input[data-fk]', box).addEventListener('input', e => { cfg.fk = e.target.value / 100; cfg.focus = true; apply(); });
+    document.body.append(box);
+    sync();
+  }
+  function toggle(open) {
+    if (!box) build();
+    box.hidden = open === undefined ? !box.hidden : !open;
+  }
+  addEventListener('keydown', e => {
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'e' || e.key === 'E') { e.preventDefault(); toggle(); }
+    else if (e.key === 'Escape' && box && !box.hidden) toggle(false);
+  });
+  apply();
+}
+
 /* ---------- Start ---------- */
 
 {
